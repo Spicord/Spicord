@@ -1,0 +1,4 @@
+name: Spicord
+author: OopsieWoopsie
+version: 1.0.1-SNAPSHOT
+main: eu.mcdb.spicord.bukkit.SpicordBukkit
