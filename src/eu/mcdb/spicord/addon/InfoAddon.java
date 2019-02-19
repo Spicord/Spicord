@@ -18,11 +18,11 @@
 package eu.mcdb.spicord.addon;
 
 import java.awt.Color;
-import net.dv8tion.jda.core.EmbedBuilder;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.bot.command.DiscordBotCommand;
 import eu.mcdb.spicord.util.Server;
+import net.dv8tion.jda.core.EmbedBuilder;
 
 public class InfoAddon extends SimpleAddon {
 
@@ -40,7 +40,7 @@ public class InfoAddon extends SimpleAddon {
 				.setTitle("Server information")
 				.setDescription("Online players: "
 						+ Server.getOnlineCount()
-						+ "/" + Server.getMaxOnlineCount()
+						+ "/" + Server.getPlayerLimit()
 						+ "\nServer version: " + Server.getServerVersion())
 			    .setColor(new Color(5154580))
 			    .setFooter("Powered by Spicord", null)

@@ -31,9 +31,11 @@ import eu.mcdb.spicord.bot.command.DiscordBotCommand;
 import lombok.Getter;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.JDA.Status;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.events.DisconnectEvent;
 import net.dv8tion.jda.core.events.ReadyEvent;
+import net.dv8tion.jda.core.events.StatusChangeEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
@@ -42,8 +44,7 @@ public class DiscordBot extends SimpleBot {
 	/**
 	 * If the bot is enabled on the config, this will be true.
 	 */
-	@Getter
-	private final boolean enabled;
+	private boolean enabled;
 
 	/**
 	 * The JDA instance.
@@ -76,7 +77,7 @@ public class DiscordBot extends SimpleBot {
 	private final Map<String, Consumer<DiscordBotCommand>> commands;
 
 	/**
-	 * If the bot was successfully loaded, the value will be 'true'.
+	 * If the bot is running, the value will be 'true'.
 	 */
 	@Getter
 	private boolean ready;
@@ -99,6 +100,7 @@ public class DiscordBot extends SimpleBot {
 
 	@Override
 	protected DiscordBot startBot() {
+		this.enabled = true;
 		try {
 			this.jda = new JDABuilder(AccountType.BOT).setToken(getToken()).build();
 			jda.addEventListener(new ListenerAdapter() {
@@ -109,11 +111,16 @@ public class DiscordBot extends SimpleBot {
 				}
 
 				@Override
+				public void onStatusChange(StatusChangeEvent event) {
+					if (event.getNewStatus() == Status.SHUTDOWN)
+						DiscordBot.this.ready = false;
+				}
+
+				@Override
 				public void onDisconnect(DisconnectEvent event) {
 					DiscordBot.this.ready = false;
 				}
 			});
-			Spicord.getInstance().getAddonManager().loadAddons(this);
 			if (isCommandSupportEnabled()) {
 				jda.addEventListener(new ListenerAdapter() {
 
@@ -126,13 +133,14 @@ public class DiscordBot extends SimpleBot {
 								String command = messageContent.split(" ")[0];
 								messageContent = messageContent.contains(" ") ? messageContent.substring(command.length() + 1) : "";
 								if (commands.containsKey(command)) {
-									commands.get(command).accept(new DiscordBotCommand(messageContent.split(" "), event));
+									commands.get(command).accept(new DiscordBotCommand(messageContent.split(" "), event.getMessage()));
 								}
 							}
 						}
 					}
 				});
 			}
+			Spicord.getInstance().getAddonManager().loadAddons(this);
 		} catch (Exception e) {
 			Spicord.getInstance().getLogger().severe("An error ocurred while enabling the bot '" + getName() + "'. " + e.getMessage());
 		}
@@ -149,12 +157,15 @@ public class DiscordBot extends SimpleBot {
 		Preconditions.checkArgument(!name.trim().isEmpty(), "The command name cannot be empty.");
 		Preconditions.checkArgument(!name.trim().contains(" "), "The command name cannot contain spaces (' ').");
 
-		if (!isCommandSupportEnabled()) {
+		if (isCommandSupportEnabled()) {
+			if (commands.containsKey(name)) {
+				Spicord.getInstance().getLogger().warning("The command '" + name + "' is already registered on bot '" + getName() + "'.");
+			} else {
+				commands.put(name, command);
+			}
+		} else {
 			Spicord.getInstance().getLogger().warning("Cannot register command '" + name + "' on bot '" + getName() + "' because the 'command-support' option is disabled.");
-			return;
 		}
-		if (!commands.containsKey(name))
-			commands.put(name, command);
 	}
 
 	/**
@@ -163,5 +174,19 @@ public class DiscordBot extends SimpleBot {
 	 */
 	public void loadAddon(SimpleAddon addon) {
 		addon.onLoad(this);
+	}
+
+	/**
+	 * @param enabled the value to set
+	 */
+	protected void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	/**
+	 * @return true if the bot is enabled
+	 */
+	public boolean isEnabled() {
+		return enabled;
 	}
 }

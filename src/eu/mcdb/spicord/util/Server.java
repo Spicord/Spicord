@@ -21,12 +21,12 @@ import java.util.stream.Stream;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import net.md_5.bungee.api.plugin.PluginDescription;
 import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.SpicordLoader.ServerType;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.PluginDescription;
 
 public class Server {
 
@@ -45,9 +45,18 @@ public class Server {
 	}
 
 	/**
-	 * @return the limit of players on the server
+	 * @deprecated As of snapshot 1.0.2, replaced by {@link #getPlayerLimit()}
+	 * @return the player limit of the server
 	 */
+	@Deprecated
 	public static int getMaxOnlineCount() {
+		return getPlayerLimit();
+	}
+
+	/**
+	 * @return the player limit of the server
+	 */
+	public static int getPlayerLimit() {
 		if (Spicord.isLoaded()) {
 			if (Spicord.getInstance().getServerType() == ServerType.BUKKIT) {
 				return Bukkit.getServer().getMaxPlayers();
@@ -59,7 +68,7 @@ public class Server {
 	}
 
 	/**
-	 * @return the usernames of the online players
+	 * @return the names of the online players
 	 */
 	public static String[] getOnlinePlayers() {
 		if (Spicord.isLoaded()) {
@@ -77,7 +86,7 @@ public class Server {
 	}
 
 	/**
-	 * @return the complete server version
+	 * @return the server version
 	 */
 	public static String getServerVersion() {
 		if (Spicord.isLoaded()) {

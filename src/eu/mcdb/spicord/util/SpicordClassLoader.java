@@ -17,10 +17,12 @@
 
 package eu.mcdb.spicord.util;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.lang.reflect.Method;
 
 public class SpicordClassLoader {
 
@@ -49,12 +51,12 @@ public class SpicordClassLoader {
 	/**
 	 * Loads the classes of a Jar file
 	 * @param file the {@link Path} of the Jar file
+	 * @throws MalformedURLException 
+	 * @throws InvocationTargetException 
+	 * @throws IllegalArgumentException 
+	 * @throws IllegalAccessException 
 	 */
-	public void loadJar(Path file) {
-		try {
-			addURL.invoke(this.classLoader, file.toUri().toURL());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public void loadJar(Path file) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, MalformedURLException {
+		addURL.invoke(this.classLoader, file.toUri().toURL());
 	}
 }

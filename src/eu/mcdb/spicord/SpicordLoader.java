@@ -19,24 +19,19 @@ package eu.mcdb.spicord;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
 import java.util.zip.ZipEntry;
-import lombok.Getter;
-import lombok.Setter;
 import com.google.common.base.Preconditions;
 import eu.mcdb.spicord.config.SpicordConfiguration;
 import eu.mcdb.spicord.util.SpicordClassLoader;
+import lombok.Getter;
+import lombok.Setter;
 
 public class SpicordLoader {
 
@@ -89,7 +84,13 @@ public class SpicordLoader {
 	 * Loads the {@link Spicord} instance triggering the {@link Spicord#onLoad(SpicordLoader)} method.
 	 */
 	public void load() {
-		spicord.onLoad(this);
+		try {
+			spicord.onLoad(this);
+		} catch (IOException e) {
+			spicord.getLogger().severe("Spicord could not be loaded, please report this error in https://github.com/OopsieWoopsie/Spicord/issues");
+			disable();
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -107,40 +108,27 @@ public class SpicordLoader {
 	 * Extract the internal libraries to the plugin data folder.
 	 * @param config the {@link SpicordConfiguration} instance.
 	 */
-	// TODO: Clean this
-	public void extractLibraries(SpicordConfiguration config) {
+	public void extractLibraries(SpicordConfiguration config) throws IOException {
 		Preconditions.checkNotNull(config);
 
-		Map<String, InputStream> libs = new HashMap<String, InputStream>();
-		JarFile f = null;
-		try {
-			f = new JarFile(config.getFile());
-			Enumeration<JarEntry> entries = f.entries();
-
-			ZipEntry entry;
-			while (entries.hasMoreElements()) {
-				if ((entry = entries.nextElement()).getName().startsWith("lib/") && entry.getName().endsWith(".jar"))
-					libs.put(entry.getName(), f.getInputStream(entry));
-			}
-		} catch (Exception ignored) {}
+		JarFile jarFile = new JarFile(config.getFile());
+		Enumeration<JarEntry> entries = jarFile.entries();
 
 		this.libFolder = new File(config.getDataFolder(), "lib");
 		if (!libFolder.exists()) libFolder.mkdir();
 
 		Preconditions.checkArgument(libFolder.isDirectory(), "File 'lib' must be a directory");
 
-		for (Entry<String, InputStream> entry : libs.entrySet()) {
-			String name = entry.getKey();
-			name = name.substring(name.lastIndexOf("/") + 1);
-			try {
-				Files.copy(entry.getValue(), (new File(libFolder, name)).toPath(), StandardCopyOption.REPLACE_EXISTING);
-			} catch (IOException e) {
-				spicord.getLogger().log(Level.SEVERE, "Cannot copy the library '" + name + "'", e);
+		while (entries.hasMoreElements()) {
+			ZipEntry entry = entries.nextElement();
+			if (entry.getName().startsWith("lib/") && entry.getName().endsWith(".jar")) {
+				String name = entry.getName();
+				name = name.substring(name.lastIndexOf("/") + 1);
+				Files.copy(jarFile.getInputStream(entry), new File(libFolder, name).toPath(), StandardCopyOption.REPLACE_EXISTING);
 			}
 		}
-		try {
-			f.close();
-		} catch (IOException ignored) {}
+
+		jarFile.close();
 	}
 
 	/**

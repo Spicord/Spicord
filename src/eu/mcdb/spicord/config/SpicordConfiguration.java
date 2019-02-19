@@ -26,15 +26,15 @@ import java.util.Set;
 import java.util.function.Predicate;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
-import lombok.Getter;
-import net.md_5.bungee.config.Configuration;
-import net.md_5.bungee.config.ConfigurationProvider;
-import net.md_5.bungee.config.YamlConfiguration;
 import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.SpicordLoader.ServerType;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.bukkit.SpicordBukkit;
 import eu.mcdb.spicord.bungee.SpicordBungee;
+import lombok.Getter;
+import net.md_5.bungee.config.Configuration;
+import net.md_5.bungee.config.ConfigurationProvider;
+import net.md_5.bungee.config.YamlConfiguration;
 
 public class SpicordConfiguration {
 
@@ -87,7 +87,11 @@ public class SpicordConfiguration {
 			Configuration config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(new File(plugin.getDataFolder(), "config.yml"));
 			((Configuration) config.get("bots")).getKeys().forEach(botName -> {
 				Configuration botData = (Configuration) config.get("bots." + botName);
-				bots.add(new DiscordBot(botName, botData.getString("token"), botData.getBoolean("enabled", false), botData.getStringList("addons"), botData.getBoolean("command-support", false), botData.getString("command-prefix")));
+				bots.add(new DiscordBot(botName, botData.getString("token"),
+						botData.getBoolean("enabled", false),
+						botData.getStringList("addons"),
+						botData.getBoolean("command-support", false),
+						botData.getString("command-prefix")));
 			});
 			this.debugEnabled = config.getBoolean("enable-debug-messages", true);
 			this.jdaMessagesEnabled = config.getBoolean("enable-jda-messages", false);
@@ -104,7 +108,11 @@ public class SpicordConfiguration {
 			FileConfiguration config = plugin.getConfig();
 			((MemorySection) config.get("bots")).getKeys(false).forEach(botName -> {
 				MemorySection botData = (MemorySection) config.get("bots." + botName);
-				bots.add(new DiscordBot(botName, botData.getString("token"), botData.getBoolean("enabled", false), botData.getStringList("addons"), botData.getBoolean("command-support", false), botData.getString("command-prefix")));
+				bots.add(new DiscordBot(botName, botData.getString("token"),
+						botData.getBoolean("enabled", false),
+						botData.getStringList("addons"),
+						botData.getBoolean("command-support", false),
+						botData.getString("command-prefix")));
 			});
 			this.debugEnabled = config.getBoolean("enable-debug-messages", true);
 			this.jdaMessagesEnabled = config.getBoolean("enable-jda-messages", false);

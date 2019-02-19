@@ -17,40 +17,41 @@
 
 package eu.mcdb.spicord;
 
-import lombok.Getter;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.dv8tion.jda.core.utils.JDALogger;
 import eu.mcdb.spicord.SpicordLoader.ServerType;
 import eu.mcdb.spicord.addon.AddonManager;
-import eu.mcdb.spicord.addon.PluginsAddon;
 import eu.mcdb.spicord.addon.InfoAddon;
 import eu.mcdb.spicord.addon.PlayersAddon;
+import eu.mcdb.spicord.addon.PluginsAddon;
 import eu.mcdb.spicord.api.ISpicord;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.bot.DiscordBotLoader;
 import eu.mcdb.spicord.config.SpicordConfiguration;
 import eu.mcdb.spicord.util.CustomMap;
+import lombok.Getter;
+import net.dv8tion.jda.core.utils.JDALogger;
 
 public class Spicord implements ISpicord {
 
 	/**
-	 * The {@link Spicord}'s instance.
+	 * The {@link Spicord} instance.
 	 */
 	@Getter
 	private static Spicord instance;
 
 	/**
-	 * The {@link Spicord}'s version
+	 * The {@link Spicord} version
 	 */
 	@Getter
-	private static final String version = "1.0.1-SNAPSHOT";
+	private static final String version = "1.0.2-SNAPSHOT";
 
 	/**
-	 * The {@link Logger}'s instance.
+	 * The {@link Logger} instance.
 	 */
 	@Getter
 	private Logger logger;
@@ -83,14 +84,14 @@ public class Spicord implements ISpicord {
 		this.addonManager = new AddonManager(this);
 	}
 
-	protected void onLoad(SpicordLoader loader) {
+	protected void onLoad(SpicordLoader loader) throws IOException {
 		this.serverType = loader.getServerType();
 		this.config = new SpicordConfiguration(serverType);
-		loader.extractLibraries(this.config);
+		loader.extractLibraries(config);
 		loader.loadLibraries();
 		if (!isLoaded()) return;
 		this.registerIntegratedAddons();
-		if (!this.config.isJdaMessagesEnabled()) {
+		if (!config.isJdaMessagesEnabled()) {
 			try {
 				debug("Disabling JDA's messages...");
 				PrintStream err = System.err;
@@ -125,21 +126,19 @@ public class Spicord implements ISpicord {
 			Field modifiersField = Field.class.getDeclaredField("modifiers");
 			modifiersField.setAccessible(true);
 			modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-			return field;
-		} catch (Exception e) {
-			return field;
-		}
+		} catch (Exception ignored) {}
+		return field;
 	}
 
 	protected void onDisable() {
 		getLogger().info("Disabling Spicord...");
-		this.config.getBots().forEach(this::shutdownBot);
-		this.config.getBots().clear();
-		this.addonManager.getAddons().clear();
+		config.getBots().forEach(this::shutdownBot);
+		config.getBots().clear();
+		addonManager.getAddons().clear();
+		this.addonManager = null;
 		this.serverType = null;
 		this.logger = null;
 		this.config = null;
-		this.addonManager = null;
 		instance = null;
 	}
 
@@ -172,9 +171,8 @@ public class Spicord implements ISpicord {
 	 * @return the {@link DiscordBot} object if the bot exists, or null if not.
 	 */
 	public DiscordBot getBotByName(String name) {
-		for (DiscordBot bot : config.getBots()) {
+		for (DiscordBot bot : config.getBots())
 			if (bot.getName().equals(name)) return bot;
-		}
 		return null;
 	}
 

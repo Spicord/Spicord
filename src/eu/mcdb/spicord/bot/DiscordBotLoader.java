@@ -20,11 +20,15 @@ package eu.mcdb.spicord.bot;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import com.google.common.base.Preconditions;
+import eu.mcdb.spicord.Spicord;
 import net.dv8tion.jda.core.JDA;
 
 public class DiscordBotLoader {
 
 	public static boolean startBot(DiscordBot bot) {
+		Preconditions.checkNotNull(bot);
+
 		try {
 			// TODO: Look for a better way to do this.
 			final CountDownLatch latch = new CountDownLatch(1);
@@ -43,5 +47,15 @@ public class DiscordBotLoader {
 			e.printStackTrace();
 		}
 		return false;
+	}
+
+	/**
+	 * @param bot the bot to be disabled
+	 */
+	public static void disableBot(DiscordBot bot) {
+		Preconditions.checkNotNull(bot);
+
+		Spicord.getInstance().shutdownBot(bot);
+		bot.setEnabled(false);
 	}
 }

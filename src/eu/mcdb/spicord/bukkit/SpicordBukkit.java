@@ -40,7 +40,7 @@ public class SpicordBukkit extends JavaPlugin {
 			this.loader = null;
 			instance = null;
 		});
-		super.getServer().getScheduler().scheduleSyncDelayedTask(this, () -> loader.load(), 20);
+		getServer().getScheduler().scheduleSyncDelayedTask(this, () -> loader.load(), 60);
 	}
 
 	@Override

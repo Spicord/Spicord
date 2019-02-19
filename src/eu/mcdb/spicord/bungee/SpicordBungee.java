@@ -17,11 +17,11 @@
 
 package eu.mcdb.spicord.bungee;
 
-import net.md_5.bungee.api.plugin.Plugin;
 import java.util.concurrent.TimeUnit;
 import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.SpicordLoader;
 import eu.mcdb.spicord.SpicordLoader.ServerType;
+import net.md_5.bungee.api.plugin.Plugin;
 
 public class SpicordBungee extends Plugin {
 
@@ -40,7 +40,7 @@ public class SpicordBungee extends Plugin {
 			this.loader = null;
 			instance = null;
 		});
-		getProxy().getScheduler().schedule(this, () -> loader.load(), 1, TimeUnit.SECONDS);
+		getProxy().getScheduler().schedule(this, () -> loader.load(), 3, TimeUnit.SECONDS);
 	}
 
 	@Override
