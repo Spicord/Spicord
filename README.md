@@ -25,22 +25,22 @@ import eu.mcdb.spicord.bot.DiscordBot;
 
 public class ExampleAddon extends SimpleAddon {
 
-	public ExampleAddon() {
-		super(
-			"Example Addon", // Addon name
-			"my_example_addon", // Addon key
-			"OopsieWoopsie" // Addon author
-		);
-	}
+    public ExampleAddon() {
+        super(
+            "Example Addon", // Addon name
+            "my_example_addon", // Addon key
+            "OopsieWoopsie" // Addon author
+        );
+    }
 
-	@Override
-	public void onLoad(DiscordBot bot) {
-		// You don't need to put a command like "!example" or "-example", because the command prefix is configured apart.
-		bot.onCommand("example", example -> {
-			example.getMessage().getChannel()
-				.sendMessage("Hello world!").queue();
-		});
-	}
+    @Override
+    public void onLoad(DiscordBot bot) {
+        // You don't need to put a command like "!example" or "-example", because the command prefix is configured apart.
+        bot.onCommand("example", example -> {
+            example.getMessage().getChannel()
+                .sendMessage("Hello world!").queue();
+        });
+    }
 }
 ```
 ### Registering the Addon
@@ -53,15 +53,15 @@ import net.md_5.bungee.api.plugin.Plugin;
 
 public class ExamplePlugin extends Plugin {
 
-	@Override
-	public void onEnable() {
-		if (Spicord.isLoaded()) { // Check if Spicord was loaded
-			Spicord.getInstance().getAddonManager().registerAddon(new ExampleAddon()); // Register the addon
-		} else {
-			// You need to add Spicord as a dependency on your plugin, so this will never happen :D
-			System.out.println("Spicord was not loaded :c");
-		}
-	}
+    @Override
+    public void onEnable() {
+        if (Spicord.isLoaded()) { // Check if Spicord was loaded
+            Spicord.getInstance().getAddonManager().registerAddon(new ExampleAddon()); // Register the addon
+        } else {
+            // You need to add Spicord as a dependency on your plugin, so this will never happen :D
+            System.out.println("Spicord was not loaded :c");
+        }
+    }
 }
 ```
 ### Add Spicord as a dependency
