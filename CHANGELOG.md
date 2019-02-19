@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.0.2-SNAPSHOT] - 2019-02-20
 ### Added
 - The *DiscordBotLoader#disableBot(DiscordBot)* method.
 - More error messages.
@@ -12,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Some Javadoc comments.
 - Organized the imports.
+- Rewritten the *SpicordLoader#extractLibraries()* method.
+- More Exceptions handled.
 
 ### Deprecated
 - The *Server#getMaxOnlineCount()* method, replaced by *Server#getPlayerLimit()*.
