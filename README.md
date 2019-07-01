@@ -2,6 +2,7 @@
 
 [![Latest release](https://img.shields.io/github/release/OopsieWoopsie/Spicord.svg)](https://github.com/OopsieWoopsie/Spicord/releases/latest)
 [![License](https://img.shields.io/github/license/OopsieWoopsie/Spicord.svg)](https://github.com/OopsieWoopsie/Spicord/blob/master/LICENSE)
+[![Downloads](https://img.shields.io/github/downloads/OopsieWoopsie/Spicord/total.svg)](https://github.com/OopsieWoopsie/Spicord/releases)
 
 ## Features
 > This is the list of the current features that Spicord has.
