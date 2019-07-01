@@ -108,6 +108,7 @@ public class DiscordBot extends SimpleBot {
 				@Override
 				public void onReady(ReadyEvent event) {
 					DiscordBot.this.ready = true;
+					System.out.println("The bot '" + DiscordBot.this.getName() + "' has started without errors.");
 				}
 
 				@Override
@@ -133,7 +134,7 @@ public class DiscordBot extends SimpleBot {
 								String command = messageContent.split(" ")[0];
 								messageContent = messageContent.contains(" ") ? messageContent.substring(command.length() + 1) : "";
 								if (commands.containsKey(command)) {
-									commands.get(command).accept(new DiscordBotCommand(messageContent.split(" "), event.getMessage()));
+									commands.get(command).accept(new DiscordBotCommand(messageContent.split(" "), event));
 								}
 							}
 						}

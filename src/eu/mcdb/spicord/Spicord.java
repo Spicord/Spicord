@@ -18,7 +18,6 @@
 package eu.mcdb.spicord;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.logging.Level;
@@ -32,9 +31,7 @@ import eu.mcdb.spicord.api.ISpicord;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.bot.DiscordBotLoader;
 import eu.mcdb.spicord.config.SpicordConfiguration;
-import eu.mcdb.spicord.util.CustomMap;
 import lombok.Getter;
-import net.dv8tion.jda.core.utils.JDALogger;
 
 public class Spicord implements ISpicord {
 
@@ -48,7 +45,7 @@ public class Spicord implements ISpicord {
 	 * The {@link Spicord} version
 	 */
 	@Getter
-	private static final String version = "1.0.2-SNAPSHOT";
+	private static final String version = "1.1.0-SNAPSHOT";
 
 	/**
 	 * The {@link Logger} instance.
@@ -93,21 +90,21 @@ public class Spicord implements ISpicord {
 		this.registerIntegratedAddons();
 		if (!config.isJdaMessagesEnabled()) {
 			try {
-				debug("Disabling JDA's messages...");
-				PrintStream err = System.err;
-				System.setErr(new PrintStream(err) {
-
-					@Override
-					public void println(String x) {
-						if (!x.startsWith("SLF4J"))
-							super.println(x);
-					}
-				});
-				setAccessible(JDALogger.class.getDeclaredField("SLF4J_ENABLED")).set(null, false);
-	            setAccessible(JDALogger.class.getDeclaredField("LOGS")).set(null, new CustomMap<String, Logger>());
+			    // The custom JDA has a Dummy Logger, it dont will log anything.
+			    //debug("Disabling JDA's messages...");
+				//PrintStream err = System.err;
+				//System.setErr(new PrintStream(err) {
+				//  @Override
+				//	public void println(String x) {
+				//		if (!x.startsWith("SLF4J"))
+				//			super.println(x);
+				//	}
+				//});
+				//setAccessible(JDALogger.class.getDeclaredField("SLF4J_ENABLED")).set(null, false);
+	            //setAccessible(JDALogger.class.getDeclaredField("LOGS")).set(null, new CustomMap<String, Logger>());
 				debug("Successfully disabled JDA's messages.");
 			} catch (Exception e) {
-				getLogger().log(Level.SEVERE, "An error ocurred while disabling JDA's messages. ", e);
+				//getLogger().log(Level.SEVERE, "An error ocurred while disabling JDA's messages. ", e);
 			}
 		}
 		getLogger().info("Starting the bots...");
@@ -120,6 +117,7 @@ public class Spicord implements ISpicord {
 		this.getAddonManager().registerAddon(new PlayersAddon());
 	}
 
+	@Deprecated
 	private Field setAccessible(Field field) {
 		try {
 			field.setAccessible(true);

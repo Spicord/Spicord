@@ -40,7 +40,7 @@ public class SpicordBungee extends Plugin {
 			this.loader = null;
 			instance = null;
 		});
-		getProxy().getScheduler().schedule(this, () -> loader.load(), 3, TimeUnit.SECONDS);
+		getProxy().getScheduler().schedule(this, () -> loader.load(), 10, TimeUnit.SECONDS);
 	}
 
 	@Override

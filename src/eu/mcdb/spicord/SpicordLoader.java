@@ -17,8 +17,11 @@
 
 package eu.mcdb.spicord;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -28,6 +31,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import com.google.common.base.Preconditions;
+import com.google.gson.Gson;
 import eu.mcdb.spicord.config.SpicordConfiguration;
 import eu.mcdb.spicord.util.SpicordClassLoader;
 import lombok.Getter;
@@ -62,6 +66,8 @@ public class SpicordLoader {
 	 */
 	@Getter
 	private SpicordClassLoader classLoader;
+
+    private Libraries libraries;
 
 	/**
 	 * The {@link SpicordLoader} constructor.
@@ -111,6 +117,18 @@ public class SpicordLoader {
 	public void extractLibraries(SpicordConfiguration config) throws IOException {
 		Preconditions.checkNotNull(config);
 
+        // ------
+        InputStream in = getClass().getResourceAsStream("/lib/libraries.json");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        StringBuilder stringBuilder = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            stringBuilder.append(line);
+        }
+        reader.close();
+        this.libraries = new Gson().fromJson(stringBuilder.toString(), Libraries.class);
+        // ------
+
 		JarFile jarFile = new JarFile(config.getFile());
 		Enumeration<JarEntry> entries = jarFile.entries();
 
@@ -138,21 +156,22 @@ public class SpicordLoader {
 		Preconditions.checkNotNull(this.libFolder);
 		Preconditions.checkArgument(this.libFolder.isDirectory());
 
-		for (File file : libFolder.listFiles()) {
-			if (file.isFile() && file.getName().endsWith(".jar")) {
-				try {
-					getClassLoader().loadJar(file.toPath());
-					spicord.debug("[Loader] Loaded library '" + file.getName() + "'.");
-				} catch (Exception e) {
-					spicord.getLogger().severe("[Loader] Cannot load library '" + file.getName() + "'. " + e.getMessage());
-				}
-			}
-		}
+        for (String libName : libraries.getLibraries()) {
+            File file = new File(libFolder, libName);
+            if (file.isFile() && file.getName().endsWith(".jar")) {
+                try {
+                    getClassLoader().loadJar(file.toPath());
+                    spicord.debug("[Loader] Loaded library '" + file.getName() + "'.");
+                } catch (Exception e) {
+                    spicord.getLogger().severe("[Loader] Cannot load library '" + file.getName() + "'. " + e.getMessage());
+                }
+            }
+        }
 		try {
 			Class.forName("net.dv8tion.jda.core.JDA");
 		} catch (ClassNotFoundException e) {
 			spicord.getLogger().severe("[Loader] JDA library is not loaded, this plugin will not work.");
-			this.disable();
+			this.disable(); // TODO: Don't use this method
 		}
 	}
 
@@ -162,5 +181,11 @@ public class SpicordLoader {
 
 	public void setDisableAction(Consumer<Void> object) {
 		this.disable = object;
+	}
+	
+	private class Libraries {
+
+	    @Getter
+	    private String[] libraries;
 	}
 }
