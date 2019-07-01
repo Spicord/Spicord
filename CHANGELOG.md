@@ -6,6 +6,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0-SNAPSHOT] - 2019-07-01
+### Changed
+- (Only) In this release, JDA will not print any message in the console.
+
+### Fixed
+- Fixed issue #6 (https://github.com/OopsieWoopsie/Spicord/issues/6)
+- Fixed issue #8 (https://github.com/OopsieWoopsie/Spicord/issues/8)
+
+## [1.0.4-SNAPSHOT] - 2019-02-28
+### Fixed
+- Fixed issue #1 (https://github.com/OopsieWoopsie/Spicord/issues/1)
+
+## [1.0.3-SNAPSHOT] - 2019-02-26
+### Changed
+- Spicord will load 10 seconds after the server starts.
+
 ## [1.0.2-SNAPSHOT] - 2019-02-20
 ### Added
 - The *DiscordBotLoader#disableBot(DiscordBot)* method.
