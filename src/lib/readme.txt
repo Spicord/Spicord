@@ -1,1 +1,1 @@
-The libraries can be found on https://mvnrepository.com
+The libraries can be found at https://mvnrepository.com

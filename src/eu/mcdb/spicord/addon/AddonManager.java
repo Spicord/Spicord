@@ -32,104 +32,113 @@ import lombok.Getter;
  */
 public class AddonManager {
 
-	/**
-	 * All the registered addons.
-	 */
-	@Getter
-	private final Set<SimpleAddon> addons;
+    /**
+     * All the registered addons.
+     */
+    @Getter
+    private final Set<SimpleAddon> addons;
 
-	/**
-	 * The {@link Spicord} instance.
-	 */
-	private final Spicord spicord;
+    /**
+     * The {@link Spicord} instance.
+     */
+    private final Spicord spicord;
 
-	/**
-	 * The AddonManager constructor.
-	 * @param spicord the {@link Spicord} instance
-	 */
-	public AddonManager(Spicord spicord) {
-		this.spicord = spicord;
-		this.addons = Collections.synchronizedSet(new HashSet<SimpleAddon>());
-	}
+    /**
+     * The AddonManager constructor.
+     * 
+     * @param spicord the {@link Spicord} instance
+     */
+    public AddonManager(Spicord spicord) {
+        this.spicord = spicord;
+        this.addons = Collections.synchronizedSet(new HashSet<SimpleAddon>());
+    }
 
-	/**
-	 * Check if a given addon is registered.
-	 * @param addon the addon object which extends {@link SimpleAddon}
-	 * @return true if the addon is registered, or false if not
-	 */
-	public boolean isRegistered(SimpleAddon addon) {
-		return addons.contains(addon);
-	}
+    /**
+     * Check if a given addon is registered.
+     * 
+     * @param addon the addon object which extends {@link SimpleAddon}
+     * @return true if the addon is registered, or false if not
+     */
+    public boolean isRegistered(SimpleAddon addon) {
+        return addons.contains(addon);
+    }
 
-	/**
-	 * Check if a given addon is registered, using its key.
-	 * @param key the addon key
-	 * @return true if the addon is registered, or false if not
-	 */
-	public boolean isRegistered(String key) {
-		return addons.stream()
-				.map(SimpleAddon::getKey)
-				.anyMatch(key::equals);
-	}
+    /**
+     * Check if a given addon is registered, using its key.
+     * 
+     * @param key the addon key
+     * @return true if the addon is registered, or false if not
+     */
+    public boolean isRegistered(String key) {
+        return addons.stream().map(SimpleAddon::getKey).anyMatch(key::equals);
+    }
 
-	/**
-	 * Register an addon.
-	 * @param addon the addon object which extends {@link SimpleAddon}
-	 * @return true if the addon was successfully registered, or false if it was already registered
-	 */
-	public boolean registerAddon(SimpleAddon addon) {
-		if (!isRegistered(addon)) {
-			spicord.getLogger().info("Registered addon '" + addon.getName() + "' (" + addon.getKey() + ") by " + addon.getAuthor());
-			return addons.add(addon);
-		}
-		return false;
-	}
+    /**
+     * Register an addon.
+     * 
+     * @param addon the addon object which extends {@link SimpleAddon}
+     * @return true if the addon was successfully registered, or false if it was
+     *         already registered
+     */
+    public boolean registerAddon(SimpleAddon addon) {
+        if (!isRegistered(addon)) {
+            spicord.getLogger().info(
+                    "Registered addon '" + addon.getName() + "' (" + addon.getKey() + ") by " + addon.getAuthor());
 
-	/**
-	 * Unregister an addon.
-	 * @param addon the addon object
-	 * @return true if it was successfully unregistered, or false if not
-	 */
-	public boolean unregisterAddon(SimpleAddon addon) {
-		return addons.remove(addon);
-	}
+            return addons.add(addon);
+        }
+        return false;
+    }
 
-	/**
-	 * Unregister an addon by its key.
-	 * @param key the addon key
-	 * @return true if it was successfully unregistered, or false if not
-	 */
-	public boolean unregisterAddon(String key) {
-		return addons.removeIf(addon -> addon.getKey().equals(key));
-	}
+    /**
+     * Unregister an addon.
+     * 
+     * @param addon the addon object
+     * @return true if it was unregistered, or false if not
+     */
+    public boolean unregisterAddon(SimpleAddon addon) {
+        return addons.remove(addon);
+    }
 
-	/**
-	 * Get an addon by its key.
-	 * @param key the addon key
-	 * @return the addon object it the addon exists, or null if it doesn't exists
-	 */
-	public SimpleAddon getAddonByKey(String key) {
-		Preconditions.checkNotNull(key, "The addon key cannot be null.");
-		Preconditions.checkArgument(!key.trim().isEmpty(), "The addon key cannot be empty.");
+    /**
+     * Unregister an addon by its key.
+     * 
+     * @param key the addon key
+     * @return true if it was unregistered, or false if not
+     */
+    public boolean unregisterAddon(String key) {
+        return addons.removeIf(addon -> addon.getKey().equals(key));
+    }
 
-		for (SimpleAddon addon : addons)
-			if (addon.getKey().equals(key))
-				return addon;
-		spicord.getLogger().warning("The addon with the key '" + key + "' was not found.");
-		return null;
-	}
+    /**
+     * Get an addon by its key.
+     * 
+     * @param key the addon key
+     * @return the addon object it the addon exists, or null if it doesn't exists
+     */
+    public SimpleAddon getAddonByKey(String key) {
+        Preconditions.checkNotNull(key, "The addon key cannot be null.");
+        Preconditions.checkArgument(!key.trim().isEmpty(), "The addon key cannot be empty.");
 
-	/**
-	 * Load/Enable the addons of the given bot, for the given bot.
-	 * @param bot the bot that will load its addons
-	 */
-	public void loadAddons(DiscordBot bot) {
-		Preconditions.checkNotNull(bot);
+        for (SimpleAddon addon : addons)
+            if (addon.getKey().equals(key))
+                return addon;
 
-		if (bot.getAddons().isEmpty()) return;
-		bot.getAddons().stream()
-			.map(this::getAddonByKey)
-			.filter(Objects::nonNull)
-			.forEach(bot::loadAddon);
-	}
+        spicord.getLogger().warning("The addon with the key '" + key + "' was not found.");
+        return null;
+    }
+
+    /**
+     * Load/Enable the addons of the given bot, only for it.
+     * 
+     * @param bot the bot that will load its addons.
+     */
+    public void loadAddons(DiscordBot bot) {
+        Preconditions.checkNotNull(bot);
+
+        if (bot.getAddons().isEmpty())
+            return;
+
+        bot.getAddons().stream().map(this::getAddonByKey).filter(Objects::nonNull).forEach(bot::loadAddon);
+    }
 }

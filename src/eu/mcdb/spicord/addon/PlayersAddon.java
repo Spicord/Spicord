@@ -19,37 +19,32 @@ package eu.mcdb.spicord.addon;
 
 import java.awt.Color;
 import java.util.stream.Stream;
-import net.dv8tion.jda.core.EmbedBuilder;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.bot.command.DiscordBotCommand;
-import eu.mcdb.spicord.util.Server;
+import eu.mcdb.util.Server;
+import net.dv8tion.jda.core.EmbedBuilder;
 
 public class PlayersAddon extends SimpleAddon {
 
-	public PlayersAddon() {
-		super("Player List", "spicord::players", "OopsieWoopsie");
-	}
+    public PlayersAddon() {
+        super("Player List", "spicord::players", "OopsieWoopsie");
+    }
 
-	@Override
-	public void onLoad(DiscordBot bot) {
-		bot.onCommand("players", this::playersCommand);
-	}
+    @Override
+    public void onLoad(DiscordBot bot) {
+        bot.onCommand("players", this::playersCommand);
+    }
 
-	private void playersCommand(DiscordBotCommand command) {
-		command.getMessage().getChannel().sendMessage(new EmbedBuilder()
-				.setTitle("Players (" + Server.getOnlineCount() + "): ")
-				.setDescription(String.join(", ", escapeUnderscores(Server.getOnlinePlayers())))
-			    .setColor(new Color(5154580))
-			    .setFooter("Powered by Spicord", null)
-			    .build()).queue();
-	}
+    private void playersCommand(DiscordBotCommand command) {
+        command.getMessage().getChannel()
+                .sendMessage(new EmbedBuilder().setTitle("Players (" + Server.getOnlineCount() + "): ")
+                        .setDescription(String.join(", ", escapeUnderscores(Server.getOnlinePlayers())))
+                        .setColor(new Color(5154580)).setFooter("Powered by Spicord", null).build())
+                .queue();
+    }
 
-	private String[] escapeUnderscores(String[] strings) {
-		return Stream.of(strings)
-				// This I used when I made this:
-				// .map(s -> ("**" + s.replaceAll("\\\\", "\\") + "**")) // I don't like the bold
-				.map(s -> ("`" + s + "`")) // This is more simple :)
-				.toArray(String[]::new);
-	}
+    private String[] escapeUnderscores(String[] strings) {
+        return Stream.of(strings).map(s -> s.replace("_", "\\_")).toArray(String[]::new);
+    }
 }

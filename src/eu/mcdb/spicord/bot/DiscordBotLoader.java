@@ -17,45 +17,54 @@
 
 package eu.mcdb.spicord.bot;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
+import java.util.logging.Logger;
 import com.google.common.base.Preconditions;
 import eu.mcdb.spicord.Spicord;
-import net.dv8tion.jda.core.JDA;
 
 public class DiscordBotLoader {
 
-	public static boolean startBot(DiscordBot bot) {
-		Preconditions.checkNotNull(bot);
+    private static final Logger logger = Spicord.getInstance().getLogger();
 
-		try {
-			// TODO: Look for a better way to do this.
-			final CountDownLatch latch = new CountDownLatch(1);
-			final List<JDA> jda = new ArrayList<JDA>();
-			new Thread(new Runnable() {
+    /**
+     * Loads the given bot.
+     * 
+     * @param bot the bot instance.
+     * @return true if the bot successfully started.
+     */
+    public static boolean startBot(DiscordBot bot) {
+        Preconditions.checkNotNull(bot);
 
-				@Override
-				public void run() {
-					jda.add(bot.startBot().getJda());
-					latch.countDown();
-				}
-			}).start();
-			latch.await();
-			return !jda.isEmpty();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
+        if (bot.isEnabled()) {
+            logger.info("Starting bot '" + bot.getName() + "'.");
+            return bot.startBot();
+        } else {
+            logger.warning("Bot '" + bot.getName() + "' is disabled. Skipping.");
+        }
 
-	/**
-	 * @param bot the bot to be disabled
-	 */
-	public static void disableBot(DiscordBot bot) {
-		Preconditions.checkNotNull(bot);
+        return false;
+    }
 
-		Spicord.getInstance().shutdownBot(bot);
-		bot.setEnabled(false);
-	}
+    /**
+     * Shutdowns the given bot if it is enabled.
+     * 
+     * @param bot the bot instance.
+     */
+    public static void shutdownBot(DiscordBot bot) {
+        Preconditions.checkNotNull(bot);
+
+        if (bot.getJda() != null) {
+            bot.getJda().shutdownNow();
+            bot.ready = false;
+        }
+    }
+
+    /**
+     * @param bot the bot to be disabled
+     * @deprecated As of snapshot 2.0.0, use {@link #shutdownBot(DiscordBot)}
+     *             instead.
+     */
+    @Deprecated
+    public static void disableBot(DiscordBot bot) {
+        shutdownBot(bot);
+    }
 }

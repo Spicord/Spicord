@@ -17,46 +17,45 @@
 
 package eu.mcdb.spicord.util;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 
 public class SpicordClassLoader {
 
-	/**
-	 * The plugin class loader.
-	 */
-	private final URLClassLoader classLoader;
+    /**
+     * The plugin class loader.
+     */
+    private final URLClassLoader classLoader;
 
-	/**
-	 * The method used to load the classes.
-	 */
-	private final Method addURL;
+    /**
+     * The method used to load the classes.
+     */
+    private final Method addURL;
 
-	/**
-	 * The SpicordClassLoader constructor.
-	 * @param classLoader the plugin class loader
-	 * @throws SecurityException 
-	 * @throws NoSuchMethodException 
-	 */
-	public SpicordClassLoader(URLClassLoader classLoader) throws NoSuchMethodException, SecurityException {
-		this.addURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-		addURL.setAccessible(true);
-		this.classLoader = classLoader;
-	}
+    /**
+     * The SpicordClassLoader constructor.
+     * 
+     * @param classLoader the class loader
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     */
+    public SpicordClassLoader(URLClassLoader classLoader) throws NoSuchMethodException, SecurityException {
+        (this.addURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class)).setAccessible(true);
+        this.classLoader = classLoader;
+    }
 
-	/**
-	 * Loads the classes of a Jar file
-	 * @param file the {@link Path} of the Jar file
-	 * @throws MalformedURLException 
-	 * @throws InvocationTargetException 
-	 * @throws IllegalArgumentException 
-	 * @throws IllegalAccessException 
-	 */
-	public void loadJar(Path file) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, MalformedURLException {
-		addURL.invoke(this.classLoader, file.toUri().toURL());
-	}
+    /**
+     * Loads the classes of a Jar file
+     * 
+     * @param file the {@link Path} of the Jar file
+     */
+    public void loadJar(Path file) {
+        try {
+            addURL.invoke(this.classLoader, file.toUri().toURL());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

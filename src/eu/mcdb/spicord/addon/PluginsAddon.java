@@ -18,29 +18,28 @@
 package eu.mcdb.spicord.addon;
 
 import java.awt.Color;
-import net.dv8tion.jda.core.EmbedBuilder;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.bot.command.DiscordBotCommand;
-import eu.mcdb.spicord.util.Server;
+import eu.mcdb.util.Server;
+import net.dv8tion.jda.core.EmbedBuilder;
 
 public class PluginsAddon extends SimpleAddon {
 
-	public PluginsAddon() {
-		super("Plugin List", "spicord::plugins", "OopsieWoopsie");
-	}
+    public PluginsAddon() {
+        super("Plugin List", "spicord::plugins", "OopsieWoopsie");
+    }
 
-	@Override
-	public void onLoad(DiscordBot bot) {
-		bot.onCommand("plugins", this::pluginsCommand);
-	}
+    @Override
+    public void onLoad(DiscordBot bot) {
+        bot.onCommand("plugins", this::pluginsCommand);
+    }
 
-	private void pluginsCommand(DiscordBotCommand command) {
-		command.getMessage().getChannel().sendMessage(new EmbedBuilder()
-				.setTitle("Plugins (" + Server.getPlugins().length + "): ")
-				.setDescription(String.join(", ", Server.getPlugins()))
-			    .setColor(new Color(5154580))
-			    .setFooter("Powered by Spicord", null)
-			    .build()).queue();
-	}
+    private void pluginsCommand(DiscordBotCommand command) {
+        command.getMessage().getChannel()
+                .sendMessage(new EmbedBuilder().setTitle("Plugins (" + Server.getPlugins().length + "): ")
+                        .setDescription(String.join(", ", Server.getPlugins())).setColor(new Color(5154580))
+                        .setFooter("Powered by Spicord", null).build())
+                .queue();
+    }
 }

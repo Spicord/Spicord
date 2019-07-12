@@ -20,40 +20,46 @@ package eu.mcdb.spicord.bungee;
 import java.util.concurrent.TimeUnit;
 import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.SpicordLoader;
-import eu.mcdb.spicord.SpicordLoader.ServerType;
+import eu.mcdb.spicord.SpicordCommand;
+import eu.mcdb.universal.MCDB;
+import eu.mcdb.util.ServerType;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class SpicordBungee extends Plugin {
 
-	private Spicord spicord;
-	private SpicordLoader loader;
-	private static SpicordBungee instance;
+    private static SpicordBungee instance;
+    private SpicordLoader loader;
 
-	@Override
-	public void onEnable() {
-		instance = this;
-		this.spicord = new Spicord(getLogger());
-		this.loader = new SpicordLoader(spicord, getClass().getClassLoader());
-		loader.setServerType(ServerType.BUNGEECORD);
-		loader.setDisableAction((OopsieWoopsie) -> {
-			this.spicord = null;
-			this.loader = null;
-			instance = null;
-		});
-		getProxy().getScheduler().schedule(this, () -> loader.load(), 10, TimeUnit.SECONDS);
-	}
+    @Override
+    public void onEnable() {
+        instance = this;
+        this.loader = new SpicordLoader(getLogger(), getClass().getClassLoader(), ServerType.BUNGEECORD);
 
-	@Override
-	public void onDisable() {
-		if (loader != null)
-			loader.disable();
-	}
+        getProxy().getScheduler().schedule(this, () -> loader.load(), 1, TimeUnit.SECONDS);
+        MCDB.registerCommand(this, new SpicordCommand());
+    }
 
-	public Spicord getSpicord() {
-		return spicord;
-	}
+    @Override
+    public void onDisable() {
+        if (loader != null)
+            loader.disable();
 
-	public static SpicordBungee getInstance() {
-		return instance;
-	}
+        this.loader = null;
+        instance = null;
+    }
+
+    /**
+     * Gets the Spicord instance
+     * 
+     * @deprecated As of snapshot 2.0.0, use {@link Spicord#getInstance()} instead.
+     * @return the Spicord instance
+     */
+    @Deprecated
+    public Spicord getSpicord() {
+        return Spicord.getInstance();
+    }
+
+    public static SpicordBungee getInstance() {
+        return instance;
+    }
 }

@@ -20,15 +20,23 @@ package eu.mcdb.spicord.bot.command;
 import eu.mcdb.spicord.api.bot.command.SimpleCommand;
 import lombok.Getter;
 import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 public class DiscordBotCommand extends SimpleCommand {
 
-	@Getter
-	private final Message message;
+    /**
+     * The message object privided by JDA.
+     */
+    @Getter
+    private final Message message;
 
-	public DiscordBotCommand(String[] args, MessageReceivedEvent event) {
-		super(args);
-		this.message = event.getMessage();
-	}
+    /**
+     * The constructor.
+     * 
+     * @param args the command arguments.
+     * @param message the message object.
+     */
+    public DiscordBotCommand(String[] args, Message message) {
+        super(args);
+        this.message = message;
+    }
 }

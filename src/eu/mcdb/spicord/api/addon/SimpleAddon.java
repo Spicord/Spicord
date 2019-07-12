@@ -24,26 +24,24 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 @Data
 public abstract class SimpleAddon {
 
-	private String name;
-	private String key;
-	private String author;
-	private String[] commands;
+    private String name;
+    private String key;
+    private String author;
+    private String[] commands;
 
-	public SimpleAddon(String name, String key, String author) {
-		this.name = name;
-		this.key = key;
-		this.author = author;
-		this.commands = new String[0];
-	}
+    public SimpleAddon(String name, String key, String author) {
+        this(name, key, author, new String[0]);
+    }
 
-	public SimpleAddon(String name, String key, String author, String[] commands) {
-		this.name = name;
-		this.key = key;
-		this.author = author;
-		this.commands = commands;
-	}
+    public SimpleAddon(String name, String key, String author, String[] commands) {
+        this.name = name;
+        this.key = key;
+        this.author = author;
+        this.commands = commands;
+    }
 
-	public abstract void onLoad(DiscordBot bot);
+    public abstract void onLoad(DiscordBot bot);
 
-	public void onCommand(String cmd, String[] args, MessageReceivedEvent event) {}
+    public void onCommand(String cmd, String[] args, MessageReceivedEvent event) {
+    }
 }

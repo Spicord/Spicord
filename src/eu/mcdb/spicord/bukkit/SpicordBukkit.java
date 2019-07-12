@@ -21,44 +21,50 @@ import java.io.File;
 import org.bukkit.plugin.java.JavaPlugin;
 import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.SpicordLoader;
-import eu.mcdb.spicord.SpicordLoader.ServerType;
+import eu.mcdb.spicord.SpicordCommand;
+import eu.mcdb.universal.MCDB;
+import eu.mcdb.util.ServerType;
 
 public class SpicordBukkit extends JavaPlugin {
 
-	private Spicord spicord;
-	private SpicordLoader loader;
-	private static SpicordBukkit instance;
+    private static SpicordBukkit instance;
+    private SpicordLoader loader;
 
-	@Override
+    @Override
     public void onEnable() {
-		instance = this;
-		this.spicord = new Spicord(getLogger());
-		this.loader = new SpicordLoader(spicord, getClass().getClassLoader());
-		loader.setServerType(ServerType.BUKKIT);
-		loader.setDisableAction((OopsieWoopsie) -> {
-			this.spicord = null;
-			this.loader = null;
-			instance = null;
-		});
-		getServer().getScheduler().scheduleSyncDelayedTask(this, () -> loader.load(), 10 * 20);
-	}
+        instance = this;
+        this.loader = new SpicordLoader(getLogger(), getClass().getClassLoader(), ServerType.BUKKIT);
 
-	@Override
-	public void onDisable() {
-		if (loader != null)
-			loader.disable();
-	}
+        getServer().getScheduler().scheduleSyncDelayedTask(this, () -> loader.load(), 200);
+        MCDB.registerCommand(this, new SpicordCommand());
+    }
 
-	public Spicord getSpicord() {
-		return spicord;
-	}
+    @Override
+    public void onDisable() {
+        if (loader != null)
+            loader.disable();
 
-	public static SpicordBukkit getInstance() {
-		return instance;
-	}
+        this.loader = null;
+        instance = null;
+    }
 
-	@Override
-	public File getFile() {
-		return super.getFile();
-	}
+    /**
+     * Gets the Spicord instance
+     * 
+     * @deprecated As of snapshot 2.0.0, use {@link Spicord#getInstance()} instead.
+     * @return the Spicord instance
+     */
+    @Deprecated
+    public Spicord getSpicord() {
+        return Spicord.getInstance();
+    }
+
+    public static SpicordBukkit getInstance() {
+        return instance;
+    }
+
+    @Override
+    public File getFile() {
+        return super.getFile();
+    }
 }

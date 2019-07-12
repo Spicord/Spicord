@@ -22,13 +22,13 @@ import lombok.Getter;
 @Getter
 public abstract class SimpleBot {
 
-	private String name;
-	protected String token;
+    protected String name;
+    protected String token;
 
-	public SimpleBot(String name, String token) {
-		this.name = name;
-		this.token = token;
-	}
+    public SimpleBot(String name, String token) {
+        this.name = name;
+        this.token = token;
+    }
 
-	protected abstract SimpleBot startBot();
+    protected abstract boolean startBot();
 }

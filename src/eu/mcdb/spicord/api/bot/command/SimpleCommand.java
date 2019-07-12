@@ -17,14 +17,26 @@
 
 package eu.mcdb.spicord.api.bot.command;
 
-import lombok.Getter;
-
 public abstract class SimpleCommand {
 
-	@Getter
-	public final String[] args; // Is intentionally public.
+    /**
+     * The command arguments.
+     */
+    private final String[] arguments;
 
-	public SimpleCommand(String[] args) {
-		this.args = args;
-	}
+    /**
+     * The constructor.
+     * 
+     * @param args the command arguments.
+     */
+    public SimpleCommand(String[] args) {
+        this.arguments = args;
+    }
+
+    /**
+     * @return the command arguments.
+     */
+    public String[] getArguments() {
+        return arguments;
+    }
 }
