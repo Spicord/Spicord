@@ -6,6 +6,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0-SNAPSHOT] - 2019-07-12
+### Added
+- A new line at the end of the source files. 🙄
+- More Javadoc comments.
+- The *DiscordBotLoader#shutdownBot(DiscordBot)* method.
+- All the embed related things.
+- The new library-loading system.
+- The */spicord* command for BungeeCord and Bukkit/Spigot.
+- Another way to create commands.
+- A new logging system for JDA.
+
+### Changed
+- Replaced the tabs with 4 spaces.
+- Renamed class *SpicordUtils* to *ReflectionUtils*.
+- Moved the enum *SpicordLoader.ServerType* to package *eu.mcdb.util*
+- Moved the class *Server* to package *eu.mcdb.util*
+- Now the libraries only will be extracted if it not exists on the lib folder.
+
+### Deprecated
+- The *DiscordBot#setEnabled(boolean)* method, the value is final and cannot be changed.
+- The *DiscordBot#setDisabled(boolean)* method, the value is final and cannot be changed.
+- The *DiscordBotLoader#disableBot(DiscordBot)* method.
+- The *ISpicord#startBot(DiscordBot)* method, use *DiscordBotLoader#startBot(DiscordBot)* instead.
+- The *ISpicord#shutdownBot(DiscordBot)* method, use *DiscordBotLoader#shutdownBot(DiscordBot)* instead.
+- The *Spicord#startBot(DiscordBot)* method, use *DiscordBotLoader#startbot(DiscordBot)* instead.
+- The *Spicord#shutdownBot(DiscordBot)* method, use *DiscordBotLoader#shutdownBot(DiscordBot)* instead.
+- The *SpicordBungee#getSpicord()* method, use *Spicord#getInstance()* instead.
+- The *SpicordBukkit#getSpicord()* method, use *Spicord#getInstance()* instead.
+
+### Removed
+- The *SpicordLoader#setDisableAction(Consumer<Void>)* method.
+- The deprecated *Server#getMaxOnlineCount()* method.
+- The *CustomMap* class.
+
 ## [1.1.0-SNAPSHOT] - 2019-07-01
 ### Changed
 - (Only) In this release, JDA will not print any message in the console.
