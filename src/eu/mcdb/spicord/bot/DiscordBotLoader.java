@@ -17,6 +17,7 @@
 
 package eu.mcdb.spicord.bot;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 import com.google.common.base.Preconditions;
 import eu.mcdb.spicord.Spicord;
@@ -36,7 +37,8 @@ public class DiscordBotLoader {
 
         if (bot.isEnabled()) {
             logger.info("Starting bot '" + bot.getName() + "'.");
-            return bot.startBot();
+            CompletableFuture.runAsync(() -> bot.startBot());
+            return true;
         } else {
             logger.warning("Bot '" + bot.getName() + "' is disabled. Skipping.");
         }

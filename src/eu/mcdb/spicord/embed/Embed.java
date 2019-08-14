@@ -1,8 +1,34 @@
+/*
+ * Copyright (C) 2019  OopsieWoopsie
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package eu.mcdb.spicord.embed;
 
 import java.time.OffsetDateTime;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.MessageEmbed;
 
 public class Embed {
+
+    public Embed() {
+    }
+
+    private Embed(String content) {
+        this.content = content;
+    }
 
     private String content;
     private EmbedData embed;
@@ -207,15 +233,15 @@ public class Embed {
             return name;
         }
 
+        public boolean hasUrl() {
+            return url != null;
+        }
+
         /**
          * @return the url
          */
         public String getUrl() {
             return url;
-        }
-
-        public boolean hasUrl() {
-            return url != null;
         }
 
         /**
@@ -269,6 +295,16 @@ public class Embed {
     }
 
     /**
+     * Converts a string to a {@link Embed} object.
+     * 
+     * @param json the json to be parsed.
+     * @return the {@link Embed} object.
+     */
+    public static Embed fromString(String content) {
+        return new Embed(content);
+    }
+
+    /**
      * Converts this object to a json string.
      * 
      * @return the json string.
@@ -285,5 +321,43 @@ public class Embed {
     @Override
     public String toString() {
         return toJson();
+    }
+
+    public MessageEmbed toJdaEmbed() {
+        EmbedBuilder builder = new EmbedBuilder();
+        if (hasEmbedData()) {
+            EmbedData data = getEmbedData();
+            builder.setColor(data.getColor());
+            if (data.hasTitle() && data.hasUrl())
+                builder.setTitle(data.getTitle(), data.getUrl());
+            else if (data.hasTitle())
+                builder.setTitle(data.getTitle());
+            if (data.hasDescription())
+                builder.appendDescription(data.getDescription());
+            if (data.hasImage())
+                builder.setImage(data.getImageUrl());
+            if (data.hasThumbnail())
+                builder.setThumbnail(data.getThumbnailUrl());
+            if (data.hasTimestamp())
+                builder.setTimestamp(data.getTimestamp());
+            if (data.hasAuthor()) {
+                Author author = data.getAuthor();
+                if (author.hasIconUrl())
+                    builder.setAuthor(author.getName(), author.getUrl(), author.getIconUrl());
+                else if (author.hasUrl())
+                    builder.setAuthor(author.getName(), author.getUrl());
+                else
+                    builder.setAuthor(author.getName());
+            }
+            if (data.hasFields()) {
+                for (Field field : data.getFields())
+                    builder.addField(field.getName(), field.getValue(), field.isInline());
+            }
+            if (data.hasFooter()) {
+                Footer footer = data.getFooter();
+                builder.setFooter(footer.getText(), footer.getIconUrl());
+            }
+        }
+        return builder.build();
     }
 }

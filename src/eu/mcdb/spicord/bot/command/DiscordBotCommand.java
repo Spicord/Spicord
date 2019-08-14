@@ -18,8 +18,13 @@
 package eu.mcdb.spicord.bot.command;
 
 import eu.mcdb.spicord.api.bot.command.SimpleCommand;
+import eu.mcdb.spicord.embed.Embed;
+import eu.mcdb.spicord.embed.EmbedSender;
 import lombok.Getter;
+import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.User;
 
 public class DiscordBotCommand extends SimpleCommand {
 
@@ -28,15 +33,36 @@ public class DiscordBotCommand extends SimpleCommand {
      */
     @Getter
     private final Message message;
+    @Getter
+    private User author;
+    @Getter
+    private Guild guild;
+    @Getter
+    private TextChannel channel;
 
     /**
      * The constructor.
      * 
-     * @param args the command arguments.
+     * @param args    the command arguments.
      * @param message the message object.
      */
     public DiscordBotCommand(String[] args, Message message) {
         super(args);
         this.message = message;
+        this.author = message.getAuthor();
+        this.guild = message.getGuild();
+        this.channel = message.getTextChannel();
+    }
+
+    public String getAuthorAsMention() {
+        return author.getAsMention();
+    }
+
+    public void reply(String message) {
+        reply(Embed.fromString(message));
+    }
+
+    public void reply(Embed embed) {
+        EmbedSender.prepare(channel, embed).queue();
     }
 }

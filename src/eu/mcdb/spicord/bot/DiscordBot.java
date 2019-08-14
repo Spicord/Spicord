@@ -95,7 +95,7 @@ public class DiscordBot extends SimpleBot {
         this.enabled = enabled;
         this.addons = Collections.unmodifiableCollection(addons);
         this.commandSupportEnabled = commandSupportEnabled;
-        this.commandPrefix = commandPrefix;
+        this.commandPrefix = commandPrefix.trim();
         this.ready = false;
         this.commands = Collections.synchronizedMap(new HashMap<String, Consumer<DiscordBotCommand>>());
         this.spicord = Spicord.getInstance();
@@ -147,13 +147,12 @@ public class DiscordBot extends SimpleBot {
 
                             if (messageContent.length() != 0) {
                                 String command = messageContent.split(" ")[0];
-                                messageContent = messageContent.contains(" ")
-                                        ? messageContent.substring(command.length() + 1)
-                                        : "";
+                                String[] args = messageContent.contains(" ")
+                                        ? messageContent.substring(command.length() + 1).split(" ")
+                                        : new String[0];
 
                                 if (commands.containsKey(command)) {
-                                    commands.get(command).accept(
-                                            new DiscordBotCommand(messageContent.split(" "), event.getMessage()));
+                                    commands.get(command).accept(new DiscordBotCommand(args, event.getMessage()));
                                 }
                             }
                         }
@@ -195,7 +194,11 @@ public class DiscordBot extends SimpleBot {
     }
 
     public void onCommand(String name, BotCommand command) {
-        this.onCommand(name, (comm1) -> command.onCommand(comm1, comm1.getArguments()));
+        this.onCommand(name, (comm) -> command.onCommand(comm, comm.getArguments()));
+    }
+
+    public void registerCommand(String name, BotCommand command) {
+        this.onCommand(name, command);
     }
 
     /**

@@ -1,5 +1,23 @@
+/*
+ * Copyright (C) 2019  OopsieWoopsie
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package eu.mcdb.spicord.logger;
 
+// This class (or at least its structure) is temporary.
 public class JDALogger implements eu.mcdb.internal.org.slf4j.Logger {
 
     private boolean debug;
@@ -33,15 +51,21 @@ public class JDALogger implements eu.mcdb.internal.org.slf4j.Logger {
 
     @Override
     public void trace(Object... obj) {
-        if (debug)
-            log("[TRACE]", obj);
     }
 
     public void log(String prefix, Object... obj) {
         if (log) {
             String str = String.valueOf(obj[0]);
-            for (int i = 1; i < obj.length; i++) {
-                str = str.replaceFirst("\\{\\}", String.valueOf(obj[i]));
+            try {
+                for (int i = 1; i < obj.length; i++) {
+                    Object curr = obj[i];
+                    if (curr instanceof Throwable) {
+                        ((Throwable) curr).printStackTrace();
+                    } else {
+                        str = str.replaceFirst("\\{\\}", String.valueOf(curr) + "");
+                    }
+                }
+            } catch (Exception ignored) {
             }
             System.out.println("[JDA] " + prefix + " " + str);
         }

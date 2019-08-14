@@ -1,6 +1,6 @@
 name: Spicord
 author: OopsieWoopsie
-version: 2.0.0-SNAPSHOT
+version: 2.1.0-SNAPSHOT
 main: eu.mcdb.spicord.bukkit.SpicordBukkit
 description: Discord integration for BungeeCord and Bukkit/Spigot servers.
 commands:

@@ -19,10 +19,11 @@ package eu.mcdb.spicord.api.bot;
 
 import lombok.Getter;
 
-@Getter
 public abstract class SimpleBot {
 
+    @Getter
     protected String name;
+
     protected String token;
 
     public SimpleBot(String name, String token) {

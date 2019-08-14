@@ -41,7 +41,7 @@ public class SpicordCommand extends UniversalCommand {
                 if (sender.hasPermission("spicord.status")) {
                     sender.sendFormattedMessage("&7&l[&a&lSpicord&7&l] &f> Status");
                     for (DiscordBot bot : spicord.getConfig().getBots()) {
-                        sender.sendFormattedMessage(" &7- " + bot.getName() + " [" + (bot.isReady() ? "&aReady" : "&cOffline") + "&7]");
+                        sender.sendFormattedMessage(" &7- " + bot.getName() + " [" + (bot.isReady() ? "&aReady" : (bot.isEnabled() ? "&cOffline" : "&cDisabled")) + "&7]");
                     }
                     sender.sendFormattedMessage("&7&l[&a&lSpicord&7&l] &f--------");
                 } else {
@@ -81,7 +81,7 @@ public class SpicordCommand extends UniversalCommand {
                     if (bot.isEnabled()) {
                         DiscordBotLoader.shutdownBot(bot);
                     } else {
-                        sender.sendFormattedMessage("&7The bot '" + name + "' is already disabled.");
+                        sender.sendFormattedMessage("&7The bot '" + name + "' is disabled.");
                     }
                 } else {
                     sender.sendFormattedMessage("&4You do not have permission to run this command.");

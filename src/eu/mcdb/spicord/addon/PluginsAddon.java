@@ -21,7 +21,6 @@ import java.awt.Color;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.bot.command.DiscordBotCommand;
-import eu.mcdb.util.Server;
 import net.dv8tion.jda.core.EmbedBuilder;
 
 public class PluginsAddon extends SimpleAddon {
@@ -37,8 +36,8 @@ public class PluginsAddon extends SimpleAddon {
 
     private void pluginsCommand(DiscordBotCommand command) {
         command.getMessage().getChannel()
-                .sendMessage(new EmbedBuilder().setTitle("Plugins (" + Server.getPlugins().length + "): ")
-                        .setDescription(String.join(", ", Server.getPlugins())).setColor(new Color(5154580))
+                .sendMessage(new EmbedBuilder().setTitle("Plugins (" + getServer().getPlugins().length + "): ")
+                        .setDescription(String.join(", ", getServer().getPlugins())).setColor(new Color(5154580))
                         .setFooter("Powered by Spicord", null).build())
                 .queue();
     }

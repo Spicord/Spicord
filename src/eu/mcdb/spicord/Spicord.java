@@ -44,7 +44,7 @@ public class Spicord implements ISpicord {
      * The {@link Spicord} version
      */
     @Getter
-    private static final String version = "2.0.0-SNAPSHOT";
+    private static final String version = "2.1.0-SNAPSHOT";
 
     /**
      * The {@link Logger} instance.
@@ -90,20 +90,21 @@ public class Spicord implements ISpicord {
 
         this.registerIntegratedAddons();
 
+        try {
+            // TODO: Don't use reflection for this
+            Class<?> loggerClass = Class.forName("eu.mcdb.spicord.logger.JDALogger");
+            Constructor<?> constructor = loggerClass.getConstructor(boolean.class, boolean.class);
+            Object loggerInstance = constructor.newInstance(config.isDebugEnabled(), config.isJdaMessagesEnabled());
+            Method method = JDALogger.class.getMethod("setLog", loggerClass.getInterfaces()[0]);
+            method.invoke(null, loggerInstance);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         if (config.isJdaMessagesEnabled()) {
-            try {
-                // TODO: Don't use reflection for this
-                Class<?> loggerClass = Class.forName("eu.mcdb.spicord.logger.JDALogger");
-                Constructor<?> constructor = loggerClass.getConstructor(boolean.class, boolean.class);
-                Object loggerInstance = constructor.newInstance(config.isDebugEnabled(), config.isJdaMessagesEnabled());
-                Method method = JDALogger.class.getMethod("setLog", loggerClass.getInterfaces()[0]);
-                method.invoke(null, loggerInstance);
-                debug("Successfully enabled JDA's messages.");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            debug("Successfully enabled JDA messages.");
         } else {
-            debug("Disabled JDA messages.");
+            debug("Successfully disabled JDA messages.");
         }
 
         getLogger().info("Starting the bots...");

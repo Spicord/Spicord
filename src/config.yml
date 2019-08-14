@@ -26,10 +26,10 @@ bots:
 #    addons: []
 
 ##> Change the value to "false" if you want to disable the debug messages.
-enable-debug-messages: true
+enable-debug-messages: false
 
 ##> Change the value to "true" if you want to enable the JDA messages.
-enable-jda-messages: false
+enable-jda-messages: true
 
 ##> Do not change this.
 config-version: 1

@@ -18,14 +18,17 @@
 package eu.mcdb.spicord.addon;
 
 import java.awt.Color;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.stream.Stream;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.bot.command.DiscordBotCommand;
-import eu.mcdb.util.Server;
 import net.dv8tion.jda.core.EmbedBuilder;
 
 public class PlayersAddon extends SimpleAddon {
+
+    private String prefix;
 
     public PlayersAddon() {
         super("Player List", "spicord::players", "OopsieWoopsie");
@@ -33,18 +36,67 @@ public class PlayersAddon extends SimpleAddon {
 
     @Override
     public void onLoad(DiscordBot bot) {
+        prefix = bot.getCommandPrefix();
         bot.onCommand("players", this::playersCommand);
     }
 
     private void playersCommand(DiscordBotCommand command) {
-        command.getMessage().getChannel()
-                .sendMessage(new EmbedBuilder().setTitle("Players (" + Server.getOnlineCount() + "): ")
-                        .setDescription(String.join(", ", escapeUnderscores(Server.getOnlinePlayers())))
-                        .setColor(new Color(5154580)).setFooter("Powered by Spicord", null).build())
-                .queue();
+        if (getServer().isBungeeCord()) {
+            String desc = "";
+
+            String[] args = command.getArguments();
+
+            if (getServer().getOnlineCount() == 0) {
+                command.reply(command.getAuthorAsMention() + ", there are no players online! x-x");
+                return;
+            }
+
+            if (args.length > 0) {
+                String server = args[0].replace("`", "'");
+                List<String> players = getServer().getServersAndPlayers().get(server);
+
+                if (players == null) {
+                    command.reply(command.getAuthorAsMention() + ", the server `" + server + "` was not found!\nUsage: `" + prefix + "players <server>` or `" + prefix + "players`");
+                    return;
+                } else {
+                    desc = buildServerLine(server, players);
+                }
+            } else {
+                for (Entry<String, List<String>> entry : getServer().getServersAndPlayers().entrySet()) {
+                    String server = entry.getKey();
+                    List<String> players = entry.getValue();
+
+                    String line = buildServerLine(server, players);
+
+                    desc += line + "\n";
+                }
+            }
+
+            final EmbedBuilder builder = new EmbedBuilder()
+                    .setTitle("Total players: " + getServer().getOnlineCount())
+                    .setDescription(desc)
+                    .setColor(new Color(5154580))
+                    .setFooter("Powered by Spicord", null);
+
+            command.getMessage().getChannel()
+                    .sendMessage(builder.build())
+                    .queue();
+        } else {
+            command.getMessage().getChannel()
+                    .sendMessage(new EmbedBuilder().setTitle("Players (" + getServer().getOnlineCount() + "): ")
+                            .setDescription(String.join(", ", escapeUnderscores(getServer().getOnlinePlayers())))
+                            .setColor(new Color(5154580)).setFooter("Powered by Spicord", null).build())
+                    .queue();
+        }
     }
 
-    private String[] escapeUnderscores(String[] strings) {
+    private String buildServerLine(String server, List<String> players) {
+        String line = "[" + server + "] (" + players.size() + "): ";
+        line += String.join(", ", escapeUnderscores(players.toArray(new String[0])));
+        return line;
+    }
+
+    private String[] escapeUnderscores(String... strings) {
         return Stream.of(strings).map(s -> s.replace("_", "\\_")).toArray(String[]::new);
     }
 }

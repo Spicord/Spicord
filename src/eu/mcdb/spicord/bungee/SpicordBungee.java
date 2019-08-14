@@ -35,7 +35,7 @@ public class SpicordBungee extends Plugin {
         instance = this;
         this.loader = new SpicordLoader(getLogger(), getClass().getClassLoader(), ServerType.BUNGEECORD);
 
-        getProxy().getScheduler().schedule(this, () -> loader.load(), 1, TimeUnit.SECONDS);
+        getProxy().getScheduler().schedule(this, () -> loader.load(), 10, TimeUnit.SECONDS);
         MCDB.registerCommand(this, new SpicordCommand());
     }
 

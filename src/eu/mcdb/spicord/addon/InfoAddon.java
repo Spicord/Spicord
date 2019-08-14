@@ -21,7 +21,6 @@ import java.awt.Color;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.bot.command.DiscordBotCommand;
-import eu.mcdb.util.Server;
 import net.dv8tion.jda.core.EmbedBuilder;
 
 public class InfoAddon extends SimpleAddon {
@@ -36,11 +35,11 @@ public class InfoAddon extends SimpleAddon {
     }
 
     private void statusCommand(DiscordBotCommand command) {
-        command.getMessage().getChannel()
-                .sendMessage(new EmbedBuilder().setTitle("Server information")
-                        .setDescription("Online players: " + Server.getOnlineCount() + "/" + Server.getPlayerLimit()
-                                + "\nServer version: " + Server.getServerVersion())
-                        .setColor(new Color(5154580)).setFooter("Powered by Spicord", null).build())
-                .queue();
+        EmbedBuilder builder = new EmbedBuilder().setTitle("Server information")
+                .setDescription("Online players: " + getServer().getOnlineCount() + "/" + getServer().getPlayerLimit()
+                        + "\nServer version: " + getServer().getVersion())
+                .setColor(new Color(5154580)).setFooter("Powered by Spicord", null);
+
+        command.getMessage().getChannel().sendMessage(builder.build()).queue();
     }
 }
