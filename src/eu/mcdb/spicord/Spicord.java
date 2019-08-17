@@ -29,6 +29,7 @@ import eu.mcdb.spicord.api.ISpicord;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.bot.DiscordBotLoader;
 import eu.mcdb.spicord.config.SpicordConfiguration;
+import eu.mcdb.util.Server;
 import eu.mcdb.util.ServerType;
 import lombok.Getter;
 import net.dv8tion.jda.core.utils.JDALogger;
@@ -44,7 +45,7 @@ public class Spicord implements ISpicord {
      * The {@link Spicord} version
      */
     @Getter
-    private static final String version = "2.1.0-SNAPSHOT";
+    private static final String version = "2.1.1-SNAPSHOT"; // TODO: Don't hardcode the version
 
     /**
      * The {@link Logger} instance.
@@ -90,21 +91,24 @@ public class Spicord implements ISpicord {
 
         this.registerIntegratedAddons();
 
-        try {
-            // TODO: Don't use reflection for this
-            Class<?> loggerClass = Class.forName("eu.mcdb.spicord.logger.JDALogger");
-            Constructor<?> constructor = loggerClass.getConstructor(boolean.class, boolean.class);
-            Object loggerInstance = constructor.newInstance(config.isDebugEnabled(), config.isJdaMessagesEnabled());
-            Method method = JDALogger.class.getMethod("setLog", loggerClass.getInterfaces()[0]);
-            method.invoke(null, loggerInstance);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Server.getInstance().setDebugEnabled(config.isDebugEnabled());
 
-        if (config.isJdaMessagesEnabled()) {
-            debug("Successfully enabled JDA messages.");
-        } else {
-            debug("Successfully disabled JDA messages.");
+        if (!SpicordLoader.hasJDA) {
+            try {
+                Class<?> loggerClass = Class.forName("eu.mcdb.spicord.logger.ProvisionalLogger");
+                Constructor<?> constructor = loggerClass.getConstructor(boolean.class, boolean.class);
+                Object loggerInst = constructor.newInstance(config.isDebugEnabled(), config.isJdaMessagesEnabled());
+                Method setLogMethod = JDALogger.class.getDeclaredMethod("setLog", loggerClass.getInterfaces()[0]);
+                setLogMethod.invoke(null, loggerInst);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (config.isJdaMessagesEnabled()) {
+                debug("Successfully enabled JDA messages.");
+            } else {
+                debug("Successfully disabled JDA messages.");
+            }
         }
 
         getLogger().info("Starting the bots...");

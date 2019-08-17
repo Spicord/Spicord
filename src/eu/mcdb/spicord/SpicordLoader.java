@@ -74,12 +74,7 @@ public class SpicordLoader {
         Preconditions.checkNotNull(logger);
         Preconditions.checkNotNull(classLoader);
 
-        try {
-            this.classLoader = new SpicordClassLoader((URLClassLoader) classLoader);
-        } catch (NoSuchMethodException | SecurityException e) {
-            throw new IllegalStateException(""); // TODO: Message
-        }
-
+        this.classLoader = new SpicordClassLoader((URLClassLoader) classLoader);
         this.spicord = new Spicord(logger);
         this.serverType = serverType;
     }
@@ -153,6 +148,8 @@ public class SpicordLoader {
         jarFile.close();
     }
 
+    protected static boolean hasJDA;
+
     /**
      * Loads the libraries inside the plugin data folder.
      */
@@ -160,9 +157,21 @@ public class SpicordLoader {
         Preconditions.checkNotNull(this.libFolder, "libFolder");
         Preconditions.checkArgument(this.libFolder.isDirectory(), "libFolder not directory");
 
+        hasJDA = false;
+        try {
+            Class.forName("net.dv8tion.jda.core.JDA");
+            hasJDA = true;
+            spicord.getLogger().warning("Detected another JDA instance, some options will not work.");
+        } catch (Exception e) {
+        }
+
         for (String libName : libraries.getLibraries()) {
+            if (hasJDA) {
+                break;
+            }
             File file = new File(libFolder, libName);
             if (file.isFile() && file.getName().endsWith(".jar")) {
+
                 if (file.exists()) {
                     try {
                         getClassLoader().loadJar(file.toPath());
@@ -183,11 +192,10 @@ public class SpicordLoader {
             this.disable();
         }
     }
-    
+
     private class Libraries {
 
         @Getter
         private String[] libraries;
     }
-
 }

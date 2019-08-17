@@ -38,11 +38,15 @@ public class SpicordClassLoader {
      * The SpicordClassLoader constructor.
      * 
      * @param classLoader the class loader
-     * @throws SecurityException
-     * @throws NoSuchMethodException
+     * @throws Exception
      */
-    public SpicordClassLoader(URLClassLoader classLoader) throws NoSuchMethodException, SecurityException {
-        (this.addURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class)).setAccessible(true);
+    public SpicordClassLoader(URLClassLoader classLoader) {
+        try {
+            (this.addURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class)).setAccessible(true);
+        } catch (NoSuchMethodException | SecurityException e) {
+            throw new RuntimeException(e);
+        }
+
         this.classLoader = classLoader;
     }
 

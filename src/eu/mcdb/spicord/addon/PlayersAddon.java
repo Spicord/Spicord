@@ -18,9 +18,9 @@
 package eu.mcdb.spicord.addon;
 
 import java.awt.Color;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.stream.Stream;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.bot.command.DiscordBotCommand;
@@ -92,11 +92,15 @@ public class PlayersAddon extends SimpleAddon {
 
     private String buildServerLine(String server, List<String> players) {
         String line = "[" + server + "] (" + players.size() + "): ";
-        line += String.join(", ", escapeUnderscores(players.toArray(new String[0])));
+        line += String.join(", ", escapeUnderscores(players));
         return line;
     }
 
-    private String[] escapeUnderscores(String... strings) {
-        return Stream.of(strings).map(s -> s.replace("_", "\\_")).toArray(String[]::new);
+    private String[] escapeUnderscores(String... players) {
+        return escapeUnderscores(Arrays.asList(players));
+    }
+
+    private String[] escapeUnderscores(List<String> players) {
+        return players.stream().map(s -> s.replace("_", "\\_")).toArray(String[]::new);
     }
 }

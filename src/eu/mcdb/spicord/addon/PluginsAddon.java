@@ -35,7 +35,7 @@ public class PluginsAddon extends SimpleAddon {
     }
 
     private void pluginsCommand(DiscordBotCommand command) {
-        command.getMessage().getChannel()
+        command.getChannel()
                 .sendMessage(new EmbedBuilder().setTitle("Plugins (" + getServer().getPlugins().length + "): ")
                         .setDescription(String.join(", ", getServer().getPlugins())).setColor(new Color(5154580))
                         .setFooter("Powered by Spicord", null).build())

@@ -18,12 +18,12 @@
 package eu.mcdb.spicord.logger;
 
 // This class (or at least its structure) is temporary.
-public class JDALogger implements eu.mcdb.internal.org.slf4j.Logger {
+public class ProvisionalLogger implements eu.mcdb.internal.org.slf4j.Logger {
 
     private boolean debug;
     private boolean log;
 
-    public JDALogger(boolean debug, boolean log) {
+    public ProvisionalLogger(boolean debug, boolean log) {
         this.debug = debug;
         this.log = log;
     }
@@ -67,7 +67,7 @@ public class JDALogger implements eu.mcdb.internal.org.slf4j.Logger {
                 }
             } catch (Exception ignored) {
             }
-            System.out.println("[JDA] " + prefix + " " + str);
+            System.out.println(String.format("[JDA] %s %s", prefix, str));
         }
     }
 
