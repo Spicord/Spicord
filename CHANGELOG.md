@@ -6,6 +6,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0-SNAPSHOT] - 2019-08-14
+### Added
+- The **-players \<serverName\>** command (only for BungeeCord).
+- The license header to some classes.
+
+### Changed
+- Now when using BungeeCord, the **-players** message is displayed in
+  other format (suggested by Sharkie).
+
+### Deprecated
+- The *Conversions#toJdaEmbed(Embed)* method.
+
+### Fixed
+- [Cyrillic letters are not displayed](https://github.com/OopsieWoopsie/BanAnnouncer/issues/2)
+- The arguments lenght of the commands.
+
 ## [2.0.0-SNAPSHOT] - 2019-07-12
 ### Added
 - A new line at the end of the source files. 🙄
