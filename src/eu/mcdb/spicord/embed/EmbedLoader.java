@@ -18,6 +18,7 @@
 package eu.mcdb.spicord.embed;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.HashMap;
@@ -27,9 +28,11 @@ import eu.mcdb.spicord.Spicord;
 
 public class EmbedLoader {
 
-    private Map<String, Embed> embeds = new HashMap<String, Embed>();
+    private static final Charset charset = Charset.forName("UTF-8");
+    private final Map<String, Embed> embeds;
 
     public EmbedLoader() {
+        this.embeds = new HashMap<String, Embed>();
     }
 
     public void load(File dir) {
@@ -41,10 +44,11 @@ public class EmbedLoader {
             if (f.isFile() && name.endsWith(".json")) {
                 try {
                     name = name.substring(0, name.length() - 5).trim();
-                    String content = new String(Files.readAllBytes(f.toPath()), Charset.forName("UTF-8"));
+                    String content = new String(Files.readAllBytes(f.toPath()), charset);
                     embeds.put(name, Embed.fromJson(content));
-                } catch (Exception e) {
+                } catch (IOException e) {
                     Spicord.getInstance().getLogger().warning("Cannot load the embed '" + f.getName() + "'.");
+                    e.printStackTrace();
                 }
             }
         }

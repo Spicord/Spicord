@@ -19,6 +19,7 @@ package eu.mcdb.spicord.api.addon;
 
 import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.bot.DiscordBot;
+import eu.mcdb.spicord.bot.command.DiscordBotCommand;
 import eu.mcdb.util.Server;
 import lombok.Data;
 import lombok.Getter;
@@ -28,14 +29,14 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 public abstract class SimpleAddon {
 
     @Getter
-    public final Server server = Server.getInstance();
+    private final Server server = Server.getInstance();
 
     @Getter
-    public final Spicord spicord = Spicord.getInstance();
+    private final Spicord spicord = Spicord.getInstance();
 
     private String name;
     private String key;
-    private String author;
+    protected String author;
     private String[] commands;
 
     public SimpleAddon(String name, String key, String author) {
@@ -49,8 +50,15 @@ public abstract class SimpleAddon {
         this.commands = commands;
     }
 
-    public abstract void onLoad(DiscordBot bot);
+    public void onLoad(DiscordBot bot) {
+    }
 
-    public void onCommand(String cmd, String[] args, MessageReceivedEvent event) {
+    public void onReady(DiscordBot bot) {
+    }
+
+    public void onCommand(DiscordBotCommand command, String[] args) {
+    }
+
+    public void onMessageReceived(DiscordBot bot, MessageReceivedEvent event) {
     }
 }

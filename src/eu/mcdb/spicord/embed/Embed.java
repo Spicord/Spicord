@@ -17,11 +17,15 @@
 
 package eu.mcdb.spicord.embed;
 
+import java.io.Serializable;
 import java.time.OffsetDateTime;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.entities.User;
 
-public class Embed {
+public class Embed implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public Embed() {
     }
@@ -359,5 +363,22 @@ public class Embed {
             }
         }
         return builder.build();
+    }
+
+    public Embed setPlaceholders(User user) {
+        String json = toString()
+                .replace("{author:name}", user.getName())
+                .replace("{author:id}", user.getId())
+                .replace("{author:avatar_url}", user.getAvatarUrl())
+                .replace("{author:discriminator}", user.getDiscriminator())
+                .replace("{author:mention}", user.getAsMention());
+        return fromJson(json);
+    }
+
+    @Override
+    public Embed clone() {
+        // planning to make this manual but im too busy for write a lot of code.
+        // probably i will do this later, idk
+        return fromJson(toString());
     }
 }

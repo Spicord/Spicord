@@ -45,7 +45,7 @@ public class Spicord implements ISpicord {
      * The {@link Spicord} version
      */
     @Getter
-    private static final String version = "2.1.1-SNAPSHOT"; // TODO: Don't hardcode the version
+    private static final String version = "2.2.0-SNAPSHOT"; // TODO: Don't hardcode the version
 
     /**
      * The {@link Logger} instance.
@@ -100,14 +100,14 @@ public class Spicord implements ISpicord {
                 Object loggerInst = constructor.newInstance(config.isDebugEnabled(), config.isJdaMessagesEnabled());
                 Method setLogMethod = JDALogger.class.getDeclaredMethod("setLog", loggerClass.getInterfaces()[0]);
                 setLogMethod.invoke(null, loggerInst);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
 
-            if (config.isJdaMessagesEnabled()) {
-                debug("Successfully enabled JDA messages.");
-            } else {
-                debug("Successfully disabled JDA messages.");
+                if (config.isJdaMessagesEnabled()) {
+                    debug("Successfully enabled JDA messages.");
+                } else {
+                    debug("Successfully disabled JDA messages.");
+                }
+            } catch (Exception e) {
+                getLogger().warning("An error ocurred while setting the logger: " + e.getMessage());
             }
         }
 

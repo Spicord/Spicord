@@ -17,12 +17,14 @@
 
 package eu.mcdb.spicord.bot;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import com.google.common.base.Preconditions;
 import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
@@ -36,6 +38,8 @@ import net.dv8tion.jda.core.JDA.Status;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.events.DisconnectEvent;
 import net.dv8tion.jda.core.events.ReadyEvent;
+import net.dv8tion.jda.core.events.ReconnectedEvent;
+import net.dv8tion.jda.core.events.ResumedEvent;
 import net.dv8tion.jda.core.events.StatusChangeEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -58,6 +62,8 @@ public class DiscordBot extends SimpleBot {
      */
     @Getter
     private final Collection<String> addons;
+
+    private final Collection<SimpleAddon> loadedAddons;
 
     /**
      * The 'command-support' flag.
@@ -89,19 +95,20 @@ public class DiscordBot extends SimpleBot {
     private final Spicord spicord;
 
     public DiscordBot(String name, String token, boolean enabled, List<String> addons, boolean commandSupportEnabled,
-            String commandPrefix) {
+            String prefix) {
         super(name, token);
 
         this.enabled = enabled;
         this.addons = Collections.unmodifiableCollection(addons);
+        this.loadedAddons = new ArrayList<SimpleAddon>();
         this.commandSupportEnabled = commandSupportEnabled;
-        this.commandPrefix = commandPrefix.trim();
+        this.commandPrefix = prefix.trim();
         this.ready = false;
         this.commands = Collections.synchronizedMap(new HashMap<String, Consumer<DiscordBotCommand>>());
         this.spicord = Spicord.getInstance();
 
         if (commandSupportEnabled) {
-            if (commandPrefix.isEmpty()) {
+            if (prefix.isEmpty()) {
                 this.commandSupportEnabled = false;
 
                 spicord.getLogger().severe(
@@ -114,19 +121,30 @@ public class DiscordBot extends SimpleBot {
     @Override
     protected boolean startBot() {
         try {
-            this.jda = new JDABuilder(AccountType.BOT).setToken(token).build();
+            this.jda = new JDABuilder(AccountType.BOT).setToken(token).setAutoReconnect(true).build();
 
             jda.addEventListener(new ListenerAdapter() {
 
                 @Override
                 public void onReady(ReadyEvent event) {
                     DiscordBot.this.ready = true;
+                    DiscordBot.this.onReady(event);
                 }
 
                 @Override
                 public void onStatusChange(StatusChangeEvent event) {
                     if (event.getNewStatus() == Status.SHUTDOWN)
                         DiscordBot.this.ready = false;
+                }
+
+                @Override
+                public void onReconnect(ReconnectedEvent event) {
+                    DiscordBot.this.ready = true;
+                }
+
+                @Override
+                public void onResume(ResumedEvent event) {
+                    DiscordBot.this.ready = true;
                 }
 
                 @Override
@@ -140,19 +158,31 @@ public class DiscordBot extends SimpleBot {
 
                     @Override
                     public void onMessageReceived(MessageReceivedEvent event) {
+                        DiscordBot.this.onMessageReceived(event);
+
                         String messageContent = event.getMessage().getContentRaw();
 
                         if (messageContent.startsWith(commandPrefix)) {
                             messageContent = messageContent.substring(commandPrefix.length());
 
                             if (messageContent.length() != 0) {
-                                String command = messageContent.split(" ")[0];
+                                String commandName = messageContent.split(" ")[0];
                                 String[] args = messageContent.contains(" ")
-                                        ? messageContent.substring(command.length() + 1).split(" ")
+                                        ? messageContent.substring(commandName.length() + 1).split(" ")
                                         : new String[0];
 
-                                if (commands.containsKey(command)) {
-                                    commands.get(command).accept(new DiscordBotCommand(args, event.getMessage()));
+                                Supplier<DiscordBotCommand> commandSupplier = () -> new DiscordBotCommand(commandName, args, event.getMessage());
+
+                                if (commands.containsKey(commandName)) {
+                                    commands.get(commandName).accept(commandSupplier.get());
+                                } else {
+                                    for (SimpleAddon addon : loadedAddons) {
+                                        for (String cmd : addon.getCommands()) {
+                                            if (cmd.equals(commandName)) {
+                                                addon.onCommand(commandSupplier.get(), args);
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -168,6 +198,18 @@ public class DiscordBot extends SimpleBot {
         }
 
         return false;
+    }
+
+    public void onReady(ReadyEvent event) {
+        loadedAddons.forEach(addon -> addon.onReady(this));
+    }
+
+    public void onMessageReceived(MessageReceivedEvent event) {
+        loadedAddons.forEach(addon -> addon.onMessageReceived(this, event));
+    }
+
+    public void addEventListener(Class<? extends ListenerAdapter> listener) {
+        jda.addEventListener(listener);
     }
 
     /**
@@ -194,7 +236,7 @@ public class DiscordBot extends SimpleBot {
     }
 
     public void onCommand(String name, BotCommand command) {
-        this.onCommand(name, (comm) -> command.onCommand(comm, comm.getArguments()));
+        this.onCommand(name, comm -> command.onCommand(comm, comm.getArguments()));
     }
 
     public void registerCommand(String name, BotCommand command) {
@@ -207,6 +249,7 @@ public class DiscordBot extends SimpleBot {
      * @param addon the addon to be loaded
      */
     public void loadAddon(SimpleAddon addon) {
+        loadedAddons.add(addon);
         addon.onLoad(this);
     }
 

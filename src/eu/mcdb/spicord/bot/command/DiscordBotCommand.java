@@ -22,34 +22,39 @@ import eu.mcdb.spicord.embed.Embed;
 import eu.mcdb.spicord.embed.EmbedSender;
 import lombok.Getter;
 import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
 public class DiscordBotCommand extends SimpleCommand {
 
-    /**
-     * The message object privided by JDA.
-     */
     @Getter
     private final Message message;
     @Getter
-    private User author;
+    private final User author;
     @Getter
-    private Guild guild;
+    private final Member member;
     @Getter
-    private TextChannel channel;
+    private final Guild guild;
+    @Getter
+    private final TextChannel channel;
+    @Getter
+    private final String name;
 
     /**
      * The constructor.
      * 
-     * @param args    the command arguments.
-     * @param message the message object.
+     * @param name    the command name
+     * @param args    the command arguments
+     * @param message the message object
      */
-    public DiscordBotCommand(String[] args, Message message) {
+    public DiscordBotCommand(String name, String[] args, Message message) {
         super(args);
+        this.name = name;
         this.message = message;
         this.author = message.getAuthor();
+        this.member = message.getMember();
         this.guild = message.getGuild();
         this.channel = message.getTextChannel();
     }
@@ -64,5 +69,10 @@ public class DiscordBotCommand extends SimpleCommand {
 
     public void reply(Embed embed) {
         EmbedSender.prepare(channel, embed).queue();
+    }
+
+    @Override
+    public String toString() {
+        return "[DiscordBotCommand command='" + name + "' author='" + getAuthorAsMention() + "' channel=" + channel.getId() + " message='" + message.getContentRaw() + "']";
     }
 }
