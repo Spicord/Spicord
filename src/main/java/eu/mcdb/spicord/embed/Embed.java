@@ -17,6 +17,9 @@
 
 package eu.mcdb.spicord.embed;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -27,7 +30,7 @@ public class Embed implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public Embed() {
+    private Embed() {
     }
 
     private Embed(String content) {
@@ -65,7 +68,9 @@ public class Embed implements Serializable {
         return embed;
     }
 
-    public class EmbedData {
+    public class EmbedData implements Serializable {
+
+        private static final long serialVersionUID = 1L;
 
         private String title;
         private String description;
@@ -194,7 +199,9 @@ public class Embed implements Serializable {
         }
     }
 
-    public class Footer {
+    public class Footer implements Serializable {
+
+        private static final long serialVersionUID = 1L;
 
         private String icon_url;
         private String text;
@@ -214,17 +221,23 @@ public class Embed implements Serializable {
         }
     }
 
-    public class Thumbnail {
+    public class Thumbnail implements Serializable {
+
+        private static final long serialVersionUID = 1L;
 
         private String url;
     }
 
-    public class Image {
+    public class Image implements Serializable {
+
+        private static final long serialVersionUID = 1L;
 
         private String url;
     }
 
-    public class Author {
+    public class Author implements Serializable {
+
+        private static final long serialVersionUID = 1L;
 
         private String name;
         private String url;
@@ -260,7 +273,9 @@ public class Embed implements Serializable {
         }
     }
 
-    public class Field {
+    public class Field implements Serializable {
+
+        private static final long serialVersionUID = 1L;
 
         private String name;
         private String value;
@@ -327,6 +342,11 @@ public class Embed implements Serializable {
         return toJson();
     }
 
+    /**
+     * Creates an embed instance compatible with JDA.
+     * 
+     * @return a JDA embed representing this instance
+     */
     public MessageEmbed toJdaEmbed() {
         EmbedBuilder builder = new EmbedBuilder();
         if (hasEmbedData()) {
@@ -365,6 +385,7 @@ public class Embed implements Serializable {
         return builder.build();
     }
 
+    @Deprecated
     public Embed setPlaceholders(User user) {
         String json = toString()
                 .replace("{author:name}", user.getName())
@@ -373,6 +394,22 @@ public class Embed implements Serializable {
                 .replace("{author:discriminator}", user.getDiscriminator())
                 .replace("{author:mention}", user.getAsMention());
         return fromJson(json);
+    }
+
+    /**
+     * Serializes the data of this object instance.
+     * 
+     * @return the serialized embed
+     * @throws IOException if an I/O error occurs while writing stream header
+     */
+    public byte[] serialize() throws IOException {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+            oos.writeObject(this);
+            return baos.toByteArray();
+        } catch (IOException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override

@@ -21,11 +21,6 @@ import eu.mcdb.spicord.bot.DiscordBot;
 
 public interface ISpicord {
 
-    @Deprecated
-    public boolean startBot(DiscordBot bot);
-
-    @Deprecated
-    public void shutdownBot(DiscordBot bot);
-
-    public DiscordBot getBotByName(String name);
+    DiscordBot getBotByName(String name);
+    void debug(String message);
 }

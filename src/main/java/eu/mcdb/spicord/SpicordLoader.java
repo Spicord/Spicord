@@ -18,17 +18,14 @@
 package eu.mcdb.spicord;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.util.Enumeration;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
@@ -61,7 +58,7 @@ public class SpicordLoader {
     @Getter
     private SpicordClassLoader classLoader;
 
-    private Libraries libraries;
+    private Libraries.Library[] libraries;
 
     /**
      * The {@link SpicordLoader} constructor.
@@ -85,15 +82,16 @@ public class SpicordLoader {
     public void load() {
         try {
             SpicordConfiguration config = new SpicordConfiguration(serverType);
-            this.extractLibraries(config);
+            this.downloadLibraries(config);
             this.loadLibraries();
 
             spicord.onLoad(config);
         } catch (IOException e) {
             spicord.getLogger().severe(
                     "Spicord could not be loaded, please report this error in \n\t -> https://github.com/OopsieWoopsie/Spicord/issues");
-            disable();
+            spicord.getLogger().severe("Error: " + e.getMessage());
             e.printStackTrace();
+            disable();
         }
     }
 
@@ -111,16 +109,12 @@ public class SpicordLoader {
      * 
      * @param config the {@link SpicordConfiguration} instance.
      */
-    public void extractLibraries(SpicordConfiguration config) throws IOException {
+    public void downloadLibraries(SpicordConfiguration config) throws IOException {
         Preconditions.checkNotNull(config);
 
-        // TODO: Move this
-        InputStream in = getClass().getResourceAsStream("/lib/libraries.json");
+        InputStream in = getClass().getResourceAsStream("/libraries.json");
         String json = new String(ByteStreams.toByteArray(in), Charset.defaultCharset());
-        this.libraries = new Gson().fromJson(json, Libraries.class);
-
-        JarFile jarFile = new JarFile(config.getFile());
-        Enumeration<JarEntry> entries = jarFile.entries();
+        this.libraries = new Gson().fromJson(json, Libraries.class).getLibraries();
 
         this.libFolder = new File(config.getDataFolder(), "lib");
 
@@ -129,23 +123,18 @@ public class SpicordLoader {
 
         Preconditions.checkArgument(libFolder.isDirectory(), "File 'lib' must be a directory.");
 
-        while (entries.hasMoreElements()) {
-            ZipEntry entry = entries.nextElement();
+        for (Libraries.Library lib : libraries) {
+            File file = new File(libFolder, lib.getFileName());
 
-            if (entry.getName().startsWith("lib/") && entry.getName().endsWith(".jar")) {
-                String jarName = entry.getName();
-                jarName = jarName.substring(jarName.lastIndexOf("/") + 1);
-
-                File file = new File(libFolder, jarName);
-
-                if (!file.exists()) {
-                    Files.copy(jarFile.getInputStream(entry), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    spicord.getLogger().info("[Loader] Extracted library '" + file.getName() + "'.");
-                }
+            if (!file.exists()) {
+                spicord.getLogger().info("[Loader] Downloading library " + lib.getName());
+                byte[] b = lib.download();
+                FileOutputStream fos = new FileOutputStream(file);
+                fos.write(b);
+                fos.flush();
+                fos.close();
             }
         }
-
-        jarFile.close();
     }
 
     protected static boolean hasJDA;
@@ -165,11 +154,11 @@ public class SpicordLoader {
         } catch (Exception e) {
         }
 
-        for (String libName : libraries.getLibraries()) {
+        for (Libraries.Library lib : libraries) {
             if (hasJDA) {
                 break;
             }
-            File file = new File(libFolder, libName);
+            File file = new File(libFolder, lib.getFileName());
             if (file.isFile() && file.getName().endsWith(".jar")) {
 
                 if (file.exists()) {
@@ -196,6 +185,33 @@ public class SpicordLoader {
     private class Libraries {
 
         @Getter
-        private String[] libraries;
+        private Library[] libraries;
+
+        @Getter
+        private class Library {
+
+            private String name;
+            private String sha1; // not implemented yet
+            private String url;
+
+            public String getFileName() {
+                return url.substring(url.lastIndexOf('/') + 1, url.length());
+            }
+
+            public byte[] download() throws IOException {
+                URL url = new URL(this.url);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(3000);
+                conn.connect();
+
+                try (InputStream in = conn.getInputStream()) {
+                    return ByteStreams.toByteArray(in);
+                } catch (IOException e) {
+                    throw new IOException(e);
+                } finally {
+                    conn.disconnect();
+                }
+            }
+        }
     }
 }

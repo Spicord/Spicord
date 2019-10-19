@@ -42,12 +42,6 @@ public class Spicord implements ISpicord {
     private static Spicord instance;
 
     /**
-     * The {@link Spicord} version
-     */
-    @Getter
-    private static final String version = "2.2.0-SNAPSHOT"; // TODO: Don't hardcode the version
-
-    /**
      * The {@link Logger} instance.
      */
     @Getter
@@ -95,7 +89,7 @@ public class Spicord implements ISpicord {
 
         if (!SpicordLoader.hasJDA) {
             try {
-                Class<?> loggerClass = Class.forName("eu.mcdb.spicord.logger.ProvisionalLogger");
+                Class<?> loggerClass = Class.forName("eu.mcdb.logger.ProvisionalLogger");
                 Constructor<?> constructor = loggerClass.getConstructor(boolean.class, boolean.class);
                 Object loggerInst = constructor.newInstance(config.isDebugEnabled(), config.isJdaMessagesEnabled());
                 Method setLogMethod = JDALogger.class.getDeclaredMethod("setLog", loggerClass.getInterfaces()[0]);
@@ -134,27 +128,6 @@ public class Spicord implements ISpicord {
     }
 
     /**
-     * @deprecated As of snapshot 2.0.0, use
-     *             {@link DiscordBotLoader#startBot(DiscordBot)} instead.
-     */
-    @Deprecated
-    public boolean startBot(DiscordBot bot) {
-        return DiscordBotLoader.startBot(bot);
-    }
-
-    /**
-     * Shutdown a bot if it is enabled.
-     * 
-     * @param bot the bot object.
-     * @deprecated As of snapshot 2.0.0, use
-     *             {@link DiscordBotLoader#shutdownBot(DiscordBot)} instead.
-     */
-    @Deprecated
-    public void shutdownBot(DiscordBot bot) {
-        DiscordBotLoader.shutdownBot(bot);
-    }
-
-    /**
      * Get a bot by its name.
      * 
      * @param name the bot name.
@@ -180,6 +153,10 @@ public class Spicord implements ISpicord {
             throw new IllegalStateException("Spicord has not loaded yet.");
 
         return instance;
+    }
+
+    public static String getVersion() {
+        return Spicord.class.getPackage().getImplementationVersion();
     }
 
     /**

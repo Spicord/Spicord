@@ -55,11 +55,7 @@ public class SpicordClassLoader {
      * 
      * @param file the {@link Path} of the Jar file
      */
-    public void loadJar(Path file) {
-        try {
-            addURL.invoke(this.classLoader, file.toUri().toURL());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void loadJar(Path file) throws Exception {
+        addURL.invoke(this.classLoader, file.toUri().toURL());
     }
 }
