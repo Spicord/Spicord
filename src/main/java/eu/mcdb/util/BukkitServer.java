@@ -30,7 +30,7 @@ import org.bukkit.plugin.Plugin;
 
 class BukkitServer extends eu.mcdb.util.Server {
 
-    private Server bukkit = Bukkit.getServer();
+    private final Server bukkit = Bukkit.getServer();
 
     @Override
     public int getOnlineCount() {
@@ -44,7 +44,9 @@ class BukkitServer extends eu.mcdb.util.Server {
 
     @Override
     public String[] getOnlinePlayers() {
-        return bukkit.getOnlinePlayers().stream().map(Player::getName).toArray(String[]::new);
+        return bukkit.getOnlinePlayers().stream()
+                .map(Player::getName)
+                .toArray(String[]::new);
     }
 
     @Override
@@ -62,7 +64,9 @@ class BukkitServer extends eu.mcdb.util.Server {
 
     @Override
     public String[] getPlugins() {
-        return Stream.of(bukkit.getPluginManager().getPlugins()).map(Plugin::getName).toArray(String[]::new);
+        return Stream.of(bukkit.getPluginManager().getPlugins())
+                .map(Plugin::getName)
+                .toArray(String[]::new);
     }
 
     @Override

@@ -24,6 +24,7 @@ import lombok.Getter;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
@@ -41,6 +42,8 @@ public class DiscordBotCommand extends SimpleCommand {
     private final TextChannel channel;
     @Getter
     private final String name;
+    @Getter
+    private final String prefix;
 
     /**
      * The constructor.
@@ -57,6 +60,8 @@ public class DiscordBotCommand extends SimpleCommand {
         this.member = message.getMember();
         this.guild = message.getGuild();
         this.channel = message.getTextChannel();
+        String raw = message.getContentRaw();
+        this.prefix = raw.split(" ")[0].substring(0, raw.indexOf(name));
     }
 
     public String getAuthorAsMention() {
@@ -69,6 +74,10 @@ public class DiscordBotCommand extends SimpleCommand {
 
     public void reply(Embed embed) {
         EmbedSender.prepare(channel, embed).queue();
+    }
+
+    public void reply(MessageEmbed embed) {
+        channel.sendMessage(embed).queue();
     }
 
     @Override

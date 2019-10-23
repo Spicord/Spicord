@@ -18,28 +18,26 @@
 package eu.mcdb.spicord.addon;
 
 import java.awt.Color;
+import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
-import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.bot.command.DiscordBotCommand;
 import net.dv8tion.jda.core.EmbedBuilder;
 
 public class InfoAddon extends SimpleAddon {
 
     public InfoAddon() {
-        super("Server Information", "spicord::info", "OopsieWoopsie");
+        super("Server Information", "spicord::info", "OopsieWoopsie", new String[] { "info" });
     }
 
     @Override
-    public void onLoad(DiscordBot bot) {
-        bot.onCommand("info", this::statusCommand);
-    }
-
-    private void statusCommand(DiscordBotCommand command) {
-        EmbedBuilder builder = new EmbedBuilder().setTitle("Server information")
+    public void onCommand(DiscordBotCommand command, String[] args) {
+        final EmbedBuilder builder = new EmbedBuilder()
+                .setTitle("Server information")
                 .setDescription("Online players: " + getServer().getOnlineCount() + "/" + getServer().getPlayerLimit()
                         + "\nServer version: " + getServer().getVersion())
-                .setColor(new Color(5154580)).setFooter("Powered by Spicord", null);
+                .setColor(new Color(5154580))
+                .setFooter("Powered by Spicord v" + Spicord.getVersion(), null);
 
-        command.getMessage().getChannel().sendMessage(builder.build()).queue();
+        command.reply(builder.build());
     }
 }

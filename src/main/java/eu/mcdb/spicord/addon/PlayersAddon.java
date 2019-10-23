@@ -21,33 +21,24 @@ import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
+import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
-import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.bot.command.DiscordBotCommand;
 import net.dv8tion.jda.core.EmbedBuilder;
 
 public class PlayersAddon extends SimpleAddon {
 
-    private String prefix;
-
     public PlayersAddon() {
-        super("Player List", "spicord::players", "OopsieWoopsie");
+        super("Player List", "spicord::players", "OopsieWoopsie", new String[] { "players" });
     }
 
     @Override
-    public void onLoad(DiscordBot bot) {
-        prefix = bot.getCommandPrefix();
-        bot.onCommand("players", this::playersCommand);
-    }
-
-    private void playersCommand(DiscordBotCommand command) {
+    public void onCommand(DiscordBotCommand command, String[] args) {
         if (getServer().isBungeeCord()) {
             String desc = "";
 
-            String[] args = command.getArguments();
-
             if (getServer().getOnlineCount() == 0) {
-                command.reply(command.getAuthorAsMention() + ", there are no players online! x-x");
+                command.reply(command.getAuthorAsMention() + ", there are no players online!");
                 return;
             }
 
@@ -56,7 +47,8 @@ public class PlayersAddon extends SimpleAddon {
                 List<String> players = getServer().getServersAndPlayers().get(server);
 
                 if (players == null) {
-                    command.reply(command.getAuthorAsMention() + ", the server `" + server + "` was not found!\nUsage: `" + prefix + "players <server>` or `" + prefix + "players`");
+                    String usage = "Usage: `" + command.getPrefix() + "players <server>` or `" + command.getPrefix() + "players`";
+                    command.reply(command.getAuthorAsMention() + ", the server `" + server + "` was not found!\n" + usage);
                     return;
                 } else {
                     desc = buildServerLine(server, players);
@@ -76,17 +68,17 @@ public class PlayersAddon extends SimpleAddon {
                     .setTitle("Total players: " + getServer().getOnlineCount())
                     .setDescription(desc)
                     .setColor(new Color(5154580))
-                    .setFooter("Powered by Spicord", null);
+                    .setFooter("Powered by Spicord v" + Spicord.getVersion(), null);
 
-            command.getMessage().getChannel()
-                    .sendMessage(builder.build())
-                    .queue();
+            command.reply(builder.build());
         } else {
-            command.getMessage().getChannel()
-                    .sendMessage(new EmbedBuilder().setTitle("Players (" + getServer().getOnlineCount() + "): ")
-                            .setDescription(String.join(", ", escapeUnderscores(getServer().getOnlinePlayers())))
-                            .setColor(new Color(5154580)).setFooter("Powered by Spicord", null).build())
-                    .queue();
+            final EmbedBuilder builder = new EmbedBuilder()
+                    .setTitle("Players (" + getServer().getOnlineCount() + "): ")
+                    .setDescription(String.join(", ", escapeUnderscores(getServer().getOnlinePlayers())))
+                    .setColor(new Color(5154580))
+                    .setFooter("Powered by Spicord v" + Spicord.getVersion(), null);
+
+            command.reply(builder.build());
         }
     }
 
@@ -101,6 +93,8 @@ public class PlayersAddon extends SimpleAddon {
     }
 
     private String[] escapeUnderscores(List<String> players) {
-        return players.stream().map(s -> s.replace("_", "\\_")).toArray(String[]::new);
+        return players.stream()
+                .map(s -> s.replace("_", "\\_"))
+                .toArray(String[]::new);
     }
 }

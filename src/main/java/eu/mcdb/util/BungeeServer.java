@@ -31,7 +31,7 @@ import net.md_5.bungee.api.plugin.PluginDescription;
 
 class BungeeServer extends Server {
 
-    private ProxyServer bungee = ProxyServer.getInstance();
+    private final ProxyServer bungee = ProxyServer.getInstance();
 
     @Override
     public int getOnlineCount() {
@@ -46,14 +46,18 @@ class BungeeServer extends Server {
 
     @Override
     public String[] getOnlinePlayers() {
-        return bungee.getPlayers().stream().map(ProxiedPlayer::getName).toArray(String[]::new);
+        return bungee.getPlayers().stream()
+                .map(ProxiedPlayer::getName)
+                .toArray(String[]::new);
     }
 
     @Override
     public Map<String, List<String>> getServersAndPlayers() {
         final Map<String, List<String>> map = new HashMap<String, List<String>>();
 
-        final Collection<ProxiedPlayer> players = bungee.getPlayers().stream().filter(ProxiedPlayer::isConnected).collect(Collectors.toList());
+        final Collection<ProxiedPlayer> players = bungee.getPlayers().stream()
+                .filter(ProxiedPlayer::isConnected)
+                .collect(Collectors.toList());
 
         for (final ProxiedPlayer player : players) {
             final String server = getServerName(player);
@@ -73,7 +77,7 @@ class BungeeServer extends Server {
     private String getServerName(ProxiedPlayer player, String def) {
         try {
             return player.getServer().getInfo().getName().intern();
-        } catch (Exception e) {
+        } catch (NullPointerException e) {
             if (isDebugEnabled())
                 getLogger().warning("[DEBUG] Cannot get the server name for player '" + (player == null ? "null" : player.getName()) + "', using '" + def + "'.");
         }
@@ -87,8 +91,10 @@ class BungeeServer extends Server {
 
     @Override
     public String[] getPlugins() {
-        return bungee.getPluginManager().getPlugins().stream().map(Plugin::getDescription)
-                .map(PluginDescription::getName).toArray(String[]::new);
+        return bungee.getPluginManager().getPlugins().stream()
+                .map(Plugin::getDescription)
+                .map(PluginDescription::getName)
+                .toArray(String[]::new);
     }
 
     @Override

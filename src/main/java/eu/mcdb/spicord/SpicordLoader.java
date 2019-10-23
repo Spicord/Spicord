@@ -201,7 +201,7 @@ public class SpicordLoader {
             public byte[] download() throws IOException {
                 URL url = new URL(this.url);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setConnectTimeout(3000);
+                conn.setConnectTimeout(5000);
                 conn.connect();
 
                 try (InputStream in = conn.getInputStream()) {

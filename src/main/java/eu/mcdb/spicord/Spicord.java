@@ -25,7 +25,6 @@ import eu.mcdb.spicord.addon.AddonManager;
 import eu.mcdb.spicord.addon.InfoAddon;
 import eu.mcdb.spicord.addon.PlayersAddon;
 import eu.mcdb.spicord.addon.PluginsAddon;
-import eu.mcdb.spicord.api.ISpicord;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.bot.DiscordBotLoader;
 import eu.mcdb.spicord.config.SpicordConfiguration;
@@ -34,7 +33,7 @@ import eu.mcdb.util.ServerType;
 import lombok.Getter;
 import net.dv8tion.jda.core.utils.JDALogger;
 
-public class Spicord implements ISpicord {
+public class Spicord {
 
     /**
      * The {@link Spicord} instance.
