@@ -106,7 +106,8 @@ public class Spicord {
                     debug("Successfully disabled JDA messages.");
                 }
             } catch (Exception e) {
-                getLogger().warning("An error ocurred while setting the logger: " + e.getMessage());
+                getLogger().warning("An error ocurred while setting the logger: " + e.getCause());
+                e.printStackTrace();
             }
         }
     }
