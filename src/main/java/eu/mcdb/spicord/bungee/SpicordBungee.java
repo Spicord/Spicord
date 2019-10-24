@@ -18,22 +18,18 @@
 package eu.mcdb.spicord.bungee;
 
 import java.util.concurrent.TimeUnit;
-import eu.mcdb.spicord.Spicord;
-import eu.mcdb.spicord.SpicordLoader;
 import eu.mcdb.spicord.SpicordCommand;
+import eu.mcdb.spicord.SpicordLoader;
 import eu.mcdb.universal.MCDB;
-import eu.mcdb.util.ServerType;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class SpicordBungee extends Plugin {
 
-    private static SpicordBungee instance;
     private SpicordLoader loader;
 
     @Override
     public void onEnable() {
-        instance = this;
-        this.loader = new SpicordLoader(getLogger(), getClass().getClassLoader(), ServerType.BUNGEECORD);
+        this.loader = new SpicordLoader(getLogger(), getClass().getClassLoader(), getDataFolder());
 
         getProxy().getScheduler().schedule(this, () -> loader.load(), 10, TimeUnit.SECONDS);
         MCDB.registerCommand(this, new SpicordCommand());
@@ -45,21 +41,5 @@ public class SpicordBungee extends Plugin {
             loader.disable();
 
         this.loader = null;
-        instance = null;
-    }
-
-    /**
-     * Gets the Spicord instance
-     * 
-     * @deprecated As of snapshot 2.0.0, use {@link Spicord#getInstance()} instead.
-     * @return the Spicord instance
-     */
-    @Deprecated
-    public Spicord getSpicord() {
-        return Spicord.getInstance();
-    }
-
-    public static SpicordBungee getInstance() {
-        return instance;
     }
 }

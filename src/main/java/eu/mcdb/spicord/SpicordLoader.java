@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
@@ -31,16 +30,9 @@ import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import eu.mcdb.spicord.config.SpicordConfiguration;
 import eu.mcdb.spicord.util.SpicordClassLoader;
-import eu.mcdb.util.ServerType;
 import lombok.Getter;
 
 public class SpicordLoader {
-
-    /**
-     * The server type.
-     */
-    @Getter
-    private final ServerType serverType;
 
     /**
      * The {@link Spicord} instance.
@@ -60,20 +52,23 @@ public class SpicordLoader {
 
     private Libraries.Library[] libraries;
 
+    private File dataFolder;
+
     /**
      * The {@link SpicordLoader} constructor.
      * 
      * @param logger      the {@link Spicord} instance
      * @param classLoader the plugin class loader
+     * @param dataFolder 
      * @param serverType  the server type
      */
-    public SpicordLoader(Logger logger, ClassLoader classLoader, ServerType serverType) {
+    public SpicordLoader(Logger logger, ClassLoader classLoader, File dataFolder) {
         Preconditions.checkNotNull(logger);
         Preconditions.checkNotNull(classLoader);
 
         this.classLoader = new SpicordClassLoader((URLClassLoader) classLoader);
         this.spicord = new Spicord(logger);
-        this.serverType = serverType;
+        this.dataFolder = dataFolder;
     }
 
     /**
@@ -81,7 +76,7 @@ public class SpicordLoader {
      */
     public void load() {
         try {
-            SpicordConfiguration config = new SpicordConfiguration(serverType);
+            SpicordConfiguration config = new SpicordConfiguration(dataFolder);
             this.downloadLibraries(config);
             this.loadLibraries();
 
@@ -116,7 +111,7 @@ public class SpicordLoader {
         String json = new String(ByteStreams.toByteArray(in), Charset.defaultCharset());
         this.libraries = new Gson().fromJson(json, Libraries.class).getLibraries();
 
-        this.libFolder = new File(config.getDataFolder(), "lib");
+        this.libFolder = new File(dataFolder, "lib");
 
         if (!libFolder.exists())
             libFolder.mkdir();
@@ -128,9 +123,9 @@ public class SpicordLoader {
 
             if (!file.exists()) {
                 spicord.getLogger().info("[Loader] Downloading library " + lib.getName());
-                byte[] b = lib.download();
+                byte[] data = lib.download();
                 FileOutputStream fos = new FileOutputStream(file);
-                fos.write(b);
+                fos.write(data);
                 fos.flush();
                 fos.close();
             }
@@ -200,16 +195,11 @@ public class SpicordLoader {
 
             public byte[] download() throws IOException {
                 URL url = new URL(this.url);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setConnectTimeout(5000);
-                conn.connect();
 
-                try (InputStream in = conn.getInputStream()) {
+                try (InputStream in = url.openStream()) {
                     return ByteStreams.toByteArray(in);
                 } catch (IOException e) {
                     throw new IOException(e);
-                } finally {
-                    conn.disconnect();
                 }
             }
         }

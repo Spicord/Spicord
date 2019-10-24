@@ -17,132 +17,157 @@
 
 package eu.mcdb.spicord.config;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import org.bukkit.configuration.MemorySection;
-import org.bukkit.configuration.file.FileConfiguration;
+import com.moandjiezana.toml.Toml;
+import com.moandjiezana.toml.TomlWriter;
 import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.bot.DiscordBot;
-import eu.mcdb.spicord.bukkit.SpicordBukkit;
-import eu.mcdb.spicord.bungee.SpicordBungee;
-import eu.mcdb.util.ServerType;
+import lombok.Data;
 import lombok.Getter;
-import net.md_5.bungee.config.Configuration;
-import net.md_5.bungee.config.ConfigurationProvider;
-import net.md_5.bungee.config.YamlConfiguration;
 
 public class SpicordConfiguration {
 
-    /** The list of the loaded bots. */
     @Getter
     private final Set<DiscordBot> bots;
 
-    /** The server type. */
-    @Getter
-    private ServerType serverType;
-
-    /** Debug mode flag. */
     @Getter
     private boolean debugEnabled;
 
-    /** JDA messages flag. */
     @Getter
     private boolean jdaMessagesEnabled;
 
-    /** The data folder of the plugin. */
-    @Getter
-    private File dataFolder;
+    private final File dataFolder;
+    private final File configFile;
+    private final TomlWriter writer;
 
-    /** The plugin jar file. */
-    @Getter
-    private File file;
+    private InternalConfig config;
 
-    public SpicordConfiguration(ServerType serverType) {
+    public SpicordConfiguration(final File dataFolder) {
+        new OldSpicordConfiguration(dataFolder); // migrate from old config
+
         this.bots = Collections.synchronizedSet(new HashSet<DiscordBot>());
-        this.serverType = serverType;
 
-        switch (serverType) {
-        case BUKKIT:
-            loadBukkit();
-            break;
-        case BUNGEECORD:
-            loadBungee();
-            break;
+        this.dataFolder = dataFolder;
+        this.dataFolder.mkdir();
+        this.configFile = new File(dataFolder, "config.toml");
+
+        this.writer = new TomlWriter.Builder()
+                .indentValuesBy(2)
+                .padArrayDelimitersBy(1)
+                .build();
+
+        this.load();
+    }
+
+    public void load() {
+        final Toml toml = new Toml().read(configFile);
+        this.config = toml.to(InternalConfig.class);
+
+        for (final InternalConfig.Bot botData : config.bots) {
+            DiscordBot bot = new DiscordBot(botData.name, botData.token, botData.enabled,
+                    Arrays.asList(botData.addons), botData.command_support,
+                    botData.command_prefix);
+
+            bots.add(bot);
         }
+
+        this.jdaMessagesEnabled = config.jda_messages.enabled;
+        this.debugEnabled = config.jda_messages.debug;
 
         long disabledCount = bots.stream().filter(DiscordBot::isDisabled).count();
         Spicord.getInstance().getLogger().info("Loaded " + bots.size() + " bots, " + disabledCount + " disabled.");
     }
 
-    private void loadBungee() {
-        SpicordBungee plugin = SpicordBungee.getInstance();
+    public void save() {
+        this.saveDefault();
 
-        try {
-            this.file = plugin.getFile();
-
-            createConfigIfNotExists(plugin.getDataFolder());
-
-            Configuration config = ConfigurationProvider.getProvider(YamlConfiguration.class)
-                    .load(new File(plugin.getDataFolder(), "config.yml"));
-            ((Configuration) config.get("bots")).getKeys().forEach(botName -> {
-                Configuration botData = (Configuration) config.get("bots." + botName);
-                bots.add(new DiscordBot(botName, botData.getString("token"), botData.getBoolean("enabled", false),
-                        botData.getStringList("addons"), botData.getBoolean("command-support", false),
-                        botData.getString("command-prefix")));
-            });
-
-            this.debugEnabled = config.getBoolean("enable-debug-messages", true);
-            this.jdaMessagesEnabled = config.getBoolean("enable-jda-messages", true);
+        try (final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                final FileOutputStream fos = new FileOutputStream(configFile)) {
+            writer.write(config, baos);
+            String str = fix(new String(baos.toByteArray()));
+            fos.write(str.getBytes(Charset.forName("UTF-8")));
+            fos.flush();
         } catch (Exception e) {
-            plugin.getLogger().severe(
-                    "This is a configuration error, NOT a plugin error, please generate a new config or fix it. "
-                            + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    private void loadBukkit() {
-        SpicordBukkit plugin = SpicordBukkit.getInstance();
-
-        try {
-            this.file = plugin.getFile();
-
-            createConfigIfNotExists(plugin.getDataFolder());
-
-            FileConfiguration config = plugin.getConfig();
-
-            ((MemorySection) config.get("bots")).getKeys(false).forEach(botName -> {
-                MemorySection botData = (MemorySection) config.get("bots." + botName);
-                bots.add(new DiscordBot(botName, botData.getString("token"), botData.getBoolean("enabled", false),
-                        botData.getStringList("addons"), botData.getBoolean("command-support", false),
-                        botData.getString("command-prefix")));
-            });
-
-            this.debugEnabled = config.getBoolean("enable-debug-messages", true);
-            this.jdaMessagesEnabled = config.getBoolean("enable-jda-messages", false);
-        } catch (Exception e) {
-            plugin.getLogger().severe(
-                    "This is a configuration error, NOT a plugin error, please generate a new config or fix it. "
-                            + e.getMessage());
-        }
-    }
-
-    private void createConfigIfNotExists(File dataFolder) {
-        if (!dataFolder.exists())
-            dataFolder.mkdir();
-
-        this.dataFolder = dataFolder;
-        File configFile = new File(dataFolder, "config.yml");
-
+    public void saveDefault() {
         if (!configFile.exists()) {
-            try (InputStream in = getClass().getResourceAsStream("/config.yml")) {
+            try (final InputStream in = getClass().getResourceAsStream("/config.toml")) {
                 Files.copy(in, configFile.toPath());
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    /*
+     * This adds the comment at the top of the file and
+     * fixes the toml indentation bug for some values
+     */
+    static String fix(String str) {
+        String[] lines = str.split("\n");
+        List<String> res = new ArrayList<>();
+        res.add("# +--------------------------------------------------+");
+        res.add("# | Project: Spicord                                 |");
+        res.add("# | GitHub: https://github.com/OopsieWoopsie/Spicord |");
+        res.add("# +--------------------------------------------------+");
+        res.add("");
+        boolean in = false;
+        for (String line : lines) {
+            if (line.trim().isEmpty()) {
+                in = false;
+            }
+            if (in) {
+                if (!line.startsWith("  ")) {
+                    line = "  " + line;
+                }
+            }
+            if (line.startsWith("[")) {
+                in = true;
+            }
+            res.add(line);
+        }
+        return String.join("\n", res);
+    }
+
+    @Data
+    static class InternalConfig {
+
+        private Bot[] bots;
+        private Messages jda_messages;
+        private int config_version;
+
+        InternalConfig() {
+            this.jda_messages = new Messages();
+        }
+
+        @Data
+        static class Bot {
+            private String name;
+            private boolean enabled;
+            private String token;
+            private boolean command_support;
+            private String command_prefix;
+            private String[] addons;
+        }
+
+        @Data
+        static class Messages {
+            private boolean enabled;
+            private boolean debug;
         }
     }
 }

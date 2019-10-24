@@ -17,23 +17,18 @@
 
 package eu.mcdb.spicord.bukkit;
 
-import java.io.File;
 import org.bukkit.plugin.java.JavaPlugin;
-import eu.mcdb.spicord.Spicord;
-import eu.mcdb.spicord.SpicordLoader;
 import eu.mcdb.spicord.SpicordCommand;
+import eu.mcdb.spicord.SpicordLoader;
 import eu.mcdb.universal.MCDB;
-import eu.mcdb.util.ServerType;
 
 public class SpicordBukkit extends JavaPlugin {
 
-    private static SpicordBukkit instance;
     private SpicordLoader loader;
 
     @Override
     public void onEnable() {
-        instance = this;
-        this.loader = new SpicordLoader(getLogger(), getClass().getClassLoader(), ServerType.BUKKIT);
+        this.loader = new SpicordLoader(getLogger(), getClass().getClassLoader(), getDataFolder());
 
         getServer().getScheduler().scheduleSyncDelayedTask(this, () -> loader.load(), 200);
         MCDB.registerCommand(this, new SpicordCommand());
@@ -45,26 +40,5 @@ public class SpicordBukkit extends JavaPlugin {
             loader.disable();
 
         this.loader = null;
-        instance = null;
-    }
-
-    /**
-     * Gets the Spicord instance
-     * 
-     * @deprecated As of snapshot 2.0.0, use {@link Spicord#getInstance()} instead.
-     * @return the Spicord instance
-     */
-    @Deprecated
-    public Spicord getSpicord() {
-        return Spicord.getInstance();
-    }
-
-    public static SpicordBukkit getInstance() {
-        return instance;
-    }
-
-    @Override
-    public File getFile() {
-        return super.getFile();
     }
 }

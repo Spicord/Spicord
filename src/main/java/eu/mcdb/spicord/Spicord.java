@@ -80,12 +80,18 @@ public class Spicord {
             return;
 
         this.config = config;
-        this.serverType = config.getServerType();
 
         this.registerIntegratedAddons();
 
         Server.getInstance().setDebugEnabled(config.isDebugEnabled());
 
+        setupLogger();
+
+        getLogger().info("Starting the bots...");
+        config.getBots().forEach(DiscordBotLoader::startBot);
+    }
+
+    private void setupLogger() {
         if (!SpicordLoader.hasJDA) {
             try {
                 Class<?> loggerClass = Class.forName("eu.mcdb.logger.ProvisionalLogger");
@@ -103,9 +109,6 @@ public class Spicord {
                 getLogger().warning("An error ocurred while setting the logger: " + e.getMessage());
             }
         }
-
-        getLogger().info("Starting the bots...");
-        config.getBots().forEach(DiscordBotLoader::startBot);
     }
 
     private void registerIntegratedAddons() {
