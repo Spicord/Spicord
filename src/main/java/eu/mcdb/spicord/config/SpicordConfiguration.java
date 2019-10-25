@@ -71,6 +71,8 @@ public class SpicordConfiguration {
     }
 
     public void load() {
+        this.saveDefault();
+
         final Toml toml = new Toml().read(configFile);
         this.config = toml.to(InternalConfig.class);
 

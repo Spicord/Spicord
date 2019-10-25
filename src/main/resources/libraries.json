@@ -26,11 +26,13 @@
         },
         {
             "name": "com.squareup.okio:okio:2.2.2",
-            "url": "https://repo1.maven.org/maven2/com/squareup/okio/okio/2.2.2/okio-2.2.2.jar"
+            "url": "https://repo1.maven.org/maven2/com/squareup/okio/okio/2.2.2/okio-2.2.2.jar",
+            "dontloadifclassfound": "okio.Okio"
         },
         {
             "name": "com.squareup.okhttp3:okhttp:3.13.0",
-            "url": "https://repo1.maven.org/maven2/com/squareup/okhttp3/okhttp/3.13.0/okhttp-3.13.0.jar"
+            "url": "https://repo1.maven.org/maven2/com/squareup/okhttp3/okhttp/3.13.0/okhttp-3.13.0.jar",
+            "dontloadifclassfound": "okhttp3.OkHttpClient"
         },
         {
             "name": "club.minnced:opus-java-api:1.0.4",

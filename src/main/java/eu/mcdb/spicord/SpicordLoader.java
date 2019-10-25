@@ -17,6 +17,7 @@
 
 package eu.mcdb.spicord;
 
+import static eu.mcdb.spicord.util.ReflectionUtils.classExists;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -132,8 +133,6 @@ public class SpicordLoader {
         }
     }
 
-    protected static boolean hasJDA;
-
     /**
      * Loads the libraries inside the plugin data folder.
      */
@@ -141,18 +140,19 @@ public class SpicordLoader {
         Preconditions.checkNotNull(this.libFolder, "libFolder");
         Preconditions.checkArgument(this.libFolder.isDirectory(), "libFolder not directory");
 
-        hasJDA = false;
-        try {
-            Class.forName("net.dv8tion.jda.core.JDA");
-            hasJDA = true;
+        if (classExists("net.dv8tion.jda.core.JDA")) {
             spicord.getLogger().warning("Detected another JDA instance, some options will not work.");
-        } catch (Exception e) {
+            return;
         }
 
         for (Libraries.Library lib : libraries) {
-            if (hasJDA) {
-                break;
+            if (lib.getDontloadifclassfound() != null) {
+                if (classExists(lib.getDontloadifclassfound())) {
+                    spicord.getLogger().info("[Loader] Another plugin already loaded '" + lib.getName() + "', skipping...");
+                    continue;
+                }
             }
+
             File file = new File(libFolder, lib.getFileName());
             if (file.isFile() && file.getName().endsWith(".jar")) {
 
@@ -169,9 +169,8 @@ public class SpicordLoader {
                 }
             }
         }
-        try {
-            Class.forName("net.dv8tion.jda.core.JDA");
-        } catch (ClassNotFoundException e) {
+
+        if (!classExists("net.dv8tion.jda.core.JDA")) {
             spicord.getLogger().severe("[Loader] JDA library is not loaded, this plugin will not work.");
             this.disable();
         }
@@ -188,6 +187,7 @@ public class SpicordLoader {
             private String name;
             private String sha1; // not implemented yet
             private String url;
+            private String dontloadifclassfound;
 
             public String getFileName() {
                 return url.substring(url.lastIndexOf('/') + 1, url.length());

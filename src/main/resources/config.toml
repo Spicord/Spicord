@@ -1,0 +1,29 @@
+# +--------------------------------------------------+
+# | Project: Spicord                                 |
+# | GitHub: https://github.com/OopsieWoopsie/Spicord |
+# +--------------------------------------------------+
+
+config_version = 1
+
+[[bots]]
+  name = "default"
+  enabled = false
+  token = "YOUR BOT TOKEN HERE"
+  command_support = true
+  command_prefix = "-"
+  addons = [
+    "spicord::info",
+    "spicord::plugins",
+    "spicord::players"
+  ]
+#[[bots]]
+#  name = "another-bot"
+#  enabled = false
+#  token = "YOUR BOT TOKEN HERE"
+#  command_support = true
+#  command_prefix = "!"
+#  addons = []
+
+[jda_messages]
+  enabled = true
+  debug = false

@@ -32,4 +32,11 @@ public class ReflectionUtils {
         }
         return field;
     }
+
+    public static boolean classExists(String className) {
+        try {
+            return Class.forName(className) != null;
+        } catch (ClassNotFoundException e) {}
+        return false;
+    }
 }

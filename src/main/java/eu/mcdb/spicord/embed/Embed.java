@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.time.OffsetDateTime;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
 public class Embed implements Serializable {
@@ -34,7 +35,8 @@ public class Embed implements Serializable {
     }
 
     private Embed(String content) {
-        this.content = content;
+        this.embed = new EmbedData();
+        this.embed.description = content;
     }
 
     private String content;
@@ -316,7 +318,7 @@ public class Embed implements Serializable {
     /**
      * Converts a string to a {@link Embed} object.
      * 
-     * @param json the json to be parsed.
+     * @param content the embed content
      * @return the {@link Embed} object.
      */
     public static Embed fromString(String content) {
@@ -417,5 +419,9 @@ public class Embed implements Serializable {
         // planning to make this manual but im too busy for write a lot of code.
         // probably i will do this later, idk
         return fromJson(toString());
+    }
+
+    public void sendToChannel(TextChannel channel) {
+        EmbedSender.prepare(channel, this).queue();
     }
 }
