@@ -22,9 +22,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.security.MessageDigest;
 import java.util.logging.Logger;
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
@@ -79,6 +82,7 @@ public class SpicordLoader {
         try {
             SpicordConfiguration config = new SpicordConfiguration(dataFolder);
             this.downloadLibraries(config);
+            this.sha1Check();
             this.loadLibraries();
 
             spicord.onLoad(config);
@@ -88,6 +92,31 @@ public class SpicordLoader {
             spicord.getLogger().severe("Error: " + e.getMessage());
             e.printStackTrace();
             disable();
+        }
+    }
+
+    private void sha1Check() {
+        for (Libraries.Library lib : libraries) {
+            if (lib.getSha1() != null) {
+                try {
+                    File file = new File(libFolder, lib.getFileName());
+                    byte[] b = Files.readAllBytes(file.toPath());
+                    MessageDigest digest = MessageDigest.getInstance("SHA-1");
+
+                    digest.update(b);
+
+                    String sha1 = String.format("%040x", new BigInteger(1, digest.digest()));
+
+                    if (!lib.getSha1().equals(sha1)) {
+                        spicord.getLogger().info("[Loader] sha1sum of library '" + lib.getName() + "' is wrong");
+                        spicord.getLogger().info("[Loader] expected sha1sum: " + lib.getSha1());
+                        spicord.getLogger().info("[Loader] current  sha1sum: " + sha1);
+                        downloadLibrary(lib, true);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -120,17 +149,23 @@ public class SpicordLoader {
         Preconditions.checkArgument(libFolder.isDirectory(), "File 'lib' must be a directory.");
 
         for (Libraries.Library lib : libraries) {
-            File file = new File(libFolder, lib.getFileName());
-
-            if (!file.exists()) {
-                spicord.getLogger().info("[Loader] Downloading library " + lib.getName());
-                byte[] data = lib.download();
-                FileOutputStream fos = new FileOutputStream(file);
-                fos.write(data);
-                fos.flush();
-                fos.close();
-            }
+            downloadLibrary(lib, false);
         }
+    }
+
+    private File downloadLibrary(Libraries.Library lib, boolean replace) throws IOException {
+        File file = new File(libFolder, lib.getFileName());
+
+        if (!file.exists() || replace) {
+            spicord.getLogger().info("[Loader] Downloading library " + lib.getName());
+            byte[] data = lib.download();
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(data);
+            fos.flush();
+            fos.close();
+        }
+
+        return file;
     }
 
     /**
@@ -185,7 +220,7 @@ public class SpicordLoader {
         private class Library {
 
             private String name;
-            private String sha1; // not implemented yet
+            private String sha1;
             private String url;
             private String dontloadifclassfound;
 

@@ -52,7 +52,8 @@
         },
         {
             "name": "eu.mcdb:jda:3.8.3",
-            "url": "https://github.com/mcdb/JDA/releases/download/v3.8.3-mcdb/JDA-3.8.3-mcdb.jar"
+            "url": "https://github.com/mcdb/JDA/releases/download/v3.8.3-mcdb/JDA-3.8.3-mcdb.jar",
+            "sha1": "e5072dcd8a25c079e32ba90de2f514de44c525d5"
         }
     ]
 }
