@@ -20,6 +20,9 @@ package eu.mcdb.spicord;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import eu.mcdb.spicord.addon.AddonManager;
 import eu.mcdb.spicord.addon.InfoAddon;
@@ -65,6 +68,8 @@ public class Spicord {
     @Getter
     private AddonManager addonManager;
 
+    private List<Consumer<Spicord>> loadListeners;
+
     /**
      * The Spicord constructor.
      * 
@@ -74,11 +79,22 @@ public class Spicord {
         instance = this;
         this.logger = logger;
         this.addonManager = new AddonManager(this);
+        this.loadListeners = new ArrayList<>();
+    }
+
+    public void onLoad(Consumer<Spicord> action) {
+        if (config != null)
+            throw new IllegalStateException();
+
+        loadListeners.add(action);
     }
 
     protected void onLoad(SpicordConfiguration config) throws IOException {
         if (!isLoaded())
             return;
+
+        loadListeners.forEach(l -> l.accept(this));
+        loadListeners.clear();
 
         this.config = config;
 
