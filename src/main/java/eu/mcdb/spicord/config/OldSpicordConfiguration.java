@@ -26,7 +26,7 @@ import java.util.List;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 import com.moandjiezana.toml.TomlWriter;
-import eu.mcdb.spicord.config.SpicordConfiguration.InternalConfig;
+import eu.mcdb.spicord.config.SpicordConfiguration.SpicordConfig;
 import eu.mcdb.util.Server;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
@@ -36,12 +36,12 @@ import net.md_5.bungee.config.YamlConfiguration;
 class OldSpicordConfiguration {
 
     private final File configFile;
-    private InternalConfig config;
+    private SpicordConfig config;
 
     public OldSpicordConfiguration(final File dataFolder) {
         dataFolder.mkdir();
         this.configFile = new File(dataFolder, "config.yml");
-        this.config = new InternalConfig();
+        this.config = new SpicordConfig();
 
         final File saveTo = new File(dataFolder, "config.toml");
 
@@ -55,6 +55,7 @@ class OldSpicordConfiguration {
             case BUKKIT:
                 new loadBukkit();
                 break;
+            default:
             }
 
             if (config == null) {
@@ -72,7 +73,7 @@ class OldSpicordConfiguration {
             try (final ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     final FileOutputStream fos = new FileOutputStream(saveTo)) {
                 writer.write(config, baos);
-                String str = SpicordConfiguration.fix(new String(baos.toByteArray()));
+                String str = SpicordConfiguration.fixIndentation(new String(baos.toByteArray()));
                 fos.write(str.getBytes(Charset.forName("UTF-8")));
                 fos.flush();
                 configFile.delete();
@@ -91,12 +92,12 @@ class OldSpicordConfiguration {
             try {
                 Configuration cfg = ConfigurationProvider.getProvider(YamlConfiguration.class).load(configFile);
 
-                List<InternalConfig.Bot> bots = new ArrayList<>();
+                List<SpicordConfig.Bot> bots = new ArrayList<>();
 
                 ((Configuration) cfg.get("bots")).getKeys().forEach(botName -> {
                     Configuration botData = (Configuration) cfg.get("bots." + botName);
 
-                    InternalConfig.Bot bot = new InternalConfig.Bot();
+                    SpicordConfig.Bot bot = new SpicordConfig.Bot();
                     bot.setName(botName);
                     bot.setToken(botData.getString("token", ""));
                     bot.setEnabled(botData.getBoolean("enabled", false));
@@ -106,7 +107,7 @@ class OldSpicordConfiguration {
                     bots.add(bot);
                 });
 
-                config.setBots(bots.toArray(new InternalConfig.Bot[0]));
+                config.setBots(bots.toArray(new SpicordConfig.Bot[0]));
                 config.getJda_messages().setDebug(cfg.getBoolean("enable-debug-messages", true));
                 config.getJda_messages().setEnabled(cfg.getBoolean("enable-jda-messages", false));
             } catch (Exception e) {
@@ -121,11 +122,11 @@ class OldSpicordConfiguration {
                 FileConfiguration cfg = new org.bukkit.configuration.file.YamlConfiguration();
                 cfg.load(configFile);
 
-                List<InternalConfig.Bot> bots = new ArrayList<>();
+                List<SpicordConfig.Bot> bots = new ArrayList<>();
 
                 ((MemorySection) cfg.get("bots")).getKeys(false).forEach(botName -> {
                     MemorySection botData = (MemorySection) cfg.get("bots." + botName);
-                    InternalConfig.Bot bot = new InternalConfig.Bot();
+                    SpicordConfig.Bot bot = new SpicordConfig.Bot();
                     bot.setName(botName);
                     bot.setToken(botData.getString("token", ""));
                     bot.setEnabled(botData.getBoolean("enabled", false));
@@ -135,7 +136,7 @@ class OldSpicordConfiguration {
                     bots.add(bot);
                 });
 
-                config.setBots(bots.toArray(new InternalConfig.Bot[0]));
+                config.setBots(bots.toArray(new SpicordConfig.Bot[0]));
                 config.getJda_messages().setDebug(cfg.getBoolean("enable-debug-messages", true));
                 config.getJda_messages().setEnabled(cfg.getBoolean("enable-jda-messages", false));
             } catch (Exception e) {

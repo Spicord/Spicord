@@ -29,14 +29,17 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.apache.commons.lang.StringUtils;
 import com.moandjiezana.toml.Toml;
 import com.moandjiezana.toml.TomlWriter;
 import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.bot.DiscordBot;
+import eu.mcdb.spicord.config.SpicordConfiguration.SpicordConfig.Bot;
+import eu.mcdb.spicord.util.ArrayUtils;
 import lombok.Data;
 import lombok.Getter;
 
-public class SpicordConfiguration {
+public final class SpicordConfiguration {
 
     @Getter
     private final Set<DiscordBot> bots;
@@ -51,7 +54,10 @@ public class SpicordConfiguration {
     private final File configFile;
     private final TomlWriter writer;
 
-    private InternalConfig config;
+    private SpicordConfig config;
+
+    @Getter
+    private final ConfigurationManager manager;
 
     public SpicordConfiguration(final File dataFolder) {
         new OldSpicordConfiguration(dataFolder); // migrate from old config
@@ -68,15 +74,17 @@ public class SpicordConfiguration {
                 .build();
 
         this.load();
+
+        this.manager = new ConfigurationManager(config);
     }
 
     public void load() {
         this.saveDefault();
 
         final Toml toml = new Toml().read(configFile);
-        this.config = toml.to(InternalConfig.class);
+        this.config = toml.to(SpicordConfig.class);
 
-        for (final InternalConfig.Bot botData : config.bots) {
+        for (final SpicordConfig.Bot botData : config.bots) {
             DiscordBot bot = new DiscordBot(botData.name, botData.token, botData.enabled,
                     Arrays.asList(botData.addons), botData.command_support,
                     botData.command_prefix);
@@ -97,7 +105,7 @@ public class SpicordConfiguration {
         try (final ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 final FileOutputStream fos = new FileOutputStream(configFile)) {
             writer.write(config, baos);
-            String str = fix(new String(baos.toByteArray()));
+            String str = fixIndentation(new String(baos.toByteArray()));
             fos.write(str.getBytes(Charset.forName("UTF-8")));
             fos.flush();
         } catch (Exception e) {
@@ -119,9 +127,9 @@ public class SpicordConfiguration {
      * This adds the comment at the top of the file and
      * fixes the toml indentation bug for some values
      */
-    static String fix(String str) {
-        String[] lines = str.split("\n");
-        List<String> res = new ArrayList<>();
+    static String fixIndentation(String content) {
+        String[] lines = content.split("\n");
+        List<String> res = new ArrayList<String>();
         res.add("# +--------------------------------------------------+");
         res.add("# | Project: Spicord                                 |");
         res.add("# | GitHub: https://github.com/OopsieWoopsie/Spicord |");
@@ -134,7 +142,7 @@ public class SpicordConfiguration {
             }
             if (in) {
                 if (!line.startsWith("  ")) {
-                    line = "  " + line;
+                    line = "  ".concat(line);
                 }
             }
             if (line.startsWith("[")) {
@@ -142,17 +150,74 @@ public class SpicordConfiguration {
             }
             res.add(line);
         }
-        return String.join("\n", res);
+        return fixArrayIndentation(res);
     }
 
+    /*
+     * Splits the array in multiline to make a good indentation :)
+     */
+    private static String fixArrayIndentation(List<String> lines) {
+        for (int lineIndex = 0; lineIndex < lines.size(); lineIndex++) {
+            String line = lines.get(lineIndex);
+            int i = line.indexOf(" = [ ");
+
+            if (i != -1) {
+                char[] c = line.toCharArray();
+                int spaceCount = -1;
+                while (c[spaceCount+=1] == 32);
+
+                String spaces = StringUtils.repeat(" ", spaceCount);
+                String indentation = spaces.concat("  ");
+
+                // format the array
+                String values = line.substring(i + 5, line.length() - 2).replace("\", \"", "\",\n" + indentation + "\"");
+                line = line.substring(0, i + 4) + "\n" + indentation + values + "\n" + spaces + "]";
+
+                // save it :)
+                lines.set(lineIndex, line);
+            }
+        }
+        return String.join("\n", lines);
+    }
+
+    public class ConfigurationManager {
+
+        private final SpicordConfig conf;
+
+        public ConfigurationManager(SpicordConfig conf) {
+            this.conf = conf;
+        }
+
+        public void addAddonToBot(String addonKey, String botName) {
+            for (Bot b : conf.bots) {
+                if (b.name.equals(botName)) {
+                    b.addons = ArrayUtils.push(b.addons, addonKey);
+                    save();
+                    return;
+                }
+            }
+        }
+
+        public void removeAddonFromBot(String addonKey, String botName) {
+            for (Bot b : conf.bots) {
+                if (b.name.equals(botName)) {
+                    b.addons = ArrayUtils.remove(b.addons, addonKey);
+                    save();
+                    return;
+                }
+            }
+        }
+    }
+
+    // exposed to "package" because of OldSpicordConfiguration class
     @Data
-    static class InternalConfig {
+    static class SpicordConfig {
 
         private Bot[] bots;
         private Messages jda_messages;
         private int config_version;
 
-        InternalConfig() {
+        SpicordConfig() {
             this.jda_messages = new Messages();
         }
 
