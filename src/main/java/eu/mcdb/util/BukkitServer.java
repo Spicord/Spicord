@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 import org.bukkit.Bukkit;
@@ -71,7 +72,15 @@ class BukkitServer extends eu.mcdb.util.Server {
 
     @Override
     public boolean dispatchCommand(String command) {
-        return Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+        return callSyncMethod(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
+    }
+
+    private <T> T callSyncMethod(Callable<T> task) {
+        try {
+            Plugin p = Bukkit.getPluginManager().getPlugins()[0];
+            return Bukkit.getScheduler().callSyncMethod(p, task).get();
+        } catch (Exception e) {}
+        return null;
     }
 
     @Override
