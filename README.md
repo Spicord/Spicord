@@ -15,31 +15,42 @@
 * Integrated easy-to-use API
 * Spicord is open-source!
 
+## Maven repository
+```xml
+<repositories>
+    <repository>
+        <id>spicord-repo</id>
+        <url>https://repo.mcdb.eu/</url>
+    </repository>
+</repositories>
+
+<dependencies>
+    <dependency>
+        <groupId>eu.mcdb</groupId>
+        <artifactId>spicord</artifactId>
+        <version>2.4.0-SNAPSHOT</version>
+        <scope>provided</scope>
+    </dependency>
+</dependencies>
+```
+
 ## Implementation
 ### Creating an Addon
 ```java
-// Example Addon
-package test;
-
 import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.bot.DiscordBot;
 
 public class ExampleAddon extends SimpleAddon {
 
     public ExampleAddon() {
-        super(
-            "Example Addon", // Addon name
-            "my_example_addon", // Addon key
-            "OopsieWoopsie" // Addon author
-        );
+        super("My Addon Name", "my_addon_key", "Author Name");
     }
 
     @Override
     public void onLoad(DiscordBot bot) {
         // You don't need to put a command like "!example" or "-example", because the command prefix is configured apart.
-        bot.onCommand("example", example -> {
-            example.getMessage().getChannel()
-                .sendMessage("Hello world!").queue();
+        bot.onCommand("example", command -> {
+            command.reply("Hello world!");
         });
     }
 }
@@ -47,8 +58,6 @@ public class ExampleAddon extends SimpleAddon {
 ### Registering the Addon
 ```java
 // Example using the BungeeCord plugin API, you can use the Bukkit API if you want ^^
-package test;
-
 import eu.mcdb.spicord.Spicord;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -56,12 +65,7 @@ public class ExamplePlugin extends Plugin {
 
     @Override
     public void onEnable() {
-        if (Spicord.isLoaded()) { // Check if Spicord was loaded
-            Spicord.getInstance().getAddonManager().registerAddon(new ExampleAddon()); // Register the addon
-        } else {
-            // You need to add Spicord as a dependency on your plugin, so this will never happen :D
-            System.out.println("Spicord was not loaded :c");
-        }
+        Spicord.getInstance().getAddonManager().registerAddon(new ExampleAddon()); // Register the addon
     }
 }
 ```
@@ -79,8 +83,11 @@ name: ExamplePlugin
 author: OopsieWoopsie
 version: 1.0
 main: test.ExamplePlugin
-depend: [Spicord] # Add this line
+depend: [ Spicord ] # Add this line
 ```
+
+## Warning: Outdated information below this line - will be updated soon.
+
 ### Using the Addon on your bot
 Your `config.yml` looks like this:
 ```yaml
