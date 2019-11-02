@@ -39,6 +39,7 @@ public class Embed implements Serializable {
         this.embed.description = content;
     }
 
+    private Integer __version;
     private String content;
     private EmbedData embed;
 
@@ -414,6 +415,9 @@ public class Embed implements Serializable {
         }
     }
 
+    /**
+     * Clones this instance.
+     */
     @Override
     public Embed clone() {
         // planning to make this manual but im too busy for write a lot of code.
@@ -421,7 +425,23 @@ public class Embed implements Serializable {
         return fromJson(toString());
     }
 
+    /**
+     * Sends this embed message to a text channel.
+     * 
+     * @param channel the channel
+     */
     public void sendToChannel(TextChannel channel) {
         EmbedSender.prepare(channel, this).queue();
+    }
+
+    /**
+     * Gets the embed version used to know if the embed
+     * is just a single json or if some values needs to be
+     * evaluated.
+     * 
+     * @return the embed version number
+     */
+    public int getVersion() {
+        return __version == null ? 0 : __version;
     }
 }
