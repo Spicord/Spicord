@@ -21,23 +21,19 @@ import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.bot.command.DiscordBotCommand;
 import eu.mcdb.util.Server;
-import lombok.Data;
 import lombok.Getter;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
-@Data
+@Getter
 public abstract class SimpleAddon {
 
-    @Getter
     private final Server server = Server.getInstance();
-
-    @Getter
     private final Spicord spicord = Spicord.getInstance();
 
-    private String name;
-    private String key;
-    protected String author;
-    private String[] commands;
+    private final String name;
+    private final String key;
+    private final String author;
+    private final String[] commands;
 
     public SimpleAddon(String name, String key, String author) {
         this(name, key, author, new String[0]);

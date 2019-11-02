@@ -37,7 +37,7 @@ import eu.mcdb.util.ServerType;
 import lombok.Getter;
 import net.dv8tion.jda.core.utils.JDALogger;
 
-public class Spicord {
+public final class Spicord {
 
     /**
      * The {@link Spicord} instance.

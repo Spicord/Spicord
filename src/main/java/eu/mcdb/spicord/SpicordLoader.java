@@ -36,7 +36,7 @@ import eu.mcdb.spicord.config.SpicordConfiguration;
 import eu.mcdb.spicord.util.SpicordClassLoader;
 import lombok.Getter;
 
-public class SpicordLoader {
+public final class SpicordLoader {
 
     /**
      * The {@link Spicord} instance.
