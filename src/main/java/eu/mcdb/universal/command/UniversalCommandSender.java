@@ -53,8 +53,8 @@ public abstract class UniversalCommandSender {
      * 
      * @param message the message to be sent
      */
-    public void sendFormattedMessage(String message) {
-        this.sendFormattedMessage(message, '&');
+    public void sendFormattedMessage(String message, Object... args) {
+        this.sendFormattedMessage(message, '&', args);
     }
 
     /**
@@ -63,8 +63,8 @@ public abstract class UniversalCommandSender {
      * @param message   the message to be sent
      * @param magicChar the magic char
      */
-    public void sendFormattedMessage(String message, char magicChar) {
-        this.sendMessage(message.replace(magicChar, '§'));
+    public void sendFormattedMessage(String message, char magicChar, Object... args) {
+        this.sendMessage(String.format(message, args).replace(magicChar, '§'));
     }
 
     /**
