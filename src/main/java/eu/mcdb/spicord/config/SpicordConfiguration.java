@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.apache.commons.lang.StringUtils;
 import com.moandjiezana.toml.Toml;
 import com.moandjiezana.toml.TomlWriter;
 import eu.mcdb.spicord.Spicord;
@@ -166,7 +165,7 @@ public final class SpicordConfiguration {
                 int spaceCount = -1;
                 while (c[spaceCount+=1] == 32);
 
-                String spaces = StringUtils.repeat(" ", spaceCount);
+                String spaces = repeat(" ", spaceCount);
                 String indentation = spaces.concat("  ");
 
                 // format the array
@@ -178,6 +177,15 @@ public final class SpicordConfiguration {
             }
         }
         return String.join("\n", lines);
+    }
+
+    private static String repeat(String string, int times) {
+        final StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < times; i++)
+            builder.append(string);
+
+        return builder.toString();
     }
 
     public class ConfigurationManager {
