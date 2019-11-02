@@ -18,5 +18,5 @@
 package eu.mcdb.util;
 
 public enum ServerType {
-    BUKKIT, BUNGEECORD
+    BUKKIT, BUNGEECORD, UNKNOWN
 }

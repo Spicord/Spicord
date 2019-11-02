@@ -17,6 +17,7 @@
 
 package eu.mcdb.util;
 
+import static eu.mcdb.spicord.util.ReflectionUtils.classExists;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -43,13 +44,15 @@ public abstract class Server implements IServer {
     private boolean debugEnabled = false;
 
     static {
-        try {
-            Class.forName("net.md_5.bungee.BungeeCord");
+        if (classExists("net.md_5.bungee.BungeeCord")) {
             serverType = ServerType.BUNGEECORD;
             instance = new BungeeServer();
-        } catch (ClassNotFoundException e) {
+        } else if (classExists("org.bukkit.Bukkit")) {
             serverType = ServerType.BUKKIT;
             instance = new BukkitServer();
+        } else {
+            serverType = ServerType.UNKNOWN;
+            instance = new DummyServer();
         }
     }
 }
