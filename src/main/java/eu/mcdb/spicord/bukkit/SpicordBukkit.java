@@ -28,10 +28,17 @@ public class SpicordBukkit extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        this.loader = new SpicordLoader(getLogger(), getClass().getClassLoader(), getDataFolder());
+        Runnable reload = () -> {
+            onDisable();
+            this.loader = new SpicordLoader(getLogger(), getClass().getClassLoader(), getDataFolder());
+        };
+        reload.run();
 
         getServer().getScheduler().scheduleSyncDelayedTask(this, () -> loader.load(), 200);
-        MCDB.registerCommand(this, new SpicordCommand());
+        MCDB.registerCommand(this, new SpicordCommand(() -> {
+            reload.run();
+            loader.load();
+        }));
     }
 
     @Override

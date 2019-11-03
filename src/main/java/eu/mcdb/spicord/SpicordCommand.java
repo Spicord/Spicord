@@ -17,77 +17,144 @@
 
 package eu.mcdb.spicord;
 
+import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.bot.DiscordBot;
+import eu.mcdb.spicord.bot.DiscordBot.BotStatus;
 import eu.mcdb.spicord.bot.DiscordBotLoader;
-import eu.mcdb.universal.command.UniversalCommand;
 import eu.mcdb.universal.command.UniversalCommandSender;
+import eu.mcdb.universal.command.api.Command;
+import eu.mcdb.universal.command.api.CommandParameter;
+import eu.mcdb.universal.command.api.CommandParameters;
 
-public class SpicordCommand extends UniversalCommand {
+public final class SpicordCommand extends Command {
 
-    private final Spicord spicord;
+    private Spicord spicord;
+    private final Runnable reloadAction;
 
-    public SpicordCommand() {
+    public SpicordCommand(Runnable reload) {
         super("spicord", null, new String[] { "sp" });
         this.spicord = Spicord.getInstance();
+        this.reloadAction = reload;
+
+        setCommandHandler(sender -> {
+            sender.sendFormattedMessage("&7&l[&a&lSpicord&7&l] &fRunning Spicord %s by OopsieWoopsie", Spicord.getVersion());
+            return true;
+        });
+
+        // bot command
+        Command bot = new Command("bot", "spicord.admin.bot");
+        bot.setParameter(0, new CommandParameter("botname"));
+        bot.setParameter(1, new CommandParameter("action", "add/remove", false));
+        bot.setParameter(2, new CommandParameter("key", "addon-key", false));
+        bot.setCommandHandler(this::handleBot);
+
+        // stop command
+        Command stop = new Command("stop", "spicord.admin.stop");
+        stop.setParameter(0, new CommandParameter("botname", true));
+        stop.setCommandHandler(this::handleStop);
+
+        // start command
+        Command start = new Command("start", "spicord.admin.start");
+        start.setParameter(0, new CommandParameter("botname", true));
+        start.setCommandHandler(this::handleStart);
+
+        // restart command
+        Command restart = new Command("restart", "spicord.admin.restart");
+        restart.setCommandHandler(this::handleRestart);
+
+        // status command
+        Command status = new Command("status", "spicord.admin.status");
+        status.setCommandHandler(this::handleStatus);
+
+        addSubCommand(bot);
+        addSubCommand(stop);
+        addSubCommand(start);
+        addSubCommand(restart);
+        addSubCommand(status);
     }
 
-    @Override
-    public boolean onCommand(UniversalCommandSender sender, String[] args) {
-        if (args.length == 0) {
-            sender.sendFormattedMessage("&7&l[&a&lSpicord&7&l] &fRunning Spicord " + Spicord.getVersion() + " by OopsieWoopsie");
-        } else if (args.length == 1) {
-            switch (args[0]) {
-            case "status":
-                if (sender.hasPermission("spicord.status")) {
-                    sender.sendFormattedMessage("&7&l[&a&lSpicord&7&l] &f> Status");
-                    for (DiscordBot bot : spicord.getConfig().getBots()) {
-                        sender.sendFormattedMessage(" &7- " + bot.getName() + " [" + (bot.isReady() ? "&aReady" : (bot.isEnabled() ? "&cOffline" : "&cDisabled")) + "&7]");
-                    }
-                    sender.sendFormattedMessage("&7&l[&a&lSpicord&7&l] &f--------");
-                } else {
-                    sender.sendFormattedMessage("&4You do not have permission to run this command.");
-                }
-            }
-        } else if (args.length == 2) {
-            switch (args[0]) {
-            case "start":
-                if (sender.hasPermission("spicord.admin.start")) {
-                    String name = args[1];
-                    DiscordBot bot = spicord.getBotByName(name);
-                    if (bot == null) {
-                        sender.sendFormattedMessage("&cCannot find the bot '" + name + "'.");
-                    } else if (bot.isReady()) {
-                        sender.sendFormattedMessage("&cThe bot '" + name + "' has already started.");
+    public boolean handleBot(UniversalCommandSender sender, CommandParameters params) {
+        String botname = params.getValue("botname");
+        String action = params.getValue("action");
+        String key = params.getValue("key");
+
+        if (action.equals("add") || action.equals("remove")) {
+            DiscordBot bot = spicord.getBotByName(botname);
+
+            if (bot != null) {
+                SimpleAddon addon = spicord.getAddonManager().getAddonByKey(key);
+
+                if (addon != null) {
+                    if (action.equals("add")) {
+                        sender.sendFormattedMessage("&eAdded the addon '%s' to bot '%s'", addon.getName(), bot.getName());
+                        spicord.getConfig().getManager().addAddonToBot(addon.getKey(), bot.getName());
                     } else {
-                        sender.sendFormattedMessage("&eStarting the bot '" + name + "'...");
-                        if (DiscordBotLoader.startBot(bot)) {
-                            sender.sendFormattedMessage("&aThe bot '" + name + "' is ready.");
-                        } else {
-                            sender.sendFormattedMessage("&cAn error ocurred while starting the bot '" + name + "'.");
-                        }
+                        sender.sendFormattedMessage("&eRemoved the addon '%s' from the bot '%s'", addon.getName(), bot.getName());
+                        spicord.getConfig().getManager().removeAddonFromBot(addon.getKey(), bot.getName());
                     }
+                    sender.sendFormattedMessage("&aDo &6/spicord restart &ato apply the changes");
+                    return true;
                 } else {
-                    sender.sendFormattedMessage("&4You do not have permission to run this command.");
+                    sender.sendFormattedMessage("&cCannot find the addon '%s'", key);
+                    //sender.sendFormattedMessage("&aExecute &6/sp confirm &ato force the removal"); - soon
                 }
-                break;
-            case "stop":
-                if (sender.hasPermission("spicord.admin.stop")) {
-                    String name = args[1];
-                    DiscordBot bot = Spicord.getInstance().getBotByName(name);
-                    if (bot == null) {
-                        sender.sendFormattedMessage("&cCannot find the bot '" + name + "'.");
-                        break;
-                    }
-                    if (bot.isEnabled()) {
-                        DiscordBotLoader.shutdownBot(bot);
-                    } else {
-                        sender.sendFormattedMessage("&7The bot '" + name + "' is disabled.");
-                    }
-                } else {
-                    sender.sendFormattedMessage("&4You do not have permission to run this command.");
-                }
+            } else sender.sendFormattedMessage("&cCannot find the bot '%s'", botname);
+        } else sender.sendFormattedMessage("&cInvalid action '%s', use 'add' or 'remove'", action);
+
+        return true;
+    }
+
+    public boolean handleStop(UniversalCommandSender sender, CommandParameters params) {
+        String botname = params.getOptionalValue("botname").orElse("default");
+
+        DiscordBot bot = spicord.getBotByName(botname);
+
+        if (bot == null) {
+            sender.sendFormattedMessage("&cCannot find the bot '%s'", botname);
+        } else {
+            if (bot.getStatus() == BotStatus.READY) {
+                DiscordBotLoader.shutdownBot(bot);
+            } else {
+                sender.sendFormattedMessage("&7The bot is not online and cannot be stopped");
             }
         }
+
+        return true;
+    }
+
+    public boolean handleStart(UniversalCommandSender sender, CommandParameters params) {
+        String botname = params.getOptionalValue("botname").orElse("default");
+        DiscordBot bot = spicord.getBotByName(botname);
+
+        if (bot == null) {
+            sender.sendFormattedMessage("&cCannot find the bot '%s'", botname);
+        } else if (bot.isReady()) {
+            sender.sendFormattedMessage("&cThe bot has already started");
+        } else {
+            if (DiscordBotLoader.startBot(bot)) {
+                sender.sendFormattedMessage("&aThe bot '%s' is being started", bot.getName());
+            } else {
+                sender.sendFormattedMessage("&cAn error ocurred while starting the bot '%s'", bot.getName());
+            }
+        }
+
+        return true;
+    }
+
+    public boolean handleRestart(UniversalCommandSender sender) {
+        sender.sendFormattedMessage("&cSpicord is being restarted, please wait...");
+        reloadAction.run();
+        this.spicord = Spicord.getInstance();
+        sender.sendFormattedMessage("&aSpicord has been restarted!");
+        return true;
+    }
+
+    public boolean handleStatus(UniversalCommandSender sender) {
+        sender.sendFormattedMessage("&7&l[&a&lSpicord&7&l] &f> Status");
+        for (DiscordBot bot : spicord.getConfig().getBots()) {
+            sender.sendFormattedMessage(" &7- %s [%s&7]", bot.getName(), bot.isReady() ? "&aReady" : (bot.isEnabled() ? "&cOffline" : "&cDisabled"));
+        }
+        sender.sendFormattedMessage("&7&l[&a&lSpicord&7&l] &f--------");
         return true;
     }
 }

@@ -29,10 +29,17 @@ public class SpicordBungee extends Plugin {
 
     @Override
     public void onEnable() {
-        this.loader = new SpicordLoader(getLogger(), getClass().getClassLoader(), getDataFolder());
+        Runnable reload = () -> {
+            onDisable();
+            this.loader = new SpicordLoader(getLogger(), getClass().getClassLoader(), getDataFolder());
+        };
+        reload.run();
 
         getProxy().getScheduler().schedule(this, () -> loader.load(), 10, TimeUnit.SECONDS);
-        MCDB.registerCommand(this, new SpicordCommand());
+        MCDB.registerCommand(this, new SpicordCommand(() -> {
+            reload.run();
+            loader.load();
+        }));
     }
 
     @Override
