@@ -21,6 +21,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 import com.google.common.base.Preconditions;
 import eu.mcdb.spicord.Spicord;
+import eu.mcdb.spicord.bot.DiscordBot.BotStatus;
 
 public class DiscordBotLoader {
 
@@ -33,12 +34,17 @@ public class DiscordBotLoader {
      * @return true if the bot successfully started.
      */
     public static boolean startBot(DiscordBot bot) {
-        Preconditions.checkNotNull(bot);
+        Preconditions.checkNotNull(bot, "bot");
 
         if (bot.isEnabled()) {
-            logger.info("Starting bot '" + bot.getName() + "'.");
-            CompletableFuture.runAsync(() -> bot.startBot());
-            return true;
+            if (bot.getStatus() == BotStatus.OFFLINE) {
+                bot.status = BotStatus.STARTING;
+                logger.info("Starting bot '" + bot.getName() + "'.");
+                CompletableFuture.runAsync(() -> bot.startBot());
+                return true;
+            } else {
+                logger.warning("Bot '" + bot.getName() + "' has already started.");
+            }
         } else {
             logger.warning("Bot '" + bot.getName() + "' is disabled. Skipping.");
         }
@@ -50,14 +56,19 @@ public class DiscordBotLoader {
      * Shutdowns the given bot if it is enabled.
      * 
      * @param bot the bot instance.
+     * @return true if the bot was stopped.
      */
-    public static void shutdownBot(DiscordBot bot) {
-        Preconditions.checkNotNull(bot);
+    public static boolean shutdownBot(DiscordBot bot) {
+        Preconditions.checkNotNull(bot, "bot");
 
-        if (bot.getJda() != null) {
-            bot.getJda().shutdownNow();
-            bot.ready = false;
+        if (bot.isReady()) {
+            bot.status = BotStatus.STOPPING;
+            bot.jda.shutdownNow();
+            bot.jda = null;
+            bot.status = BotStatus.OFFLINE;
+            return true;
         }
+        return false;
     }
 
     /**

@@ -36,12 +36,16 @@ public class AddonManager {
      * All the registered addons.
      */
     @Getter
-    private final Set<SimpleAddon> addons;
+    private static final Set<SimpleAddon> addons;
 
     /**
      * The {@link Spicord} instance.
      */
     private final Spicord spicord;
+
+    static {
+        addons = Collections.synchronizedSet(new HashSet<SimpleAddon>());
+    }
 
     /**
      * The AddonManager constructor.
@@ -50,7 +54,6 @@ public class AddonManager {
      */
     public AddonManager(Spicord spicord) {
         this.spicord = spicord;
-        this.addons = Collections.synchronizedSet(new HashSet<SimpleAddon>());
     }
 
     /**

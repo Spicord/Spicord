@@ -22,15 +22,15 @@ public abstract class UniversalCommand {
     /**
      * The command name.
      */
-    private String name;
+    private final String name;
     /**
      * The command permission.
      */
-    private String permission;
+    private final String permission;
     /**
      * The command aliases.
      */
-    private String[] aliases;
+    private final String[] aliases;
 
     /**
      * UniversalCommand constructor.

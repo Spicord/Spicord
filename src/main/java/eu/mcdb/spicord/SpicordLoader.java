@@ -38,6 +38,8 @@ import lombok.Getter;
 
 public final class SpicordLoader {
 
+    private static boolean firstRun = true;
+
     /**
      * The {@link Spicord} instance.
      */
@@ -81,9 +83,13 @@ public final class SpicordLoader {
     public void load() {
         try {
             SpicordConfiguration config = new SpicordConfiguration(dataFolder);
-            this.downloadLibraries(config);
-            this.sha1Check();
-            this.loadLibraries();
+
+            if (firstRun) {
+                firstRun = false;
+                this.downloadLibraries(config);
+                this.sha1Check();
+                this.loadLibraries();
+            }
 
             spicord.onLoad(config);
         } catch (IOException e) {
@@ -176,7 +182,7 @@ public final class SpicordLoader {
         Preconditions.checkArgument(this.libFolder.isDirectory(), "libFolder not directory");
 
         if (classExists("net.dv8tion.jda.core.JDA")) {
-            spicord.getLogger().warning("Detected another JDA instance, some options will not work.");
+            spicord.getLogger().warning("JDA was previously loaded, some options may not work.");
             return;
         }
 

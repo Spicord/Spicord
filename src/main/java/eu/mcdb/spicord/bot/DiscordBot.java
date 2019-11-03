@@ -55,7 +55,7 @@ public class DiscordBot extends SimpleBot {
      * The JDA instance.
      */
     @Getter
-    private JDA jda;
+    protected JDA jda;
 
     /**
      * The addons key of the addons which this bot use.
@@ -83,11 +83,8 @@ public class DiscordBot extends SimpleBot {
     @Getter
     private final Map<String, Consumer<DiscordBotCommand>> commands;
 
-    /**
-     * If the bot is running, the value will be 'true'.
-     */
     @Getter
-    protected boolean ready;
+    protected BotStatus status;
 
     /**
      * The Spicord instance
@@ -103,9 +100,9 @@ public class DiscordBot extends SimpleBot {
         this.loadedAddons = new ArrayList<SimpleAddon>();
         this.commandSupportEnabled = commandSupportEnabled;
         this.commandPrefix = prefix.trim();
-        this.ready = false;
-        this.commands = Collections.synchronizedMap(new HashMap<String, Consumer<DiscordBotCommand>>());
+        this.commands = new HashMap<String, Consumer<DiscordBotCommand>>();
         this.spicord = Spicord.getInstance();
+        this.status = BotStatus.OFFLINE;
 
         if (commandSupportEnabled) {
             if (prefix.isEmpty()) {
@@ -127,29 +124,30 @@ public class DiscordBot extends SimpleBot {
 
                 @Override
                 public void onReady(ReadyEvent event) {
-                    DiscordBot.this.ready = true;
+                    DiscordBot.this.status = BotStatus.READY;
                     DiscordBot.this.onReady(event);
                 }
 
                 @Override
                 public void onStatusChange(StatusChangeEvent event) {
-                    if (event.getNewStatus() == Status.SHUTDOWN)
-                        DiscordBot.this.ready = false;
+                    if (event.getNewStatus() == Status.SHUTDOWN) {
+                        DiscordBot.this.status = BotStatus.OFFLINE;
+                    }
                 }
 
                 @Override
                 public void onReconnect(ReconnectedEvent event) {
-                    DiscordBot.this.ready = true;
+                    DiscordBot.this.status = BotStatus.READY;
                 }
 
                 @Override
                 public void onResume(ResumedEvent event) {
-                    DiscordBot.this.ready = true;
+                    DiscordBot.this.status = BotStatus.READY;
                 }
 
                 @Override
                 public void onDisconnect(DisconnectEvent event) {
-                    DiscordBot.this.ready = false;
+                    DiscordBot.this.status = BotStatus.OFFLINE;
                 }
             });
 
@@ -193,6 +191,7 @@ public class DiscordBot extends SimpleBot {
             spicord.getAddonManager().loadAddons(this);
             return true;
         } catch (Exception e) {
+            this.status = BotStatus.OFFLINE;
             spicord.getLogger()
                     .severe("An error ocurred while starting the bot '" + getName() + "'. " + e.getMessage());
         }
@@ -283,5 +282,16 @@ public class DiscordBot extends SimpleBot {
      */
     public boolean isDisabled() {
         return !enabled;
+    }
+
+    /**
+     * @return true if the bot is running
+     */
+    public boolean isReady() {
+        return status == BotStatus.READY;
+    }
+
+    public enum BotStatus {
+        READY, OFFLINE, STARTING, STOPPING, UNKNOWN
     }
 }

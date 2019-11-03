@@ -139,7 +139,6 @@ public final class Spicord {
         getLogger().info("Disabling Spicord...");
         config.getBots().forEach(DiscordBotLoader::shutdownBot);
         config.getBots().clear();
-        addonManager.getAddons().clear();
         this.addonManager = null;
         this.serverType = null;
         this.logger = null;
