@@ -1,5 +1,7 @@
 .classpath
-.settings
+.idea
 .project
-target
+.settings
+bin
 dependency-reduced-pom.xml
+target
