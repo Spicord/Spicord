@@ -23,6 +23,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
@@ -429,9 +430,10 @@ public class Embed implements Serializable {
      * Sends this embed message to a text channel.
      * 
      * @param channel the channel
+     * @return the response value
      */
-    public void sendToChannel(TextChannel channel) {
-        EmbedSender.prepare(channel, this).queue();
+    public Message sendToChannel(TextChannel channel) {
+        return EmbedSender.prepare(channel, this).complete();
     }
 
     /**
