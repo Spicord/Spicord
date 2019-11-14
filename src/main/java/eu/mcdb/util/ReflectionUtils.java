@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.util;
+package eu.mcdb.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

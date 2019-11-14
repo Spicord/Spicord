@@ -23,9 +23,9 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
-import eu.mcdb.spicord.util.ArrayUtils;
 import eu.mcdb.universal.command.UniversalCommand;
 import eu.mcdb.universal.command.UniversalCommandSender;
+import eu.mcdb.util.ArrayUtils;
 import lombok.Getter;
 
 @Getter

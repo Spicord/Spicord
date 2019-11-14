@@ -17,7 +17,7 @@
 
 package eu.mcdb.util;
 
-import static eu.mcdb.spicord.util.ReflectionUtils.classExists;
+import static eu.mcdb.util.ReflectionUtils.classExists;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import eu.mcdb.spicord.Spicord;
 
 class DummyServer extends Server {
 
@@ -67,6 +66,6 @@ class DummyServer extends Server {
 
     @Override
     public Logger getLogger() {
-        return Spicord.getInstance().getLogger();
+        return null;
     }
 }

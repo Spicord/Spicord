@@ -31,7 +31,7 @@ import eu.mcdb.spicord.addon.PluginsAddon;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.bot.DiscordBotLoader;
 import eu.mcdb.spicord.config.SpicordConfiguration;
-import eu.mcdb.spicord.util.ReflectionUtils;
+import eu.mcdb.util.ReflectionUtils;
 import eu.mcdb.util.Server;
 import eu.mcdb.util.ServerType;
 import lombok.Getter;

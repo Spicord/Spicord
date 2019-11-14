@@ -17,7 +17,7 @@
 
 package eu.mcdb.spicord;
 
-import static eu.mcdb.spicord.util.ReflectionUtils.classExists;
+import static eu.mcdb.util.ReflectionUtils.classExists;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

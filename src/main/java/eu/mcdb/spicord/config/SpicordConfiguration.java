@@ -34,7 +34,7 @@ import com.moandjiezana.toml.TomlWriter;
 import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.config.SpicordConfiguration.SpicordConfig.Bot;
-import eu.mcdb.spicord.util.ArrayUtils;
+import eu.mcdb.util.ArrayUtils;
 import lombok.Data;
 import lombok.Getter;
 
