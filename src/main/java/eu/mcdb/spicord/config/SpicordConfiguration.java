@@ -35,8 +35,8 @@ import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.config.SpicordConfiguration.SpicordConfig.Bot;
 import eu.mcdb.util.ArrayUtils;
-import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 
 public final class SpicordConfiguration {
 
@@ -218,30 +218,49 @@ public final class SpicordConfiguration {
     }
 
     // exposed to "package" because of OldSpicordConfiguration class
-    @Data
     static class SpicordConfig {
 
+        @Getter
+        @Setter
         private Bot[] bots;
+        @Getter
+        @Setter
         private Messages jda_messages;
+        @Getter
+        @Setter
         private int config_version;
 
         SpicordConfig() {
             this.jda_messages = new Messages();
         }
 
-        @Data
         static class Bot {
+            @Getter
+            @Setter
             private String name;
+            @Getter
+            @Setter
             private boolean enabled;
+            @Getter
+            @Setter
             private String token;
+            @Getter
+            @Setter
             private boolean command_support;
+            @Getter
+            @Setter
             private String command_prefix;
+            @Getter
+            @Setter
             private String[] addons;
         }
 
-        @Data
         static class Messages {
+            @Getter
+            @Setter
             private boolean enabled;
+            @Getter
+            @Setter
             private boolean debug;
         }
     }
