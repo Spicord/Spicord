@@ -37,12 +37,16 @@ public class BukkitCommandExecutor implements CommandExecutor {
 
             @Override
             public boolean hasPermission(String permission) {
-                return sender.hasPermission(permission);
+                return isEmpty(permission) || sender.hasPermission(permission);
             }
 
             @Override
             public void sendMessage(String message) {
                 sender.sendMessage(message);
+            }
+
+            private boolean isEmpty(String s) {
+                return s == null || "".equals(s);
             }
         };
 
