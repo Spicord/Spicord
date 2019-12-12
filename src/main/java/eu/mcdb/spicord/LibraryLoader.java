@@ -28,6 +28,9 @@ public class LibraryLoader {
         this.classLoader = SpicordClassLoader.get();
         this.libFolder = new File(dataFolder, "lib");
 
+        if (!dataFolder.exists())
+            dataFolder.mkdir();
+
         if (!libFolder.exists())
             libFolder.mkdir();
 
