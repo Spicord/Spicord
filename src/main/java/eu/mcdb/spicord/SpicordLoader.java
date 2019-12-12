@@ -82,6 +82,7 @@ public final class SpicordLoader {
                     if (!classExists("net.dv8tion.jda.core.JDA")) {
                         logger.severe("[Loader] JDA library is not loaded, this plugin will not work.");
                         this.disable();
+                        return;
                     }
                 }
             }
