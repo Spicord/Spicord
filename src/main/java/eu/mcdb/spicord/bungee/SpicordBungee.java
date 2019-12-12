@@ -31,7 +31,7 @@ public class SpicordBungee extends Plugin {
     public void onEnable() {
         Runnable reload = () -> {
             onDisable();
-            this.loader = new SpicordLoader(getLogger(), getClass().getClassLoader(), getDataFolder());
+            this.loader = new SpicordLoader(getLogger(), getDataFolder());
         };
         reload.run();
 

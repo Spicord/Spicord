@@ -76,7 +76,13 @@
                     <include>plugin.yml</include>
                     <include>bungee.yml</include>
                     <include>config.toml</include>
-                    <include>libraries.json</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>libraries.libinfo</include>
                 </includes>
             </resource>
         </resources>

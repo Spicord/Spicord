@@ -24,6 +24,12 @@ import java.nio.file.Path;
 
 public class SpicordClassLoader {
 
+    private final static SpicordClassLoader self;
+
+    static {
+        self = new SpicordClassLoader();
+    }
+
     /**
      * The plugin class loader.
      */
@@ -40,14 +46,13 @@ public class SpicordClassLoader {
      * @param classLoader the class loader
      * @throws Exception
      */
-    public SpicordClassLoader(URLClassLoader classLoader) {
+    private SpicordClassLoader() {
         try {
             (this.addURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class)).setAccessible(true);
+            this.classLoader = (URLClassLoader) getClass().getClassLoader();
         } catch (NoSuchMethodException | SecurityException e) {
             throw new RuntimeException(e);
         }
-
-        this.classLoader = classLoader;
     }
 
     /**
@@ -57,5 +62,9 @@ public class SpicordClassLoader {
      */
     public void loadJar(Path file) throws Exception {
         addURL.invoke(this.classLoader, file.toUri().toURL());
+    }
+
+    public static SpicordClassLoader get() {
+        return self;
     }
 }
