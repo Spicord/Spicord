@@ -70,22 +70,19 @@ public final class SpicordLoader {
      */
     public void load() {
         try {
-            final SpicordConfiguration config = new SpicordConfiguration(dataFolder);
-
             if (firstRun) {
                 firstRun = false;
                 libraryLoader.downloadLibraries();
-                if (classExists("net.dv8tion.jda.core.JDA")) {
-                    logger.warning("JDA was previously loaded, some options may not work.");
-                } else {
-                    libraryLoader.loadLibraries();
-                    if (!classExists("net.dv8tion.jda.core.JDA")) {
-                        logger.severe("[Loader] JDA library is not loaded, this plugin will not work.");
-                        this.disable();
-                        return;
-                    }
+                libraryLoader.loadLibraries();
+
+                if (!classExists("net.dv8tion.jda.core.JDA")) {
+                    logger.severe("[Loader] JDA library is not loaded, this plugin will not work.");
+                    this.disable();
+                    return;
                 }
             }
+
+            final SpicordConfiguration config = new SpicordConfiguration(dataFolder);
 
             spicord.onLoad(config);
         } catch (IOException e) {
