@@ -28,10 +28,10 @@ public class DiscordBotLoader {
     private static final Logger logger = Spicord.getInstance().getLogger();
 
     /**
-     * Loads the given bot.
+     * Start a bot.
      * 
-     * @param bot the bot instance.
-     * @return true if the bot successfully started.
+     * @param bot the bot to be started
+     * @return true if the bot successfully started
      */
     public static boolean startBot(DiscordBot bot) {
         Preconditions.checkNotNull(bot, "bot");
@@ -69,15 +69,5 @@ public class DiscordBotLoader {
             return true;
         }
         return false;
-    }
-
-    /**
-     * @param bot the bot to be disabled
-     * @deprecated As of snapshot 2.0.0, use {@link #shutdownBot(DiscordBot)}
-     *             instead.
-     */
-    @Deprecated
-    public static void disableBot(DiscordBot bot) {
-        shutdownBot(bot);
     }
 }
