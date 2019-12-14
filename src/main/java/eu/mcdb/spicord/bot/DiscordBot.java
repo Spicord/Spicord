@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
+import javax.security.auth.login.LoginException;
 import com.google.common.base.Preconditions;
 import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
@@ -34,13 +34,8 @@ import eu.mcdb.spicord.bot.command.DiscordBotCommand;
 import lombok.Getter;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDA.Status;
 import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.events.DisconnectEvent;
 import net.dv8tion.jda.core.events.ReadyEvent;
-import net.dv8tion.jda.core.events.ReconnectedEvent;
-import net.dv8tion.jda.core.events.ResumedEvent;
-import net.dv8tion.jda.core.events.StatusChangeEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
@@ -63,7 +58,7 @@ public class DiscordBot extends SimpleBot {
     @Getter
     private final Collection<String> addons;
 
-    private final Collection<SimpleAddon> loadedAddons;
+    protected final Collection<SimpleAddon> loadedAddons;
 
     /**
      * The 'command-support' flag.
@@ -81,7 +76,7 @@ public class DiscordBot extends SimpleBot {
      * The commands provided by the addons (to THIS bot).
      */
     @Getter
-    private final Map<String, Consumer<DiscordBotCommand>> commands;
+    protected final Map<String, Consumer<DiscordBotCommand>> commands;
 
     @Getter
     protected BotStatus status;
@@ -120,77 +115,14 @@ public class DiscordBot extends SimpleBot {
         try {
             this.jda = new JDABuilder(AccountType.BOT).setToken(token).setAutoReconnect(true).build();
 
-            jda.addEventListener(new ListenerAdapter() {
+            jda.addEventListener(new BotStatusListener(this));
 
-                @Override
-                public void onReady(ReadyEvent event) {
-                    DiscordBot.this.status = BotStatus.READY;
-                    DiscordBot.this.onReady(event);
-                }
-
-                @Override
-                public void onStatusChange(StatusChangeEvent event) {
-                    if (event.getNewStatus() == Status.SHUTDOWN) {
-                        DiscordBot.this.status = BotStatus.OFFLINE;
-                    }
-                }
-
-                @Override
-                public void onReconnect(ReconnectedEvent event) {
-                    DiscordBot.this.status = BotStatus.READY;
-                }
-
-                @Override
-                public void onResume(ResumedEvent event) {
-                    DiscordBot.this.status = BotStatus.READY;
-                }
-
-                @Override
-                public void onDisconnect(DisconnectEvent event) {
-                    DiscordBot.this.status = BotStatus.OFFLINE;
-                }
-            });
-
-            if (commandSupportEnabled) {
-                jda.addEventListener(new ListenerAdapter() {
-
-                    @Override
-                    public void onMessageReceived(MessageReceivedEvent event) {
-                        DiscordBot.this.onMessageReceived(event);
-
-                        String messageContent = event.getMessage().getContentRaw();
-
-                        if (messageContent.startsWith(commandPrefix)) {
-                            messageContent = messageContent.substring(commandPrefix.length());
-
-                            if (messageContent.length() != 0) {
-                                String commandName = messageContent.split(" ")[0];
-                                String[] args = messageContent.contains(" ")
-                                        ? messageContent.substring(commandName.length() + 1).split(" ")
-                                        : new String[0];
-
-                                Supplier<DiscordBotCommand> commandSupplier = () -> new DiscordBotCommand(commandName, args, event.getMessage());
-
-                                if (commands.containsKey(commandName)) {
-                                    commands.get(commandName).accept(commandSupplier.get());
-                                } else {
-                                    for (SimpleAddon addon : loadedAddons) {
-                                        for (String cmd : addon.getCommands()) {
-                                            if (cmd.equals(commandName)) {
-                                                addon.onCommand(commandSupplier.get(), args);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
+            if (commandSupportEnabled)
+                jda.addEventListener(new BotCommandListener(this));
 
             spicord.getAddonManager().loadAddons(this);
             return true;
-        } catch (Exception e) {
+        } catch (LoginException e) {
             this.status = BotStatus.OFFLINE;
             spicord.getLogger()
                     .severe("An error ocurred while starting the bot '" + getName() + "'. " + e.getMessage());
@@ -207,13 +139,23 @@ public class DiscordBot extends SimpleBot {
         loadedAddons.forEach(addon -> addon.onMessageReceived(this, event));
     }
 
-    public void addEventListener(Class<? extends ListenerAdapter> listener) {
+    /**
+     * Add an event listener to this bot.
+     * 
+     * @param listener the event listener
+     */
+    public void addEventListener(ListenerAdapter listener) {
         jda.addEventListener(listener);
     }
 
     /**
-     * @param name    the command name without a prefix
-     * @param command the action that will be performed when the command is executed
+     * Register a command for this bot.
+     * 
+     * @param name    the command name (without prefix)
+     * @param command the action to be performed when the command is executed
+     * 
+     * @throws NullPointerException if one of the arguments is null
+     * @throws IllegalArgumentException if the {@code name} is empty or contains spaces
      */
     public void onCommand(String name, Consumer<DiscordBotCommand> command) {
         Preconditions.checkNotNull(name, "name");
@@ -234,16 +176,35 @@ public class DiscordBot extends SimpleBot {
         }
     }
 
+    /**
+     * Register a command for this bot.
+     * 
+     * @param name    the command name (without prefix)
+     * @param command the action to be performed when the command is executed
+     * 
+     * @throws NullPointerException if one of the arguments is null
+     * @throws IllegalArgumentException if the {@code name} is empty or contains spaces
+     */
     public void onCommand(String name, BotCommand command) {
         this.onCommand(name, comm -> command.onCommand(comm, comm.getArguments()));
     }
 
+    /**
+     * Register a command for this bot.
+     * Alias of {@link #onCommand(String, BotCommand)}.
+     * 
+     * @param name    the command name (without prefix)
+     * @param command the action to be performed when the command is executed
+     * 
+     * @throws NullPointerException if one of the arguments is null
+     * @throws IllegalArgumentException if the {@code name} is empty or contains spaces
+     */
     public void registerCommand(String name, BotCommand command) {
         this.onCommand(name, command);
     }
 
     /**
-     * Loads an addon to this bot.
+     * Load an addon to this bot.
      * 
      * @param addon the addon to be loaded
      */
@@ -253,6 +214,9 @@ public class DiscordBot extends SimpleBot {
     }
 
     /**
+     * Check if the bot is enabled..
+     * 
+     * @see #isDisabled()
      * @return true if the bot is enabled
      */
     public boolean isEnabled() {
@@ -260,24 +224,9 @@ public class DiscordBot extends SimpleBot {
     }
 
     /**
-     * @param enabled the value to set
-     * @deprecated The value is final and cannot be changed.
-     */
-    @Deprecated
-    protected void setEnabled(boolean enabled) {
-        throw new IllegalStateException("The value is final and cannot be changed.");
-    }
-
-    /**
-     * @param disabled the value to set
-     * @deprecated The value is final and cannot be changed.
-     */
-    @Deprecated
-    public void setDisabled(boolean disabled) {
-        throw new IllegalStateException("The value is final and cannot be changed.");
-    }
-
-    /**
+     * Check if the bot is disabled.
+     * 
+     * @see #isEnabled()
      * @return true if the bot is disabled
      */
     public boolean isDisabled() {
@@ -285,6 +234,8 @@ public class DiscordBot extends SimpleBot {
     }
 
     /**
+     * Check if the bot has started and is running.
+     * 
      * @return true if the bot is running
      */
     public boolean isReady() {
