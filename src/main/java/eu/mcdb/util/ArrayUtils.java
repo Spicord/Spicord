@@ -20,9 +20,7 @@ package eu.mcdb.util;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import lombok.experimental.UtilityClass;
 
-@UtilityClass
 public class ArrayUtils {
 
     /**
@@ -31,7 +29,7 @@ public class ArrayUtils {
      * @param array the array
      * @return the array with the given element
      */
-    public <T> T[] push(T[] array, T value) {
+    public static <T> T[] push(T[] array, T value) {
         final List<T> l = toList(array);
         if (!l.contains(value)) l.add(value);
         return toArray(l, array);
@@ -43,7 +41,7 @@ public class ArrayUtils {
      * @param array the array
      * @return the array without the given element
      */
-    public <T> T[] remove(T[] array, T value) {
+    public static <T> T[] remove(T[] array, T value) {
         final List<T> l = toList(array);
         l.remove(value);
         return toArray(l, array);
@@ -55,7 +53,7 @@ public class ArrayUtils {
      * @param array the array
      * @return the array without the last element
      */
-    public <T> T[] pop(T[] array) {
+    public static <T> T[] pop(T[] array) {
         if (array.length == 0)
             return array;
 
@@ -70,7 +68,7 @@ public class ArrayUtils {
      * @param array the array
      * @return the array without the first element
      */
-    public <T> T[] shift(T[] array) {
+    public static <T> T[] shift(T[] array) {
         if (array.length == 0)
             return array;
 
@@ -80,11 +78,11 @@ public class ArrayUtils {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T[] toArray(List<T> list, T[] orig) {
+    private static <T> T[] toArray(List<T> list, T[] orig) {
         return (T[]) Arrays.copyOf(list.toArray(), list.size(), orig.getClass());
     }
 
-    private <T> LinkedList<T> toList(T[] array) {
+    private static <T> LinkedList<T> toList(T[] array) {
         return new LinkedList<T>(Arrays.asList(array));
     }
 }
