@@ -2,7 +2,7 @@
 
 [![Latest release](https://img.shields.io/github/v/release/OopsieWoopsie/Spicord?include_prereleases&logo=github&logoColor=white&style=flat-square)](https://github.com/OopsieWoopsie/Spicord/releases/latest)
 [![Discord](https://img.shields.io/badge/Support-Discord-blue?logo=discord&logoColor=white&style=flat-square)](https://discord.gg/fBzAwWW)
-[![Downloads](https://img.shields.io/github/downloads/OopsieWoopsie/Spicord/total?label=love%20count&logo=github&style=flat-square)](https://github.com/OopsieWoopsie/Spicord/releases)
+[![Downloads](https://img.shields.io/github/downloads/OopsieWoopsie/Spicord/total?label=love%20count&logo=git&style=flat-square)](https://github.com/OopsieWoopsie/Spicord/releases)
 [![License](https://img.shields.io/github/license/OopsieWoopsie/Spicord?logo=gnu&style=flat-square)](https://github.com/OopsieWoopsie/Spicord/blob/master/LICENSE)
 
 ## Features
