@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /*
  * Copyright (C) 2019  OopsieWoopsie
  * 
@@ -16,23 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-=======
->>>>>>> 41854b324e3d05c7046534531eda7df28818b7b3
 package eu.mcdb.universal.command;
 
 import com.velocitypowered.api.command.Command;
 import com.velocitypowered.api.command.CommandSource;
 import net.kyori.text.TextComponent;
 
-<<<<<<< HEAD
 /**
  * Wrapper for the {@link UniversalCommand} class to
  * make it usable by Velocity.
  * 
  * @author sheidy
  */
-=======
->>>>>>> 41854b324e3d05c7046534531eda7df28818b7b3
 public final class VelocityCommandExecutor implements Command {
 
     private final UniversalCommand command;
