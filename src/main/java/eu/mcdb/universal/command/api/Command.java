@@ -55,10 +55,10 @@ public class Command extends UniversalCommand {
     }
 
     /**
-     * Create a command with a given name and only allow it to be executed
-     * by entities that has the given permission.
+     * Create a command with a given name and only allow it to be executed by
+     * entities that has the given permission.
      * 
-     * @param name the command name
+     * @param name       the command name
      * @param permission the required permission
      */
     public Command(String name, String permission) {
@@ -66,13 +66,12 @@ public class Command extends UniversalCommand {
     }
 
     /**
-     * Create a command with a given name and only allow it to be executed
-     * by entities that has the given permission and create aliases
-     * for that command.
+     * Create a command with a given name and only allow it to be executed by
+     * entities that has the given permission and create aliases for that command.
      * 
-     * @param name the command name
+     * @param name       the command name
      * @param permission the required permission
-     * @param aliases the command aliases
+     * @param aliases    the command aliases
      */
     public Command(String name, String permission, String... aliases) {
         super(name, permission, aliases);
@@ -87,7 +86,7 @@ public class Command extends UniversalCommand {
     /**
      * Add a subcommand for this command.
      * 
-     * @param name the command name
+     * @param name    the command name
      * @param handler the command handler
      */
     public void addSubCommand(final String name, final CommandHandler handler) {
@@ -99,9 +98,9 @@ public class Command extends UniversalCommand {
     /**
      * Add a subcommand for this command.
      * 
-     * @param name the command name
+     * @param name       the command name
      * @param permission the command permission
-     * @param handler the command handler
+     * @param handler    the command handler
      */
     public void addSubCommand(final String name, final String permission, final CommandHandler handler) {
         final Command command = new Command(name, permission);
@@ -134,7 +133,7 @@ public class Command extends UniversalCommand {
 
     /**
      * Set the command handler for this command.
-     * The given command handler will not receive any parameter.
+     * Note: The command handler will not receive any parameter.
      * 
      * @param commandHandler the command handler
      */
