@@ -28,21 +28,15 @@ import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
+@Getter
 public class DiscordBotCommand extends SimpleCommand {
 
-    @Getter
     private final Message message;
-    @Getter
     private final User author;
-    @Getter
     private final Member member;
-    @Getter
     private final Guild guild;
-    @Getter
     private final TextChannel channel;
-    @Getter
     private final String name;
-    @Getter
     private final String prefix;
 
     /**

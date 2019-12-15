@@ -73,7 +73,7 @@ public final class SpicordCommand extends Command {
         addSubCommand(status);
     }
 
-    public boolean handleBot(UniversalCommandSender sender, CommandParameters params) {
+    private boolean handleBot(UniversalCommandSender sender, CommandParameters params) {
         String botname = params.getValue("botname");
         String action = params.getValue("action");
         String key = params.getValue("key");
@@ -104,7 +104,7 @@ public final class SpicordCommand extends Command {
         return true;
     }
 
-    public boolean handleStop(UniversalCommandSender sender, CommandParameters params) {
+    private boolean handleStop(UniversalCommandSender sender, CommandParameters params) {
         String botname = params.getOptionalValue("botname").orElse("default");
 
         DiscordBot bot = spicord.getBotByName(botname);
@@ -122,7 +122,7 @@ public final class SpicordCommand extends Command {
         return true;
     }
 
-    public boolean handleStart(UniversalCommandSender sender, CommandParameters params) {
+    private boolean handleStart(UniversalCommandSender sender, CommandParameters params) {
         String botname = params.getOptionalValue("botname").orElse("default");
         DiscordBot bot = spicord.getBotByName(botname);
 
@@ -141,7 +141,7 @@ public final class SpicordCommand extends Command {
         return true;
     }
 
-    public boolean handleRestart(UniversalCommandSender sender) {
+    private boolean handleRestart(UniversalCommandSender sender) {
         sender.sendFormattedMessage("&cSpicord is being restarted, please wait...");
         reloadAction.run();
         this.spicord = Spicord.getInstance();
@@ -149,7 +149,7 @@ public final class SpicordCommand extends Command {
         return true;
     }
 
-    public boolean handleStatus(UniversalCommandSender sender) {
+    private boolean handleStatus(UniversalCommandSender sender) {
         sender.sendFormattedMessage("&7&l[&a&lSpicord&7&l] &f> Status");
         for (DiscordBot bot : spicord.getConfig().getBots()) {
             sender.sendFormattedMessage(" &7- %s [%s&7]", bot.getName(), bot.isReady() ? "&aReady" : (bot.isEnabled() ? "&cOffline" : "&cDisabled"));

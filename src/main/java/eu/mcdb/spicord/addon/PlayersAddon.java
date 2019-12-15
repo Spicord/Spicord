@@ -47,7 +47,7 @@ public class PlayersAddon extends SimpleAddon {
                 List<String> players = getServer().getServersAndPlayers().get(server);
 
                 if (players == null) {
-                    String usage = "Usage: `" + command.getPrefix() + "players <server>` or `" + command.getPrefix() + "players`";
+                    String usage = "Usage: `" + command.getPrefix() + "players [server]`";
                     command.reply(command.getAuthorAsMention() + ", the server `" + server + "` was not found!\n" + usage);
                     return;
                 } else {

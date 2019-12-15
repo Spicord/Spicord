@@ -32,7 +32,7 @@ class DummyServer extends Server {
 
     @Override
     public int getPlayerLimit() {
-        return 100;
+        return 0;
     }
 
     @Override
@@ -60,12 +60,12 @@ class DummyServer extends Server {
 
     @Override
     public boolean dispatchCommand(String command) {
-        getLogger().info(String.format("Tried to dispatch command: %s", command));
+        getLogger().info(String.format("Tried to dispatch command: '%s'", command));
         return true;
     }
 
     @Override
     public Logger getLogger() {
-        return null;
+        return Logger.getAnonymousLogger();
     }
 }
