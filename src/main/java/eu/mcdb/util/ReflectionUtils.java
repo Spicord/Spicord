@@ -19,21 +19,22 @@ package eu.mcdb.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class ReflectionUtils {
 
-    public static Field setAccessible(Field field) {
+    public Field setAccessible(Field field) {
         try {
             field.setAccessible(true);
             Field modifiersField = Field.class.getDeclaredField("modifiers");
             modifiersField.setAccessible(true);
             modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
         return field;
     }
 
-    public static boolean classExists(String className) {
+    public boolean classExists(String className) {
         try {
             return Class.forName(className) != null;
         } catch (ClassNotFoundException e) {}

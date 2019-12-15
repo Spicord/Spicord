@@ -32,20 +32,14 @@ import lombok.Getter;
  */
 public class AddonManager {
 
-    /**
-     * All the registered addons.
-     */
     @Getter
     private static final Set<SimpleAddon> addons;
-
-    /**
-     * The {@link Spicord} instance.
-     */
-    private final Spicord spicord;
 
     static {
         addons = Collections.synchronizedSet(new HashSet<SimpleAddon>());
     }
+
+    private final Spicord spicord;
 
     /**
      * The AddonManager constructor.
@@ -57,20 +51,20 @@ public class AddonManager {
     }
 
     /**
-     * Check if a given addon is registered.
+     * Check if the given addon is registered.
      * 
-     * @param addon the addon object which extends {@link SimpleAddon}
-     * @return true if the addon is registered, or false if not
+     * @param addon the addon
+     * @return true if the addon is registered
      */
     public boolean isRegistered(SimpleAddon addon) {
         return addons.contains(addon);
     }
 
     /**
-     * Check if a given addon is registered, using its key.
+     * Check if the given addon key is registered.
      * 
      * @param key the addon key
-     * @return true if the addon is registered, or false if not
+     * @return true if the addon is registered
      */
     public boolean isRegistered(String key) {
         return addons.stream().map(SimpleAddon::getKey).anyMatch(key::equals);
@@ -79,7 +73,7 @@ public class AddonManager {
     /**
      * Register an addon.
      * 
-     * @param addon the addon object which extends {@link SimpleAddon}
+     * @param addon the addon
      * @return true if the addon was successfully registered, or false if it was
      *         already registered
      */
@@ -132,9 +126,9 @@ public class AddonManager {
     }
 
     /**
-     * Load/Enable the addons of the given bot, only for it.
+     * Load the available addons for the given bot.
      * 
-     * @param bot the bot that will load its addons.
+     * @param bot the bot that will load its addons
      */
     public void loadAddons(DiscordBot bot) {
         Preconditions.checkNotNull(bot);

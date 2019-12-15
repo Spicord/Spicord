@@ -23,7 +23,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import eu.mcdb.universal.player.UniversalPlayer;
 
-public class BukkitCommandExecutor implements CommandExecutor {
+/**
+ * Wrapper for the {@link UniversalCommand} class to
+ * make it usable by Bukkit.
+ * 
+ * @author sheidy
+ */
+public final class BukkitCommandExecutor implements CommandExecutor {
 
     private final UniversalCommand command;
 

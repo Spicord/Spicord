@@ -24,48 +24,63 @@ import java.util.logging.Logger;
 public interface IServer {
 
     /**
-     * Gets the amount of online players.
+     * Get the amount of online players.
      * 
-     * @return the amount of online players on the server.
+     * @return the amount of online players on the server
      */
     int getOnlineCount();
 
     /**
-     * Gets the max amount of players that can join the server.
+     * Get the max amount of players that can join the server.
      * 
-     * @return the player limit of the server.
+     * @return the player limit of the server
      */
     int getPlayerLimit();
 
     /**
-     * Gets the names of the connected players.
+     * Get the names of the connected players.
      * 
-     * @return the names of the online players.
+     * @return the names of the online players
      */
     String[] getOnlinePlayers();
 
+    /**
+     * Get the players connected to each server in case of
+     * using BungeeCord.
+     * When using bukkit the only map key will be "default"
+     * and it will contain all the online players, the
+     * result is the same as {@link #getOnlinePlayers()}.
+     * 
+     * @return the list of online players on each server
+     */
     Map<String, List<String>> getServersAndPlayers();
 
     /**
-     * Gets the server version.
+     * Get the server version.
      * 
-     * @return the server version.
+     * @return the server version
      */
     String getVersion();
 
     /**
-     * Gets the names of the installed plugins.
+     * Get the names of the installed plugins.
      * 
-     * @return the names of the installed plugins.
+     * @return the names of the installed plugins
      */
     String[] getPlugins();
 
+    /**
+     * Dispatch a server command from the console.
+     * 
+     * @param command the command to be executed
+     * @return true if the execution result was successfully
+     */
     boolean dispatchCommand(String command);
 
     /**
      * Bukkit flag.
      * 
-     * @return true if running a Bukkit-based server.
+     * @return true if running a Bukkit-based server
      */
     default boolean isBukkit() {
         return false;
@@ -74,11 +89,16 @@ public interface IServer {
     /**
      * Bungee flag.
      * 
-     * @return true if running a BungeeCord-based server.
+     * @return true if running a BungeeCord-based server
      */
     default boolean isBungeeCord() {
         return false;
     }
 
+    /**
+     * Get the server logger.
+     * 
+     * @return the logger
+     */
     Logger getLogger();
 }

@@ -27,12 +27,17 @@ public abstract class UniversalCommandSender {
         this.player = player;
     }
 
+    /**
+     * Get the sender name.
+     * 
+     * @return the name
+     */
     public String getName() {
-        return isPlayer() ? player.getName() : "CONSOLE";
+        return isPlayer() ? player.getName() : "Console";
     }
 
     /**
-     * Gets the player who executed the command.
+     * Get the player who executed the command.
      * 
      * @return the player, may be null
      * @see {@link #isPlayer()}
@@ -42,33 +47,40 @@ public abstract class UniversalCommandSender {
     }
 
     /**
-     * Send a message.
+     * Send a message to this sender.
      * 
      * @param message the message to be sent
      */
     public abstract void sendMessage(String message);
 
     /**
-     * Send a formatted message, using '&' as the color char.
+     * Send a formatted message to this sender,
+     * using '&' as the color char.
      * 
      * @param message the message to be sent
      */
     public void sendFormattedMessage(String message, Object... args) {
-        this.sendFormattedMessage(message, '&', args);
+        if (message != null)
+            this.sendFormattedMessage(message, '&', args);
     }
 
     /**
-     * Send a formatted message, using a char of your choice.
+     * Send a formatted message to this sender,
+     * using a color/format char of your choice.
+     * 
+     * Using {@link String#format(String, Object...)} internally.
      * 
      * @param message   the message to be sent
      * @param magicChar the magic char
+     * @param args      the arguments referenced by the message value
      */
     public void sendFormattedMessage(String message, char magicChar, Object... args) {
-        this.sendMessage(String.format(message, args).replace(magicChar, '§'));
+        if (message != null)
+            this.sendMessage(String.format(message, args).replace(magicChar, '§'));
     }
 
     /**
-     * Checks if a sender has a permission.
+     * Check if the sender has the given permission.
      * 
      * @param permission the permission
      * @return true if the sender has the given permission
@@ -76,7 +88,7 @@ public abstract class UniversalCommandSender {
     public abstract boolean hasPermission(String permission);
 
     /**
-     * Checks if the sender is a player.
+     * Check if the sender is a player.
      * 
      * @return true if the sender is a player
      */

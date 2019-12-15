@@ -23,16 +23,13 @@ import lombok.Setter;
 
 /**
  * This class provides methods that can be accesed no matter what server
- * software are you using.
+ * software you are using.
  * 
  * @author OopsieWoopsie
  * @version 1.0
  */
 public abstract class Server implements IServer {
 
-    /**
-     * The server type.
-     */
     @Getter
     private static ServerType serverType;
 
@@ -41,7 +38,7 @@ public abstract class Server implements IServer {
 
     @Getter
     @Setter
-    private boolean debugEnabled = false;
+    private boolean debugEnabled; // false by default
 
     static {
         if (classExists("net.md_5.bungee.BungeeCord")) {

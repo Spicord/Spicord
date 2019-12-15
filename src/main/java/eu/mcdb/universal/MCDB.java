@@ -21,27 +21,39 @@ import org.bukkit.plugin.java.JavaPlugin;
 import eu.mcdb.universal.command.BukkitCommandExecutor;
 import eu.mcdb.universal.command.BungeeCommandExecutor;
 import eu.mcdb.universal.command.UniversalCommand;
+import lombok.experimental.UtilityClass;
 import net.md_5.bungee.api.plugin.Plugin;
 
-public final class MCDB {
+@UtilityClass
+public class MCDB {
 
-    private MCDB() {}
-
-    public static void registerCommand(Plugin plugin, UniversalCommand command) {
+    /**
+     * Register a command to the server.
+     * 
+     * @param plugin the BungeeCord plugin instance
+     * @param command the command to be registered
+     */
+    public void registerCommand(Plugin plugin, UniversalCommand command) {
         new registerBungeeCommand(plugin, command);
     }
 
-    public static void registerCommand(JavaPlugin plugin, UniversalCommand command) {
+    /**
+     * Register a command to the server.
+     * 
+     * @param plugin the Bukkit plugin instance
+     * @param command the command to be registered
+     */
+    public void registerCommand(JavaPlugin plugin, UniversalCommand command) {
         new registerBukkitCommand(plugin, command);
     }
 
-    private static class registerBungeeCommand {
+    private class registerBungeeCommand {
         registerBungeeCommand(Plugin plugin, UniversalCommand command) {
             plugin.getProxy().getPluginManager().registerCommand(plugin, new BungeeCommandExecutor(command));
         }
     }
 
-    private static class registerBukkitCommand {
+    private class registerBukkitCommand {
         registerBukkitCommand(JavaPlugin plugin, UniversalCommand command) {
             plugin.getCommand(command.getName()).setExecutor(new BukkitCommandExecutor(command));
         }

@@ -22,7 +22,13 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
-public class BungeeCommandExecutor extends Command {
+/**
+ * Wrapper for the {@link UniversalCommand} class to
+ * make it usable by BungeeCord.
+ * 
+ * @author sheidy
+ */
+public final class BungeeCommandExecutor extends Command {
 
     private final UniversalCommand command;
 

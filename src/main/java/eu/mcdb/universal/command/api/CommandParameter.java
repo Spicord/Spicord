@@ -33,10 +33,22 @@ public class CommandParameter {
     @Getter
     private final boolean optional;
 
+    /**
+     * Create a command parameter with the given name
+     * and make it a required parameter (non-optional).
+     * 
+     * @param name the parameter name
+     */
     public CommandParameter(String name) {
         this(name, false);
     }
 
+    /**
+     * Get the display name for this command, or its name
+     * if no display name was set.
+     * 
+     * @return the name or the display name
+     */
     public String getDisplayName() {
         return displayName == null ? name : displayName;
     }

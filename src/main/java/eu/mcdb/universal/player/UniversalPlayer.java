@@ -23,6 +23,11 @@ import eu.mcdb.universal.command.UniversalCommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+/**
+ * Wrapper class for the Bukkit & BungeeCord player objects.
+ * 
+ * @author sheidy
+ */
 public class UniversalPlayer extends UniversalCommandSender {
 
     private String name;

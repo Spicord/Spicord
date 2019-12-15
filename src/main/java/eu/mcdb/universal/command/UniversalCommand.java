@@ -19,34 +19,28 @@ package eu.mcdb.universal.command;
 
 public abstract class UniversalCommand {
 
-    /**
-     * The command name.
-     */
     private final String name;
-    /**
-     * The command permission.
-     */
     private final String permission;
-    /**
-     * The command aliases.
-     */
     private final String[] aliases;
 
     /**
-     * UniversalCommand constructor.
+     * Create a command with the given name that doesn't requires
+     * any permission to be executed.
      * 
-     * @param name the command name.
+     * @param name the command name
      */
     public UniversalCommand(String name) {
         this(name, null, new String[0]);
     }
 
     /**
-     * UniversalCommand constructor.
+     * Create a command with the given name that requires
+     * the given permission to be executed and create the
+     * given aliases for this command.
      * 
-     * @param name the command name.
-     * @param permission the command permission.
-     * @param aliases the aliases of the command.
+     * @param name the command name
+     * @param permission the command permission
+     * @param aliases the aliases of the command
      */
     public UniversalCommand(String name, String permission, String... aliases) {
         this.name = name;
@@ -54,30 +48,37 @@ public abstract class UniversalCommand {
         this.aliases = aliases;
     }
 
+    /**
+     * Handle the command execution.
+     * 
+     * @param sender who executed this command
+     * @param args the command arguments
+     * @return true if the command execution ended successfully
+     */
     public abstract boolean onCommand(UniversalCommandSender sender, String[] args);
 
     /**
-     * Gets the command name.
+     * Get the command name.
      * 
-     * @return the command name.
+     * @return the command name
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Gets the needed permission for this command.
+     * Get the needed permission to run this command.
      * 
-     * @return the command permission.
+     * @return the permission
      */
     public String getPermission() {
         return permission;
     }
 
     /**
-     * Gets the aliases of this command.
+     * Get the aliases for this command.
      * 
-     * @return the aliases.
+     * @return the aliases
      */
     public String[] getAliases() {
         return aliases;
