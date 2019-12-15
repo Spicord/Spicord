@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.velocity;
+package eu.mcdb.util;
 
 import java.util.logging.LogRecord;
 import org.slf4j.Logger;

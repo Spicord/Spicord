@@ -27,7 +27,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.util.ProxyVersion;
-import eu.mcdb.spicord.velocity.SLF4JWrapper;
+import eu.mcdb.util.SLF4JWrapper;
 import lombok.Setter;
 
 class VelocityServer extends Server {

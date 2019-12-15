@@ -25,7 +25,7 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.PluginManager;
 import com.velocitypowered.api.proxy.ProxyServer;
-import eu.mcdb.spicord.velocity.SLF4JWrapper;
+import eu.mcdb.util.SLF4JWrapper;
 import eu.mcdb.util.Server;
 import lombok.AccessLevel;
 import lombok.Getter;
