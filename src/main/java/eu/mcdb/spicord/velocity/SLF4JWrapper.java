@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
  * Copyright (C) 2019  OopsieWoopsie
  * 
@@ -15,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+=======
+>>>>>>> 41854b324e3d05c7046534531eda7df28818b7b3
 package eu.mcdb.spicord.velocity;
 
 import java.util.logging.LogRecord;
