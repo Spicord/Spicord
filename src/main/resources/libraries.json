@@ -1,59 +1,85 @@
 {
-    "libraries": [
-        {
-            "name": "org.jetbrains:annotations:16.0.1",
-            "url": "https://repo1.maven.org/maven2/org/jetbrains/annotations/16.0.1/annotations-16.0.1.jar"
-        },
-        {
-            "name": "com.google.code.findbugs:jsr305:3.0.2",
-            "url": "https://repo1.maven.org/maven2/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar"
-        },
-        {
-            "name": "org.apache.commons:commons-collections4:4.1",
-            "url": "https://repo1.maven.org/maven2/org/apache/commons/commons-collections4/4.1/commons-collections4-4.1.jar"
-        },
-        {
-            "name": "net.java.dev.jna:jna:4.4.0",
-            "url": "https://repo1.maven.org/maven2/net/java/dev/jna/jna/4.4.0/jna-4.4.0.jar"
-        },
-        {
-            "name": "org.json:json:20160810",
-            "url": "https://repo1.maven.org/maven2/org/json/json/20160810/json-20160810.jar"
-        },
-        {
-            "name": "com.neovisionaries:nv-websocket-client:2.5",
-            "url": "https://repo1.maven.org/maven2/com/neovisionaries/nv-websocket-client/2.5/nv-websocket-client-2.5.jar"
-        },
-        {
-            "name": "com.squareup.okio:okio:2.2.2",
-            "url": "https://repo1.maven.org/maven2/com/squareup/okio/okio/2.2.2/okio-2.2.2.jar",
-            "dontloadifclassfound": "okio.Okio"
-        },
-        {
-            "name": "com.squareup.okhttp3:okhttp:3.13.0",
-            "url": "https://repo1.maven.org/maven2/com/squareup/okhttp3/okhttp/3.13.0/okhttp-3.13.0.jar",
-            "dontloadifclassfound": "okhttp3.OkHttpClient"
-        },
-        {
-            "name": "club.minnced:opus-java-api:1.0.4",
-            "url": "https://jcenter.bintray.com/club/minnced/opus-java-api/1.0.4/opus-java-api-1.0.4.jar"
-        },
-        {
-            "name": "club.minnced:opus-java-natives:1.0.4",
-            "url": "https://jcenter.bintray.com/club/minnced/opus-java-natives/1.0.4/opus-java-natives-1.0.4.jar"
-        },
-        {
-            "name": "net.sf.trove4j:trove4j:3.0.3",
-            "url": "https://repo1.maven.org/maven2/net/sf/trove4j/trove4j/3.0.3/trove4j-3.0.3.jar"
-        },
-        {
-            "name": "org.jetbrains.kotlin:kotlin-stdlib:1.3.31",
-            "url": "https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/1.3.31/kotlin-stdlib-1.3.31.jar"
-        },
-        {
-            "name": "eu.mcdb:jda:3.8.3",
-            "url": "https://github.com/mcdb/JDA/releases/download/v3.8.3-mcdb/JDA-3.8.3-mcdb.jar",
-            "sha1": "e5072dcd8a25c079e32ba90de2f514de44c525d5"
-        }
-    ]
+  "libraries": [
+    {
+      "name": "org.jetbrains:annotations:16.0.1",
+      "sha1": "c1a6655cebcac68e63e4c24d23f573035032eb2a",
+      "url": "https://repo1.maven.org/maven2/org/jetbrains/annotations/16.0.1/annotations-16.0.1.jar"
+    },
+    {
+      "name": "com.google.code.findbugs:jsr305:3.0.2",
+      "sha1": "25ea2e8b0c338a877313bd4672d3fe056ea78f0d",
+      "url": "https://repo1.maven.org/maven2/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar"
+    },
+    {
+      "name": "org.apache.commons:commons-collections4:4.1",
+      "sha1": "a4cf4688fe1c7e3a63aa636cc96d013af537768e",
+      "url": "https://repo1.maven.org/maven2/org/apache/commons/commons-collections4/4.1/commons-collections4-4.1.jar",
+      "dontloadifclassfound": "org.apache.commons.collections4.CollectionUtils"
+    },
+    {
+      "name": "net.java.dev.jna:jna:4.4.0",
+      "sha1": "cb208278274bf12ebdb56c61bd7407e6f774d65a",
+      "url": "https://repo1.maven.org/maven2/net/java/dev/jna/jna/4.4.0/jna-4.4.0.jar",
+      "dontloadifclassfound": "com.sun.jna.Version"
+    },
+    {
+      "name": "org.json:json:20160810",
+      "sha1": "aca5eb39e2a12fddd6c472b240afe9ebea3a6733",
+      "url": "https://repo1.maven.org/maven2/org/json/json/20160810/json-20160810.jar",
+      "dontloadifclassfound": "org.json.JSONObject"
+    },
+    {
+      "name": "com.neovisionaries:nv-websocket-client:2.5",
+      "sha1": "562c5e33fbb23a576d5ae9b359dd554ce79de37e",
+      "url": "https://repo1.maven.org/maven2/com/neovisionaries/nv-websocket-client/2.5/nv-websocket-client-2.5.jar",
+      "dontloadifclassfound": "com.neovisionaries.ws.client.WebSocket"
+    },
+    {
+      "name": "com.squareup.okio:okio:2.2.2",
+      "sha1": "36f483536153f15339a8b48d508e22be7c9c531a",
+      "url": "https://repo1.maven.org/maven2/com/squareup/okio/okio/2.2.2/okio-2.2.2.jar",
+      "dontloadifclassfound": "okio.Okio"
+    },
+    {
+      "name": "com.squareup.okhttp3:okhttp:3.13.0",
+      "sha1": "f53f6362226e4546c3987b8693f3d6976df8c797",
+      "url": "https://repo1.maven.org/maven2/com/squareup/okhttp3/okhttp/3.13.0/okhttp-3.13.0.jar",
+      "dontloadifclassfound": "okhttp3.OkHttpClient"
+    },
+    {
+      "name": "club.minnced:opus-java-api:1.0.4",
+      "sha1": "20e4fafa8523ed391446ddc7dff60ef832f1543a",
+      "url": "https://jcenter.bintray.com/club/minnced/opus-java-api/1.0.4/opus-java-api-1.0.4.jar",
+      "dontloadifclassfound": "club.minnced.opus.util.OpusLibrary"
+    },
+    {
+      "name": "club.minnced:opus-java-natives:1.0.4",
+      "sha1": "292d015243833578eda04b1ad0af2dc351b14b1b",
+      "url": "https://jcenter.bintray.com/club/minnced/opus-java-natives/1.0.4/opus-java-natives-1.0.4.jar"
+    },
+    {
+      "name": "net.sf.trove4j:trove4j:3.0.3",
+      "sha1": "42ccaf4761f0dfdfa805c9e340d99a755907e2dd",
+      "url": "https://repo1.maven.org/maven2/net/sf/trove4j/trove4j/3.0.3/trove4j-3.0.3.jar",
+      "dontloadifclassfound": "gnu.trove.Version"
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-stdlib:1.3.31",
+      "sha1": "11289d20fd95ae219333f3456072be9f081c30cc",
+      "url": "https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/1.3.31/kotlin-stdlib-1.3.31.jar",
+      "dontloadifclassfound": "kotlin.KotlinVersion"
+    },
+    {
+      "name": "com.moandjiezana.toml:toml4j:0.4.0",
+      "sha1": "0a03337911d0bd2c40932aca3946edb30d0e7d0c",
+      "url": "https://repo1.maven.org/maven2/com/moandjiezana/toml/toml4j/0.7.2/toml4j-0.7.2.jar",
+      "dontloadifclassfound": "com.moandjiezana.toml.Toml"
+    },
+    {
+      "name": "eu.mcdb:jda:3.8.3",
+      "sha1": "e5072dcd8a25c079e32ba90de2f514de44c525d5",
+      "url": "https://github.com/mcdb/JDA/releases/download/v3.8.3-mcdb/JDA-3.8.3-mcdb.jar",
+      "dontloadifclassfound": "net.dv8tion.jda.core.JDA"
+    }
+  ]
 }
