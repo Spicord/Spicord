@@ -95,6 +95,10 @@ public interface IServer {
         return false;
     }
 
+    default boolean isVelocity() {
+        return false;
+    }
+
     /**
      * Get the server logger.
      * 

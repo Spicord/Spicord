@@ -18,11 +18,12 @@
 package eu.mcdb.util;
 
 import static eu.mcdb.util.ReflectionUtils.classExists;
+import com.velocitypowered.api.proxy.ProxyServer;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * This class provides methods that can be accesed no matter what server
+ * This class provides methods that can be accessed no matter what server
  * software you are using.
  * 
  * @author OopsieWoopsie
@@ -47,9 +48,16 @@ public abstract class Server implements IServer {
         } else if (classExists("org.bukkit.Bukkit")) {
             serverType = ServerType.BUKKIT;
             instance = new BukkitServer();
+        } else if (classExists("com.velocitypowered.api.proxy.ProxyServer")) {
+            serverType = ServerType.VELOCITY;
+            instance = new VelocityServer();
         } else {
             serverType = ServerType.UNKNOWN;
             instance = new DummyServer();
         }
+    }
+
+    public static void setVelocityHandle(ProxyServer proxy) {
+        VelocityServer.setHandle(proxy);
     }
 }
