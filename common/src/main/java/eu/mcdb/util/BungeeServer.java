@@ -22,8 +22,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import eu.mcdb.universal.player.UniversalPlayer;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -110,5 +112,18 @@ class BungeeServer extends Server {
     @Override
     public Logger getLogger() {
         return bungee.getLogger();
+    }
+
+    @Override
+    public UniversalPlayer getPlayer(UUID uuid) {
+        final ProxiedPlayer player = bungee.getPlayer(uuid);
+
+        return new UniversalPlayer(player.getName(), uuid) {
+
+            @Override
+            public ProxiedPlayer getProxiedPlayer() {
+                return player;
+            }
+        };
     }
 }

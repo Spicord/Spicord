@@ -24,7 +24,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 /**
- * Wrapper class for the Bukkit & BungeeCord player objects.
+ * Wrapper class for the player object for each server type.
  * 
  * @author sheidy
  */
@@ -54,6 +54,10 @@ public class UniversalPlayer extends UniversalCommandSender {
         return null;
     }
 
+    public com.velocitypowered.api.proxy.Player getVelocityPlayer() {
+        return null;
+    }
+
     public boolean isProxiedPlayer() {
         return getProxiedPlayer() != null;
     }
@@ -62,12 +66,20 @@ public class UniversalPlayer extends UniversalCommandSender {
         return getBukkitPlayer() != null;
     }
 
+    public boolean isVelocityPlayer() {
+        return getVelocityPlayer() != null;
+    }
+
     @Override
     public void sendMessage(String message) {
         if (isProxiedPlayer()) {
             getProxiedPlayer().sendMessage(new TextComponent(message));
-        } else {
+        } else if (isBukkitPlayer()) {
             getBukkitPlayer().sendMessage(message);
+        } else if (isVelocityPlayer()) {
+            getVelocityPlayer().sendMessage(net.kyori.text.TextComponent.of(message));
+        } else {
+            throw new IllegalStateException("The player instance was not set");
         }
     }
 
@@ -75,8 +87,12 @@ public class UniversalPlayer extends UniversalCommandSender {
     public boolean hasPermission(String permission) {
         if (isProxiedPlayer()) {
             return getProxiedPlayer().hasPermission(permission);
-        } else {
+        } else if (isBukkitPlayer()) {
             return getBukkitPlayer().hasPermission(permission);
+        } else if (isVelocityPlayer()) {
+            return getVelocityPlayer().hasPermission(permission);
+        } else {
+            throw new IllegalStateException("The player instance was not set");
         }
     }
 }

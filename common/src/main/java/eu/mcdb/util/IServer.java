@@ -19,7 +19,9 @@ package eu.mcdb.util;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Logger;
+import eu.mcdb.universal.player.UniversalPlayer;
 
 public interface IServer {
 
@@ -43,6 +45,14 @@ public interface IServer {
      * @return the names of the online players
      */
     String[] getOnlinePlayers();
+
+    /**
+     * Get a player instance.
+     * 
+     * @param uuid the player uuid
+     * @return the player, or null if the player is offline
+     */
+    UniversalPlayer getPlayer(UUID uuid);
 
     /**
      * Get the players connected to each server in case of

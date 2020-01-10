@@ -21,12 +21,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.util.ProxyVersion;
+import eu.mcdb.universal.player.UniversalPlayer;
 import eu.mcdb.util.SLF4JWrapper;
 import lombok.Setter;
 
@@ -34,6 +36,12 @@ class VelocityServer extends Server {
 
     @Setter
     private static ProxyServer handle;
+
+    private final Logger logger;
+
+    VelocityServer() {
+        this.logger = new SLF4JWrapper();
+    }
 
     @Override
     public int getOnlineCount() {
@@ -94,6 +102,22 @@ class VelocityServer extends Server {
 
     @Override
     public Logger getLogger() {
-        return new SLF4JWrapper();
+        return logger;
+    }
+
+    @Override
+    public UniversalPlayer getPlayer(UUID uuid) {
+        final Player player = handle.getPlayer(uuid).orElse(null);
+
+        if (player == null)
+            return null;
+
+        return new UniversalPlayer(player.getUsername(), uuid) {
+
+            @Override
+            public Player getVelocityPlayer() {
+                return player;
+            }
+        };
     }
 }

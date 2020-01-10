@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -28,6 +29,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import eu.mcdb.universal.player.UniversalPlayer;
 
 class BukkitServer extends eu.mcdb.util.Server {
 
@@ -91,5 +93,21 @@ class BukkitServer extends eu.mcdb.util.Server {
     @Override
     public Logger getLogger() {
         return bukkit.getLogger();
+    }
+
+    @Override
+    public UniversalPlayer getPlayer(UUID uuid) {
+        final Player player = bukkit.getPlayer(uuid);
+
+        if (player == null || !player.isOnline())
+            return null;
+
+        return new UniversalPlayer(player.getName(), uuid) {
+
+            @Override
+            public Player getBukkitPlayer() {
+                return player;
+            }
+        };
     }
 }

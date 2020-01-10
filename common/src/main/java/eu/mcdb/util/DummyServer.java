@@ -21,7 +21,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Logger;
+import eu.mcdb.universal.player.UniversalPlayer;
 
 class DummyServer extends Server {
 
@@ -67,5 +69,10 @@ class DummyServer extends Server {
     @Override
     public Logger getLogger() {
         return Logger.getAnonymousLogger();
+    }
+
+    @Override
+    public UniversalPlayer getPlayer(UUID uuid) {
+        return null;
     }
 }
