@@ -18,7 +18,9 @@
 package eu.mcdb.util;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 
 public class ReflectionUtils {
 
@@ -36,6 +38,17 @@ public class ReflectionUtils {
         try {
             return Class.forName(className) != null;
         } catch (ClassNotFoundException e) {}
+        return false;
+    }
+
+    public static boolean methodExists(Class<?> clazz, String methodName, Class<?>... params) {
+        for (Method m : clazz.getDeclaredMethods()) {
+            if (m.getName().equals(methodName)) {
+                if (Arrays.equals(m.getParameterTypes(), params)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 }

@@ -114,13 +114,19 @@ public final class Spicord {
                 Class<?> loggerClass = Class.forName("eu.mcdb.logger.ProvisionalLogger");
                 Constructor<?> constructor = loggerClass.getConstructor(boolean.class, boolean.class);
                 Object loggerInst = constructor.newInstance(config.isDebugEnabled(), config.isJdaMessagesEnabled());
-                Method setLogMethod = JDALogger.class.getDeclaredMethod("setLog", loggerClass.getInterfaces()[0]);
-                setLogMethod.invoke(null, loggerInst);
+                boolean b = ReflectionUtils.methodExists(JDALogger.class, "setLog", loggerClass.getInterfaces()[0]);
 
-                if (config.isJdaMessagesEnabled()) {
-                    debug("Successfully enabled JDA messages.");
+                if (b) {
+                    Method setLogMethod = JDALogger.class.getDeclaredMethod("setLog", loggerClass.getInterfaces()[0]);
+                    setLogMethod.invoke(null, loggerInst);
+
+                    if (config.isJdaMessagesEnabled()) {
+                        debug("Successfully enabled JDA messages.");
+                    } else {
+                        debug("Successfully disabled JDA messages.");
+                    }
                 } else {
-                    debug("Successfully disabled JDA messages.");
+                    getLogger().warning("setLog method not found, this may cause errors.");
                 }
             } catch (Exception e) {
                 getLogger().warning("An error ocurred while setting the logger: " + e.getCause());
