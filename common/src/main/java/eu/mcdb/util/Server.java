@@ -42,7 +42,12 @@ public abstract class Server implements IServer {
     private boolean debugEnabled; // false by default
 
     static {
-        if (classExists("net.md_5.bungee.BungeeCord")) {
+        final boolean console = false;
+
+        if (console) {
+            serverType = ServerType.UNKNOWN;
+            instance = new DummyServer();
+        } else if (classExists("net.md_5.bungee.BungeeCord")) {
             serverType = ServerType.BUNGEECORD;
             instance = new BungeeServer();
         } else if (classExists("org.bukkit.Bukkit")) {
