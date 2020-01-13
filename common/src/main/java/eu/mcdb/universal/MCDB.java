@@ -32,31 +32,26 @@ public final class MCDB {
     /**
      * Register a command to the server.
      * 
-     * @param plugin  the BungeeCord plugin instance
+     * @param plugin  the plugin instance
      * @param command the command to be registered
      */
-    public static void registerCommand(Plugin plugin, UniversalCommand command) {
-        new registerBungeeCommand(plugin, command);
+    public static void registerCommand(Object plugin, UniversalCommand command) {
+        if (isInstance(plugin, "net.md_5.bungee.api.plugin.Plugin"))
+            new registerBungeeCommand((Plugin) plugin, command);
+        else if (isInstance(plugin, "org.bukkit.plugin.java.JavaPlugin"))
+            new registerBukkitCommand((JavaPlugin) plugin, command);
+        else if (isInstance(plugin, "eu.mcdb.universal.plugin.VelocityPlugin"))
+            new registerVelocityCommand((VelocityPlugin) plugin, command);
+        else
+            throw new IllegalArgumentException();
     }
 
-    /**
-     * Register a command to the server.
-     * 
-     * @param plugin  the Bukkit plugin instance
-     * @param command the command to be registered
-     */
-    public static void registerCommand(JavaPlugin plugin, UniversalCommand command) {
-        new registerBukkitCommand(plugin, command);
-    }
-
-    /**
-     * Register a command to the server.
-     * 
-     * @param plugin  the Velocity plugin instance
-     * @param command the command to be registered
-     */
-    public static void registerCommand(VelocityPlugin plugin, UniversalCommand command) {
-        new registerVelocityCommand(plugin, command);
+    private static boolean isInstance(Object plugin, String className) {
+        try {
+            final Class<?> clazz = Class.forName(className);
+            return clazz.isInstance(plugin);
+        } catch (Exception e) {}
+        return false;
     }
 
     private static class registerBungeeCommand {
