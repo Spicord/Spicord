@@ -20,6 +20,7 @@ package eu.mcdb.universal.player;
 import java.util.UUID;
 import org.bukkit.entity.Player;
 import eu.mcdb.universal.command.UniversalCommandSender;
+import net.kyori.text.Component;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -77,9 +78,16 @@ public class UniversalPlayer extends UniversalCommandSender {
         } else if (isBukkitPlayer()) {
             getBukkitPlayer().sendMessage(message);
         } else if (isVelocityPlayer()) {
-            getVelocityPlayer().sendMessage(net.kyori.text.TextComponent.of(message));
+            getVelocityPlayer().sendMessage(new Fix1().get(message));
         } else {
             throw new IllegalStateException("The player instance was not set");
+        }
+    }
+
+    // fix "class not found"
+    private class Fix1 {
+        public Component get(String message) {
+            return net.kyori.text.TextComponent.of(message);
         }
     }
 
