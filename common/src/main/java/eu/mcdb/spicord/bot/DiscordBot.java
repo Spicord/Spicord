@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 import javax.security.auth.login.LoginException;
 import com.google.common.base.Preconditions;
 import eu.mcdb.spicord.Spicord;
+import eu.mcdb.spicord.api.Node;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.api.bot.SimpleBot;
 import eu.mcdb.spicord.api.bot.command.BotCommand;
@@ -39,7 +40,7 @@ import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-public class DiscordBot extends SimpleBot {
+public class DiscordBot extends SimpleBot implements Node {
 
     /**
      * If the bot is enabled on the config, this will be true.
@@ -81,9 +82,6 @@ public class DiscordBot extends SimpleBot {
     @Getter
     protected BotStatus status;
 
-    /**
-     * The Spicord instance
-     */
     private final Spicord spicord;
 
     public DiscordBot(String name, String token, boolean enabled, List<String> addons, boolean commandSupportEnabled,
@@ -96,7 +94,7 @@ public class DiscordBot extends SimpleBot {
         this.commandSupportEnabled = commandSupportEnabled;
         this.commandPrefix = prefix.trim();
         this.commands = new HashMap<String, Consumer<DiscordBotCommand>>();
-        this.spicord = Spicord.getInstance();
+        this.spicord = getSpicord();
         this.status = BotStatus.OFFLINE;
 
         if (commandSupportEnabled) {

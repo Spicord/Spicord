@@ -78,7 +78,7 @@ public final class Spicord {
     public Spicord(Logger logger) {
         instance = this;
         this.logger = logger;
-        this.addonManager = new AddonManager(this);
+        this.addonManager = new AddonManager();
         this.loadListeners = new ArrayList<>();
     }
 

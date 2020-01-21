@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,7 +37,6 @@ import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.config.SpicordConfiguration.SpicordConfig.Bot;
 import eu.mcdb.util.ArrayUtils;
 import lombok.Getter;
-import lombok.Setter;
 
 public final class SpicordConfiguration {
 
@@ -59,8 +59,6 @@ public final class SpicordConfiguration {
     private final ConfigurationManager manager;
 
     public SpicordConfiguration(final File dataFolder) {
-        new OldSpicordConfiguration(dataFolder); // migrate from old config
-
         this.bots = Collections.synchronizedSet(new HashSet<DiscordBot>());
 
         this.dataFolder = dataFolder;
@@ -115,7 +113,7 @@ public final class SpicordConfiguration {
     public void saveDefault() {
         if (!configFile.exists()) {
             try (final InputStream in = getClass().getResourceAsStream("/config.toml")) {
-                Files.copy(in, configFile.toPath());
+                Files.copy(in, configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -217,50 +215,29 @@ public final class SpicordConfiguration {
         }
     }
 
-    // exposed to "package" because of OldSpicordConfiguration class
-    static class SpicordConfig {
+    public class SpicordConfig {
 
-        @Getter
-        @Setter
         private Bot[] bots;
-        @Getter
-        @Setter
         private Messages jda_messages;
-        @Getter
-        @Setter
-        private int config_version;
+        //private int config_version;
 
-        SpicordConfig() {
+        public SpicordConfig() {
             this.jda_messages = new Messages();
         }
 
-        static class Bot {
-            @Getter
-            @Setter
+        public class Bot {
+
             private String name;
-            @Getter
-            @Setter
             private boolean enabled;
-            @Getter
-            @Setter
             private String token;
-            @Getter
-            @Setter
             private boolean command_support;
-            @Getter
-            @Setter
             private String command_prefix;
-            @Getter
-            @Setter
             private String[] addons;
         }
 
-        static class Messages {
-            @Getter
-            @Setter
+        public class Messages {
+
             private boolean enabled;
-            @Getter
-            @Setter
             private boolean debug;
         }
     }

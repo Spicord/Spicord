@@ -17,18 +17,14 @@
 
 package eu.mcdb.spicord.api.addon;
 
-import eu.mcdb.spicord.Spicord;
+import eu.mcdb.spicord.api.Node;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.bot.command.DiscordBotCommand;
-import eu.mcdb.util.Server;
 import lombok.Getter;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 @Getter
-public abstract class SimpleAddon {
-
-    private final Server server = Server.getInstance();
-    private final Spicord spicord = Spicord.getInstance();
+public abstract class SimpleAddon implements Node {
 
     private final String name;
     private final String key;

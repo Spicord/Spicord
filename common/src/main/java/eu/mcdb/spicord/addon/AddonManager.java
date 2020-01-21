@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import com.google.common.base.Preconditions;
-import eu.mcdb.spicord.Spicord;
+import eu.mcdb.spicord.api.Node;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.bot.DiscordBot;
 import lombok.Getter;
@@ -30,24 +30,13 @@ import lombok.Getter;
 /**
  * This class is used for manage and register addons.
  */
-public class AddonManager {
+public class AddonManager implements Node {
 
     @Getter
     private static final Set<SimpleAddon> addons;
 
     static {
         addons = Collections.synchronizedSet(new HashSet<SimpleAddon>());
-    }
-
-    private final Spicord spicord;
-
-    /**
-     * The AddonManager constructor.
-     * 
-     * @param spicord the {@link Spicord} instance
-     */
-    public AddonManager(Spicord spicord) {
-        this.spicord = spicord;
     }
 
     /**
@@ -79,8 +68,9 @@ public class AddonManager {
      */
     public boolean registerAddon(SimpleAddon addon) {
         if (!isRegistered(addon)) {
-            spicord.getLogger().info(
-                    "Registered addon '" + addon.getName() + "' (" + addon.getKey() + ") by " + addon.getAuthor());
+            final Object[] args = new Object[] { addon.getName(), addon.getKey(), addon.getAuthor() };
+
+            getLogger().info(String.format("Registered addon '%s' (%s) by %s", args));
 
             return addons.add(addon);
         }
@@ -90,7 +80,7 @@ public class AddonManager {
     /**
      * Unregister an addon.
      * 
-     * @param addon the addon object
+     * @param addon the addon instance
      * @return true if it was unregistered, or false if not
      */
     public boolean unregisterAddon(SimpleAddon addon) {
@@ -108,20 +98,20 @@ public class AddonManager {
     }
 
     /**
-     * Get an addon by its key.
+     * Get an addon instance by its key.
      * 
      * @param key the addon key
-     * @return the addon object it the addon exists, or null if it doesn't exists
+     * @return the addon instance, or null if not found
      */
     public SimpleAddon getAddonByKey(String key) {
         Preconditions.checkNotNull(key, "The addon key cannot be null.");
         Preconditions.checkArgument(!key.trim().isEmpty(), "The addon key cannot be empty.");
 
-        for (SimpleAddon addon : addons)
+        for (final SimpleAddon addon : addons)
             if (addon.getKey().equals(key))
                 return addon;
 
-        spicord.getLogger().warning("The addon with the key '" + key + "' was not found.");
+        getLogger().warning("The addon with the key '" + key + "' was not found.");
         return null;
     }
 

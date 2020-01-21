@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.event.EventManager;
 import com.velocitypowered.api.plugin.Plugin;
-import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.PluginManager;
 import com.velocitypowered.api.proxy.ProxyServer;
 import eu.mcdb.util.SLF4JWrapper;
@@ -41,7 +40,6 @@ public abstract class VelocityPlugin {
     private final EventManager eventManager;
     private final PluginManager pluginManager;
 
-    private PluginContainer container;
     private File dataFolder;
     private Logger logger;
 
@@ -78,20 +76,17 @@ public abstract class VelocityPlugin {
             return;
         }
 
-        throw new IllegalStateException(); // TODO: message
+        throw new IllegalStateException(String.format("missing annotation %s for class %s", Plugin.class.getName(), clazz.getName()));
     }
 
     private Class<?> getExtendingClass() {
         try {
-            throw new Exception();
-        } catch (Exception e) {
-            try {
-                // index 3 (+1) because is the amount of calls since this class was extended
-                final String name = e.getStackTrace()[3].getClassName();
-                return Class.forName(name);
-            } catch (Exception e1) {
-                return null;
-            }
+            // index 3 (+1) because is the amount of calls since this class was extended
+            final StackTraceElement[] st = new Throwable().getStackTrace();
+            final String name = st[3].getClassName();
+            return Class.forName(name);
+        } catch (ClassNotFoundException | IndexOutOfBoundsException e) {
+            throw new RuntimeException("an error ocurred while getting the extending class", e);
         }
     }
 

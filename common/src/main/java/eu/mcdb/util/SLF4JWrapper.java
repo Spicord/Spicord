@@ -36,8 +36,24 @@ public final class SLF4JWrapper extends java.util.logging.Logger {
 
     @Override
     public void log(LogRecord record) {
-        // TODO: not send all messages with #info()
-        logger.info(record.getMessage());
+        final String message = record.getMessage();
+
+        switch (record.getLevel().toString()) {
+        case "CONFIG":
+        case "FINE":
+        case "FINER":
+        case "FINEST":
+            logger.debug(message); break;
+        case "SEVERE":
+            logger.error(message); break;
+        case "WARNING":
+            logger.warn(message); break;
+        case "INFO":
+        case "ALL":
+        case "OFF":
+        default:
+            logger.info(message); break;
+        }
     }
 
     public Logger getSLF4JLogger() {

@@ -29,9 +29,10 @@ public final class SpicordLoader {
     private static boolean firstRun = true;
 
     private Spicord spicord;
-    private File dataFolder;
-    private LibraryLoader libraryLoader;
-    private Logger logger;
+
+    private final File dataFolder;
+    private final LibraryLoader libraryLoader;
+    private final Logger logger;
 
     /**
      * The {@link SpicordLoader} constructor.
