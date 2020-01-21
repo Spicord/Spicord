@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  OopsieWoopsie
+ * Copyright (C) 2020  OopsieWoopsie
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -24,32 +24,13 @@ import java.nio.file.Path;
 
 public class SpicordClassLoader {
 
-    private final static SpicordClassLoader self;
+    private final static URLClassLoader classLoader;
+    private final static Method addURL;
 
     static {
-        self = new SpicordClassLoader();
-    }
-
-    /**
-     * The plugin class loader.
-     */
-    private final URLClassLoader classLoader;
-
-    /**
-     * The method used to load the classes.
-     */
-    private final Method addURL;
-
-    /**
-     * The SpicordClassLoader constructor.
-     * 
-     * @param classLoader the class loader
-     * @throws Exception
-     */
-    private SpicordClassLoader() {
         try {
-            (this.addURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class)).setAccessible(true);
-            this.classLoader = (URLClassLoader) getClass().getClassLoader();
+            (addURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class)).setAccessible(true);
+             classLoader = (URLClassLoader) SpicordClassLoader.class.getClassLoader();
         } catch (NoSuchMethodException | SecurityException e) {
             throw new RuntimeException(e);
         }
@@ -60,11 +41,7 @@ public class SpicordClassLoader {
      * 
      * @param file the {@link Path} of the Jar file
      */
-    public void loadJar(Path file) throws Exception {
-        addURL.invoke(this.classLoader, file.toUri().toURL());
-    }
-
-    public static SpicordClassLoader get() {
-        return self;
+    public static void loadJar(Path file) throws Exception {
+        addURL.invoke(classLoader, file.toUri().toURL());
     }
 }

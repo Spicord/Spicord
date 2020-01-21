@@ -23,28 +23,14 @@ import java.io.IOException;
 import java.util.logging.Logger;
 import com.google.common.base.Preconditions;
 import eu.mcdb.spicord.config.SpicordConfiguration;
-import eu.mcdb.spicord.util.SpicordClassLoader;
-import lombok.Getter;
 
 public final class SpicordLoader {
 
     private static boolean firstRun = true;
 
-    /**
-     * The {@link Spicord} instance.
-     */
     private Spicord spicord;
-
-    /**
-     * The {@link SpicordClassLoader} instance.
-     */
-    @Getter
-    private SpicordClassLoader classLoader;
-
     private File dataFolder;
-
     private LibraryLoader libraryLoader;
-
     private Logger logger;
 
     /**
@@ -59,7 +45,6 @@ public final class SpicordLoader {
         Preconditions.checkNotNull(logger);
 
         this.logger = logger;
-        this.classLoader = SpicordClassLoader.get();
         this.libraryLoader = new LibraryLoader("/libraries.libinfo", logger, dataFolder);
         this.spicord = new Spicord(logger);
         this.dataFolder = dataFolder;

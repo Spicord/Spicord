@@ -36,13 +36,11 @@ import lombok.Getter;
 public class LibraryLoader {
 
     private final Logger log;
-    private SpicordClassLoader classLoader;
     private File libFolder;
     private Library[] libraries;
 
     public LibraryLoader(String libinfo, Logger log, File dataFolder) {
         this.log = log;
-        this.classLoader = SpicordClassLoader.get();
         this.libFolder = new File(dataFolder, "lib");
 
         if (!dataFolder.exists())
@@ -127,7 +125,7 @@ public class LibraryLoader {
 
                 if (file.exists()) {
                     try {
-                        classLoader.loadJar(file.toPath());
+                        SpicordClassLoader.loadJar(file.toPath());
                         log.info("[Loader] Loaded library '" + file.getName() + "'.");
                     } catch (Exception e) {
                         log.severe("[Loader] Cannot load library '" + file.getName() + "'. " + e.getMessage());
