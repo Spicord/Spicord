@@ -15,41 +15,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.util;
+package eu.mcdb.universal;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
-import org.bukkit.Bukkit;
-import org.bukkit.Server;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import eu.mcdb.universal.player.UniversalPlayer;
 
-class BukkitServer extends eu.mcdb.util.Server {
-
-    private final Server bukkit = Bukkit.getServer();
+class DummyServer extends Server {
 
     @Override
     public int getOnlineCount() {
-        return bukkit.getOnlinePlayers().size();
+        return 0;
     }
 
     @Override
     public int getPlayerLimit() {
-        return bukkit.getMaxPlayers();
+        return 0;
     }
 
     @Override
     public String[] getOnlinePlayers() {
-        return bukkit.getOnlinePlayers().stream()
-                .map(Player::getName)
-                .toArray(String[]::new);
+        return new String[0];
     }
 
     @Override
@@ -62,52 +52,27 @@ class BukkitServer extends eu.mcdb.util.Server {
 
     @Override
     public String getVersion() {
-        return bukkit.getVersion();
+        return "DummyServer 1.0";
     }
 
     @Override
     public String[] getPlugins() {
-        return Stream.of(bukkit.getPluginManager().getPlugins())
-                .map(Plugin::getName)
-                .toArray(String[]::new);
+        return new String[] { "Spicord" };
     }
 
     @Override
     public boolean dispatchCommand(String command) {
-        return callSyncMethod(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
-    }
-
-    private <T> T callSyncMethod(Callable<T> task) {
-        try {
-            Plugin p = Bukkit.getPluginManager().getPlugins()[0];
-            return Bukkit.getScheduler().callSyncMethod(p, task).get();
-        } catch (Exception e) {}
-        return null;
-    }
-
-    @Override
-    public boolean isBukkit() {
+        getLogger().info(String.format("Tried to dispatch command: '%s'", command));
         return true;
     }
 
     @Override
     public Logger getLogger() {
-        return bukkit.getLogger();
+        return Logger.getAnonymousLogger();
     }
 
     @Override
     public UniversalPlayer getPlayer(UUID uuid) {
-        final Player player = bukkit.getPlayer(uuid);
-
-        if (player == null || !player.isOnline())
-            return null;
-
-        return new UniversalPlayer(player.getName(), uuid) {
-
-            @Override
-            public Player getBukkitPlayer() {
-                return player;
-            }
-        };
+        return null;
     }
 }

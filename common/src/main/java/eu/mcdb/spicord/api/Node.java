@@ -2,7 +2,7 @@ package eu.mcdb.spicord.api;
 
 import java.util.logging.Logger;
 import eu.mcdb.spicord.Spicord;
-import eu.mcdb.util.Server;
+import eu.mcdb.universal.Server;
 
 public interface Node {
 

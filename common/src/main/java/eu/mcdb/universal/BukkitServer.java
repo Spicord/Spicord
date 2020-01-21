@@ -15,31 +15,41 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.util;
+package eu.mcdb.universal;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
+import org.bukkit.Bukkit;
+import org.bukkit.Server;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import eu.mcdb.universal.player.UniversalPlayer;
 
-class DummyServer extends Server {
+class BukkitServer extends eu.mcdb.universal.Server {
+
+    private final Server bukkit = Bukkit.getServer();
 
     @Override
     public int getOnlineCount() {
-        return 0;
+        return bukkit.getOnlinePlayers().size();
     }
 
     @Override
     public int getPlayerLimit() {
-        return 0;
+        return bukkit.getMaxPlayers();
     }
 
     @Override
     public String[] getOnlinePlayers() {
-        return new String[0];
+        return bukkit.getOnlinePlayers().stream()
+                .map(Player::getName)
+                .toArray(String[]::new);
     }
 
     @Override
@@ -52,27 +62,52 @@ class DummyServer extends Server {
 
     @Override
     public String getVersion() {
-        return "DummyServer 1.0";
+        return bukkit.getVersion();
     }
 
     @Override
     public String[] getPlugins() {
-        return new String[] { "Spicord" };
+        return Stream.of(bukkit.getPluginManager().getPlugins())
+                .map(Plugin::getName)
+                .toArray(String[]::new);
     }
 
     @Override
     public boolean dispatchCommand(String command) {
-        getLogger().info(String.format("Tried to dispatch command: '%s'", command));
+        return callSyncMethod(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
+    }
+
+    private <T> T callSyncMethod(Callable<T> task) {
+        try {
+            Plugin p = Bukkit.getPluginManager().getPlugins()[0];
+            return Bukkit.getScheduler().callSyncMethod(p, task).get();
+        } catch (Exception e) {}
+        return null;
+    }
+
+    @Override
+    public boolean isBukkit() {
         return true;
     }
 
     @Override
     public Logger getLogger() {
-        return Logger.getAnonymousLogger();
+        return bukkit.getLogger();
     }
 
     @Override
     public UniversalPlayer getPlayer(UUID uuid) {
-        return null;
+        final Player player = bukkit.getPlayer(uuid);
+
+        if (player == null || !player.isOnline())
+            return null;
+
+        return new UniversalPlayer(player.getName(), uuid) {
+
+            @Override
+            public Player getBukkitPlayer() {
+                return player;
+            }
+        };
     }
 }

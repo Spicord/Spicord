@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.util;
+package eu.mcdb.universal;
 
 public enum ServerType {
     BUKKIT, BUNGEECORD, VELOCITY, UNKNOWN

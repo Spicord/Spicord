@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.util;
+package eu.mcdb.universal;
 
 import java.util.HashMap;
 import java.util.List;

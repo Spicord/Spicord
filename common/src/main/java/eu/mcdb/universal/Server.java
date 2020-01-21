@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.util;
+package eu.mcdb.universal;
 
 import static eu.mcdb.util.ReflectionUtils.classExists;
 import com.velocitypowered.api.proxy.ProxyServer;
