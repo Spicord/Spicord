@@ -39,32 +39,20 @@ import net.dv8tion.jda.core.utils.JDALogger;
 
 public final class Spicord {
 
-    /**
-     * The {@link Spicord} instance.
-     */
     private static Spicord instance;
 
-    /**
-     * The {@link Logger} instance.
-     */
     @Getter
     private Logger logger;
 
-    /**
-     * The server type.
-     */
     @Getter
     private ServerType serverType;
 
-    /**
-     * The Spicord configuration.
-     */
     @Getter
     private SpicordConfiguration config;
 
-    /**
-     * The addon manager.
-     */
+    @Getter
+    private SpicordServiceManager serviceManager;
+
     @Getter
     private AddonManager addonManager;
 
@@ -97,6 +85,7 @@ public final class Spicord {
         loadListeners.clear();
 
         this.config = config;
+        this.serviceManager = new SpicordServiceManager();
 
         this.registerIntegratedAddons();
 

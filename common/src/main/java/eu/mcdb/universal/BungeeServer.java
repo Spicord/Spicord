@@ -88,7 +88,16 @@ class BungeeServer extends Server {
 
     @Override
     public String getVersion() {
-        return bungee.getVersion();
+        String version = bungee.getVersion();
+
+        if (version.contains(":")) {
+            String[] parts = version.split(":");
+            if (parts.length == 5) {
+                version = bungee.getName() + " " + parts[3];
+            }
+        }
+
+        return version;
     }
 
     @Override

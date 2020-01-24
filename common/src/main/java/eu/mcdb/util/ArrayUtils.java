@@ -24,26 +24,28 @@ import java.util.List;
 public class ArrayUtils {
 
     /**
-     * Add the given element to the given array only if the element isn't there.
+     * Add the {@code element} to the {@code array} if it's not present.
      * 
      * @param array the array
-     * @return the array with the given element
+     * @param element the element
+     * @return the result array
      */
-    public static <T> T[] push(T[] array, T value) {
+    public static <T> T[] push(T[] array, T element) {
         final List<T> l = toList(array);
-        if (!l.contains(value)) l.add(value);
+        if (!l.contains(element)) l.add(element);
         return toArray(l, array);
     }
 
     /**
-     * Remove the given element from the given array.
+     * Remove the {@code element} from the {@code array}.
      * 
      * @param array the array
-     * @return the array without the given element
+     * @param element the element
+     * @return the result array
      */
-    public static <T> T[] remove(T[] array, T value) {
+    public static <T> T[] remove(T[] array, T element) {
         final List<T> l = toList(array);
-        l.remove(value);
+        l.remove(element);
         return toArray(l, array);
     }
 
@@ -51,7 +53,7 @@ public class ArrayUtils {
      * Remove the last element from the given array.
      * 
      * @param array the array
-     * @return the array without the last element
+     * @return the result array
      */
     public static <T> T[] pop(T[] array) {
         if (array.length == 0)
@@ -63,10 +65,10 @@ public class ArrayUtils {
     }
 
     /**
-     * Remove the first element from the given array.
+     * Remove the first element from the {@code array}.
      * 
      * @param array the array
-     * @return the array without the first element
+     * @return the result array
      */
     public static <T> T[] shift(T[] array) {
         if (array.length == 0)

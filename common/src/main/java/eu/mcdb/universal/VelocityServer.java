@@ -30,11 +30,9 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.util.ProxyVersion;
 import eu.mcdb.universal.player.UniversalPlayer;
 import eu.mcdb.util.SLF4JWrapper;
-import lombok.Setter;
 
 class VelocityServer extends Server {
 
-    @Setter
     private static ProxyServer handle;
 
     private final Logger logger;
@@ -119,5 +117,12 @@ class VelocityServer extends Server {
                 return player;
             }
         };
+    }
+
+    protected static void setHandle(ProxyServer server) {
+        if (server == null) return;
+        if (handle != null) return;
+
+        handle = server;
     }
 }

@@ -32,13 +32,13 @@ import java.util.List;
 import java.util.Set;
 import com.moandjiezana.toml.Toml;
 import com.moandjiezana.toml.TomlWriter;
-import eu.mcdb.spicord.Spicord;
+import eu.mcdb.spicord.api.Node;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.config.SpicordConfiguration.SpicordConfig.Bot;
 import eu.mcdb.util.ArrayUtils;
 import lombok.Getter;
 
-public final class SpicordConfiguration {
+public final class SpicordConfiguration implements Node {
 
     @Getter
     private final Set<DiscordBot> bots;
@@ -82,9 +82,14 @@ public final class SpicordConfiguration {
         this.config = toml.to(SpicordConfig.class);
 
         for (final SpicordConfig.Bot botData : config.bots) {
-            DiscordBot bot = new DiscordBot(botData.name, botData.token, botData.enabled,
-                    Arrays.asList(botData.addons), botData.command_support,
-                    botData.command_prefix);
+            final DiscordBot bot = new DiscordBot(
+                    botData.name,
+                    botData.token,
+                    botData.enabled,
+                    Arrays.asList(botData.addons),
+                    botData.command_support,
+                    botData.command_prefix
+                );
 
             bots.add(bot);
         }
@@ -93,7 +98,7 @@ public final class SpicordConfiguration {
         this.debugEnabled = config.jda_messages.debug;
 
         long disabledCount = bots.stream().filter(DiscordBot::isDisabled).count();
-        Spicord.getInstance().getLogger().info("Loaded " + bots.size() + " bots, " + disabledCount + " disabled.");
+        getLogger().info("Loaded " + bots.size() + " bots, " + disabledCount + " disabled.");
     }
 
     public void save() {
@@ -124,7 +129,7 @@ public final class SpicordConfiguration {
      * This adds the comment at the top of the file and
      * fixes the toml indentation bug for some values
      */
-    static String fixIndentation(String content) {
+    private String fixIndentation(String content) {
         String[] lines = content.split("\n");
         List<String> res = new ArrayList<String>();
         res.add("# +--------------------------------------------------+");
@@ -153,7 +158,7 @@ public final class SpicordConfiguration {
     /*
      * Splits the array in multiline to make a good indentation :)
      */
-    private static String fixArrayIndentation(List<String> lines) {
+    private String fixArrayIndentation(List<String> lines) {
         for (int lineIndex = 0; lineIndex < lines.size(); lineIndex++) {
             String line = lines.get(lineIndex);
             int i = line.indexOf(" = [ ");

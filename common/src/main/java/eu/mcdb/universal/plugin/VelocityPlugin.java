@@ -54,7 +54,7 @@ public abstract class VelocityPlugin {
 
         Server.setVelocityHandle(proxyServer);
 
-        this.check();
+        this.setup();
         this.onLoad();
         this.onEnable(); // TODO
     }
@@ -62,8 +62,8 @@ public abstract class VelocityPlugin {
     public void onLoad() {}
     public void onEnable() {}
 
-    private void check() {
-        final Class<?> clazz = getExtendingClass();
+    private void setup() {
+        final Class<?> clazz = getClass();
 
         if (clazz.isAnnotationPresent(Plugin.class)) {
             this.plugin = clazz.getAnnotation(Plugin.class);
@@ -77,17 +77,6 @@ public abstract class VelocityPlugin {
         }
 
         throw new IllegalStateException(String.format("missing annotation %s for class %s", Plugin.class.getName(), clazz.getName()));
-    }
-
-    private Class<?> getExtendingClass() {
-        try {
-            // index 3 (+1) because is the amount of calls since this class was extended
-            final StackTraceElement[] st = new Throwable().getStackTrace();
-            final String name = st[3].getClassName();
-            return Class.forName(name);
-        } catch (ClassNotFoundException | IndexOutOfBoundsException e) {
-            throw new RuntimeException("an error ocurred while getting the extending class", e);
-        }
     }
 
     public final org.slf4j.Logger getSLF4JLogger() {

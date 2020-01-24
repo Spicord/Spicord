@@ -152,7 +152,7 @@ public final class SpicordCommand extends Command {
     private boolean handleStatus(UniversalCommandSender sender) {
         sender.sendFormattedMessage("&7&l[&a&lSpicord&7&l] &f> Status");
         for (DiscordBot bot : spicord.getConfig().getBots()) {
-            sender.sendFormattedMessage(" &7- %s [%s&7]", bot.getName(), bot.isReady() ? "&aReady" : (bot.isEnabled() ? "&cOffline" : "&cDisabled"));
+            sender.sendFormattedMessage(" &7- %s [&e%s&7]", bot.getName(), bot.getStatus().toString());
         }
         sender.sendFormattedMessage("&7&l[&a&lSpicord&7&l] &f--------");
         return true;
