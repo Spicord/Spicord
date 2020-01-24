@@ -32,6 +32,7 @@ import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.api.bot.SimpleBot;
 import eu.mcdb.spicord.api.bot.command.BotCommand;
 import eu.mcdb.spicord.bot.command.DiscordBotCommand;
+import eu.mcdb.spicord.bot.command.DiscordCommand;
 import lombok.Getter;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
@@ -179,7 +180,6 @@ public class DiscordBot extends SimpleBot implements Node {
      * 
      * @param name    the command name (without prefix)
      * @param command the action to be performed when the command is executed
-     * 
      * @throws NullPointerException if one of the arguments is null
      * @throws IllegalArgumentException if the {@code name} is empty or contains spaces
      */
@@ -197,8 +197,22 @@ public class DiscordBot extends SimpleBot implements Node {
      * @throws NullPointerException if one of the arguments is null
      * @throws IllegalArgumentException if the {@code name} is empty or contains spaces
      */
+    @Deprecated
     public void registerCommand(String name, BotCommand command) {
         this.onCommand(name, command);
+    }
+
+    /**
+     * 
+     * 
+     * @param command the command
+     */
+    public void registerCommand(final DiscordCommand command) {
+        this.onCommand(command.getName(), command);
+
+        for (final String alias : command.getAliases()) {
+            this.onCommand(alias, command);
+        }
     }
 
     /**
@@ -241,6 +255,17 @@ public class DiscordBot extends SimpleBot implements Node {
     }
 
     public enum BotStatus {
-        READY, OFFLINE, STARTING, STOPPING, UNKNOWN
+        READY("Ready"), OFFLINE("Offline"), STARTING("Starting"), STOPPING("Stopping"), UNKNOWN("Unknown");
+
+        private final String value;
+
+        BotStatus(final String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
     }
 }
