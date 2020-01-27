@@ -17,25 +17,19 @@
 
 package org.spicord.script;
 
-public interface ScriptEngine extends IScriptEngine {
+public class ScriptException extends RuntimeException {
 
-    /**
-     * Get a new ScriptEngine instance for the requested engine.
-     * 
-     * @param name the engine name
-     * @return the new ScriptEngine instance
-     * @throws IllegalArgumentException if the engine was not found
-     */
-    public static ScriptEngine getEngine(String name) {
-        final ScriptEngine engine;
+    private static final long serialVersionUID = 1L;
 
-        switch (name) {
-        case "nashorn":
-            engine = new NashornScriptEngine(); break;
-        default:
-            throw new IllegalArgumentException("engine '" + name + "' not found");
-        }
+    public ScriptException(String message) {
+        super(message);
+    }
 
-        return engine;
+    public ScriptException(Throwable cause) {
+        super(cause);
+    }
+
+    public ScriptException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

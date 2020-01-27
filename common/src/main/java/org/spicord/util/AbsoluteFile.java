@@ -15,27 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.spicord.script;
+package org.spicord.util;
 
-public interface ScriptEngine extends IScriptEngine {
+import java.io.File;
 
-    /**
-     * Get a new ScriptEngine instance for the requested engine.
-     * 
-     * @param name the engine name
-     * @return the new ScriptEngine instance
-     * @throws IllegalArgumentException if the engine was not found
-     */
-    public static ScriptEngine getEngine(String name) {
-        final ScriptEngine engine;
+public final class AbsoluteFile {
 
-        switch (name) {
-        case "nashorn":
-            engine = new NashornScriptEngine(); break;
-        default:
-            throw new IllegalArgumentException("engine '" + name + "' not found");
-        }
+    private AbsoluteFile() {}
 
-        return engine;
+    public static File of(String pathname) {
+        return new File(pathname).getAbsoluteFile();
+    }
+
+    public static File of(String parent, String child) {
+        return new File(parent, child).getAbsoluteFile();
     }
 }
