@@ -32,6 +32,8 @@ public interface ScriptEngine extends IScriptEngine {
         switch (name) {
         case "nashorn":
             engine = new NashornScriptEngine(); break;
+        case "rhino":
+            engine = new RhinoScriptEngine(); break;
         default:
             throw new IllegalArgumentException("engine '" + name + "' not found");
         }
