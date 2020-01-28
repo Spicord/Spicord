@@ -63,6 +63,7 @@ class RhinoScriptEngine implements ScriptEngine {
                 + "    const __dirname = \"{{{dirname}}}\";"
                 + "    const require = (name) => __core.require(__dirname, name);"
                 + "    {{{body}}}"
+                + ""
                 + "    return module.exports;"
                 + "})();";
     }

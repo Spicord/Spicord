@@ -17,6 +17,9 @@
 
 package org.spicord.script;
 
+import eu.mcdb.spicord.api.addon.JavaScriptBaseAddon;
+import eu.mcdb.universal.Server;
+
 /**
  * The ModuleManager utility provides methods for module registrations,
  * the modules can be accessed from a JavaScript environment using the
@@ -72,4 +75,11 @@ public interface ModuleManager {
      */
     Object getModule(String name);
 
+    /**
+     * Register the default modules for this ModuleManager instance.
+     */
+    default void registerDefaultModules() {
+        this.register("server", Server.getInstance());
+        this.register("base-addon", JavaScriptBaseAddon.class);
+    }
 }

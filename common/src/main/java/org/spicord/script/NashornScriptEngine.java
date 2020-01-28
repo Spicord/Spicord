@@ -41,7 +41,7 @@ class NashornScriptEngine implements ScriptEngine {
         if (nashorn == null)
             throw new IllegalStateException("the nashorn engine is not present on this JVM");
 
-        this.moduleManager = new NashornModuleManager(this);
+        this.moduleManager = new NashornModuleManager();
 
         final String setup = "const console = { log: print };"
                 + "const __core = { require: {} };"
@@ -62,6 +62,7 @@ class NashornScriptEngine implements ScriptEngine {
                 + "        return __core.require(__dirname, name)"
                 + "    };"
                 + "    {{{body}}}"
+                + ""
                 + "    return module.exports;"
                 + "})();";
     }

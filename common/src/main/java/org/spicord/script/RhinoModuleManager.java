@@ -29,6 +29,7 @@ public final class RhinoModuleManager implements ModuleManager {
     public RhinoModuleManager(RhinoScriptEngine scriptEngine) {
         this.modules = new HashMap<String, Object>();
         this.engine = scriptEngine;
+        this.registerDefaultModules();
     }
 
     @Override

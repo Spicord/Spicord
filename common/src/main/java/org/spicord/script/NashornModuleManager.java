@@ -20,14 +20,14 @@ package org.spicord.script;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("restriction")
 public final class NashornModuleManager implements ModuleManager {
 
     private final Map<String, Object> modules;
-    private final NashornScriptEngine engine;
 
-    public NashornModuleManager(NashornScriptEngine scriptEngine) {
+    public NashornModuleManager() {
         this.modules = new HashMap<String, Object>();
-        this.engine = scriptEngine;
+        this.registerDefaultModules();
     }
 
     @Override
@@ -62,7 +62,6 @@ public final class NashornModuleManager implements ModuleManager {
     }
 
     private Object getClass(Class<?> clazz) {
-        final String line = String.format("Java.type('%s');", clazz.getName());
-        return engine.eval(line);
+        return jdk.internal.dynalink.beans.StaticClass.forClass(clazz);
     }
 }
