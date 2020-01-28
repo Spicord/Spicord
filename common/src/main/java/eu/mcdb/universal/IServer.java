@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  OopsieWoopsie
+ * Copyright (C) 2020  OopsieWoopsie
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -88,31 +88,55 @@ public interface IServer {
     boolean dispatchCommand(String command);
 
     /**
-     * Bukkit flag.
-     * 
-     * @return true if running a Bukkit-based server
-     */
-    default boolean isBukkit() {
-        return false;
-    }
-
-    /**
-     * Bungee flag.
-     * 
-     * @return true if running a BungeeCord-based server
-     */
-    default boolean isBungeeCord() {
-        return false;
-    }
-
-    default boolean isVelocity() {
-        return false;
-    }
-
-    /**
      * Get the server logger.
      * 
      * @return the logger
      */
     Logger getLogger();
+
+    // DEPRECATED METHODS BELOW THIS LINE
+
+    /**
+     * Bukkit flag.
+     * 
+     * @deprecated Use {@link Server#getServerType()} instead
+     * @return true if running a Bukkit-based server
+     */
+    @Deprecated
+    default boolean isBukkit() {
+        return Server.getServerType() == ServerType.BUKKIT;
+    }
+
+    /**
+     * Bungee flag.
+     * 
+     * @deprecated Use {@link Server#getServerType()} instead
+     * @return true if running a BungeeCord-based server
+     */
+    @Deprecated
+    default boolean isBungeeCord() {
+        return Server.getServerType() == ServerType.BUNGEECORD;
+    }
+
+    /**
+     * Velocity flag.
+     * 
+     * @deprecated Use {@link Server#getServerType()} instead
+     * @return true if running a Velocity-based server
+     */
+    @Deprecated
+    default boolean isVelocity() {
+        return Server.getServerType() == ServerType.VELOCITY;
+    }
+
+    /**
+     * Sponge flag.
+     * 
+     * @deprecated Use {@link Server#getServerType()} instead
+     * @return true if running a Sponge-based server
+     */
+    @Deprecated
+    default boolean isSponge() {
+        return Server.getServerType() == ServerType.SPONGE;
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  OopsieWoopsie
+ * Copyright (C) 2020  OopsieWoopsie
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -19,11 +19,11 @@ package eu.mcdb.universal.plugin;
 
 import java.io.File;
 import java.util.logging.Logger;
-import com.velocitypowered.api.command.CommandManager;
-import com.velocitypowered.api.event.EventManager;
-import com.velocitypowered.api.plugin.Plugin;
-import com.velocitypowered.api.plugin.PluginManager;
-import com.velocitypowered.api.proxy.ProxyServer;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.command.CommandManager;
+import org.spongepowered.api.event.EventManager;
+import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.plugin.PluginManager;
 import eu.mcdb.universal.Server;
 import eu.mcdb.util.SLF4JWrapper;
 import lombok.AccessLevel;
@@ -31,14 +31,14 @@ import lombok.Getter;
 import lombok.NonNull;
 
 @Getter
-public abstract class VelocityPlugin {
+public abstract class SpongePlugin {
 
     private final static File pluginsDir = new File("plugins");
 
-    private final ProxyServer proxyServer;
+    private final Game game;
     private final CommandManager commandManager;
-    private final EventManager eventManager;
     private final PluginManager pluginManager;
+    private final EventManager eventManager;
 
     private File dataFolder;
     private Logger logger;
@@ -46,13 +46,13 @@ public abstract class VelocityPlugin {
     @Getter(value = AccessLevel.NONE)
     private Plugin plugin;
 
-    public VelocityPlugin(@NonNull ProxyServer proxyServer) {
-        this.proxyServer = proxyServer;
-        this.commandManager = proxyServer.getCommandManager();
-        this.eventManager = proxyServer.getEventManager();
-        this.pluginManager = proxyServer.getPluginManager();
+    public SpongePlugin(@NonNull Game game) {
+        this.game = game;
+        this.commandManager = game.getCommandManager();
+        this.pluginManager = game.getPluginManager();
+        this.eventManager = game.getEventManager();
 
-        new Server.setVelocityHandle(proxyServer);
+        new Server.setSpongeHandle(game);
 
         this.setup();
         this.onLoad();

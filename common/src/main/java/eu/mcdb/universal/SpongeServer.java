@@ -22,32 +22,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
-import org.bukkit.Bukkit;
-import org.bukkit.Server;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.Server;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.plugin.PluginContainer;
 import eu.mcdb.universal.player.UniversalPlayer;
+import eu.mcdb.util.SLF4JWrapper;
 
-class BukkitServer extends eu.mcdb.universal.Server {
+class SpongeServer extends eu.mcdb.universal.Server {
 
-    private final Server bukkit = Bukkit.getServer();
+    private static Game handle;
+    private static Server server;
+
+    private final Logger logger = new SLF4JWrapper();
 
     @Override
     public int getOnlineCount() {
-        return bukkit.getOnlinePlayers().size();
+        return server.getOnlinePlayers().size();
     }
 
     @Override
     public int getPlayerLimit() {
-        return bukkit.getMaxPlayers();
+        return server.getMaxPlayers();
     }
 
     @Override
     public String[] getOnlinePlayers() {
-        return bukkit.getOnlinePlayers().stream()
+        return server.getOnlinePlayers().stream()
                 .map(Player::getName)
                 .toArray(String[]::new);
     }
@@ -62,47 +64,48 @@ class BukkitServer extends eu.mcdb.universal.Server {
 
     @Override
     public String getVersion() {
-        return bukkit.getVersion();
+        return "Sponge " + handle.getPlatform().getMinecraftVersion().getName();
     }
 
     @Override
     public String[] getPlugins() {
-        return Stream.of(bukkit.getPluginManager().getPlugins())
-                .map(Plugin::getName)
+        return handle.getPluginManager().getPlugins().stream()
+                .map(PluginContainer::getName)
                 .toArray(String[]::new);
     }
 
     @Override
     public boolean dispatchCommand(String command) {
-        return callSyncMethod(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
-    }
-
-    private <T> T callSyncMethod(Callable<T> task) {
-        try {
-            Plugin p = Bukkit.getPluginManager().getPlugins()[0];
-            return Bukkit.getScheduler().callSyncMethod(p, task).get();
-        } catch (Exception e) {}
-        return null;
+        handle.getCommandManager().process(server.getConsole(), command);
+        return true;
     }
 
     @Override
     public Logger getLogger() {
-        return bukkit.getLogger();
+        return logger;
     }
 
     @Override
     public UniversalPlayer getPlayer(UUID uuid) {
-        final Player player = bukkit.getPlayer(uuid);
+        final Player player = server.getPlayer(uuid).orElse(null);
 
-        if (player == null || !player.isOnline())
+        if (player == null)
             return null;
 
         return new UniversalPlayer(player.getName(), uuid) {
 
             @Override
-            public Player getBukkitPlayer() {
+            public Player getSpongePlayer() {
                 return player;
             }
         };
+    }
+
+    protected static void setHandle(Game ins) {
+        if (ins == null) return;
+        if (handle != null) return;
+
+        handle = ins;
+        server = ins.getServer();
     }
 }

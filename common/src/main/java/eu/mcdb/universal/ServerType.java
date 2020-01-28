@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  OopsieWoopsie
+ * Copyright (C) 2020  OopsieWoopsie
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -17,6 +17,31 @@
 
 package eu.mcdb.universal;
 
+import eu.mcdb.util.ReflectionUtils;
+
 public enum ServerType {
-    BUKKIT, BUNGEECORD, VELOCITY, UNKNOWN
+
+    BUKKIT("org.bukkit.Bukkit"),
+    BUNGEECORD("net.md_5.bungee.api.ProxyServer"),
+    VELOCITY("com.velocitypowered.api.proxy.ProxyServer"),
+    SPONGE("org.spongepowered.api.Game"),
+    UNKNOWN(null);
+
+    private final String clazz;
+
+    private ServerType(String clazz) {
+        this.clazz = clazz;
+    }
+
+    private boolean check() {
+        if (clazz == null) return false;
+        return ReflectionUtils.classExists(clazz);
+    }
+
+    public static ServerType auto() {
+        for (ServerType val : ServerType.values())
+            if (val.check()) return val;
+
+        return UNKNOWN;
+    }
 }

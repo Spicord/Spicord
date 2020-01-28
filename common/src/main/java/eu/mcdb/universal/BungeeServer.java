@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  OopsieWoopsie
+ * Copyright (C) 2020  OopsieWoopsie
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -73,7 +73,7 @@ class BungeeServer extends Server {
     }
 
     private String getServerName(ProxiedPlayer player) {
-        return getServerName(player, "default");
+        return getServerName(player, "unknown");
     }
 
     private String getServerName(ProxiedPlayer player, String def) {
@@ -93,7 +93,7 @@ class BungeeServer extends Server {
         if (version.contains(":")) {
             String[] parts = version.split(":");
             if (parts.length == 5) {
-                version = bungee.getName() + " " + parts[3];
+                version = String.format("%s %s (%s)", bungee.getName(), parts[2], parts[3]);
             }
         }
 
@@ -111,11 +111,6 @@ class BungeeServer extends Server {
     @Override
     public boolean dispatchCommand(String command) {
         return bungee.getPluginManager().dispatchCommand(bungee.getConsole(), command);
-    }
-
-    @Override
-    public boolean isBungeeCord() {
-        return true;
     }
 
     @Override

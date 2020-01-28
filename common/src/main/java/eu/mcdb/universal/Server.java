@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  OopsieWoopsie
+ * Copyright (C) 2020  OopsieWoopsie
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -17,7 +17,7 @@
 
 package eu.mcdb.universal;
 
-import static eu.mcdb.util.ReflectionUtils.classExists;
+import org.spongepowered.api.Game;
 import com.velocitypowered.api.proxy.ProxyServer;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,44 +25,44 @@ import lombok.Setter;
 /**
  * This class provides methods that can be accessed no matter what server
  * software you are using.
- * 
- * @author OopsieWoopsie
- * @version 1.0
  */
 public abstract class Server implements IServer {
 
-    @Getter
-    private static ServerType serverType;
-
-    @Getter
-    private static Server instance;
-
-    @Getter
-    @Setter
-    private boolean debugEnabled; // false by default
+    @Getter private static ServerType serverType;
+    @Getter private static Server instance;
+    @Getter @Setter private boolean debugEnabled; // false by default
 
     static {
-        final boolean console = false;
+        instance = buildServer(serverType = ServerType.auto());
+    }
 
-        if (console) {
-            serverType = ServerType.UNKNOWN;
-            instance = new DummyServer();
-        } else if (classExists("net.md_5.bungee.BungeeCord")) {
-            serverType = ServerType.BUNGEECORD;
-            instance = new BungeeServer();
-        } else if (classExists("org.bukkit.Bukkit")) {
-            serverType = ServerType.BUKKIT;
-            instance = new BukkitServer();
-        } else if (classExists("com.velocitypowered.api.proxy.ProxyServer")) {
-            serverType = ServerType.VELOCITY;
-            instance = new VelocityServer();
-        } else {
-            serverType = ServerType.UNKNOWN;
-            instance = new DummyServer();
+    private static Server buildServer(final ServerType serverType) {
+        switch (serverType) {
+        case BUKKIT:
+            return new BukkitServer();
+        case BUNGEECORD:
+            return new BungeeServer();
+        case SPONGE:
+            return new SpongeServer();
+        case VELOCITY:
+            return new VelocityServer();
+        case UNKNOWN:
+        default:
+            return new DummyServer();
         }
     }
 
-    public static void setVelocityHandle(ProxyServer proxy) {
-        VelocityServer.setHandle(proxy);
+    // TODO: look for a better way to do this
+    public static class setVelocityHandle { // prevent java.lang.NoClassDefFoundError: ...ProxyServer
+        public setVelocityHandle(ProxyServer proxy) {
+            VelocityServer.setHandle(proxy);
+        }
+    }
+
+    // TODO: look for a better way to do this
+    public static class setSpongeHandle {
+        public setSpongeHandle(Game game) {
+            SpongeServer.setHandle(game);
+        }
     }
 }

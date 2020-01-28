@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  OopsieWoopsie
+ * Copyright (C) 2020  OopsieWoopsie
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -35,11 +35,7 @@ class VelocityServer extends Server {
 
     private static ProxyServer handle;
 
-    private final Logger logger;
-
-    VelocityServer() {
-        this.logger = new SLF4JWrapper();
-    }
+    private final Logger logger = new SLF4JWrapper();
 
     @Override
     public int getOnlineCount() {
@@ -48,8 +44,10 @@ class VelocityServer extends Server {
 
     @Override
     public int getPlayerLimit() {
-        // TODO: ...
-        return getOnlineCount();
+        // From docs: "This allows you to customize the number of “maximum” players in
+        // the player’s server list. Note that Velocity doesn’t have a maximum number of
+        // players it supports."
+        return handle.getConfiguration().getShowMaxPlayers();
     }
 
     @Override
@@ -91,11 +89,6 @@ class VelocityServer extends Server {
     @Override
     public boolean dispatchCommand(String command) {
         return handle.getCommandManager().execute(handle.getConsoleCommandSource(), command);
-    }
-
-    @Override
-    public boolean isVelocity() {
-        return true;
     }
 
     @Override
