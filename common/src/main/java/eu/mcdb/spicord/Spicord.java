@@ -87,6 +87,8 @@ public final class Spicord {
         this.config = config;
         this.serviceManager = new SpicordServiceManager();
 
+        this.getAddonManager().loadAddons(config.getDataFolder());
+
         this.registerIntegratedAddons();
 
         Server.getInstance().setDebugEnabled(config.isDebugEnabled());

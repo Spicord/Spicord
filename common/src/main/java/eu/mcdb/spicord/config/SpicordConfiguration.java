@@ -49,7 +49,9 @@ public final class SpicordConfiguration implements Node {
     @Getter
     private boolean jdaMessagesEnabled;
 
+    @Getter
     private final File dataFolder;
+
     private final File configFile;
     private final TomlWriter writer;
 
