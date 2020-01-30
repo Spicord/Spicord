@@ -80,6 +80,11 @@
       "sha1": "e5072dcd8a25c079e32ba90de2f514de44c525d5",
       "url": "https://github.com/mcdb/JDA/releases/download/v3.8.3-mcdb/JDA-3.8.3-mcdb.jar",
       "dontloadifclassfound": "net.dv8tion.jda.core.JDA"
+    },
+    {
+      "name": "org.mozilla:rhino:1.7.12",
+      "sha1": "16d8b370e5dd4513d15ee1b4b471b9542ebccfa1",
+      "url": "https://repo1.maven.org/maven2/org/mozilla/rhino/1.7.12/rhino-1.7.12.jar"
     }
   ]
 }
