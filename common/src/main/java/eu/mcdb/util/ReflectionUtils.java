@@ -42,13 +42,10 @@ public class ReflectionUtils {
     }
 
     public static boolean methodExists(Class<?> clazz, String methodName, Class<?>... params) {
-        for (Method m : clazz.getDeclaredMethods()) {
-            if (m.getName().equals(methodName)) {
-                if (Arrays.equals(m.getParameterTypes(), params)) {
-                    return true;
-                }
-            }
-        }
+        for (final Method method : clazz.getDeclaredMethods())
+            if (method.getName().equals(methodName))
+                return Arrays.equals(method.getParameterTypes(), params);
+
         return false;
     }
 }

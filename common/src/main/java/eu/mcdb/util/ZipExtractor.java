@@ -19,11 +19,16 @@ package eu.mcdb.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
@@ -81,11 +86,26 @@ public class ZipExtractor implements AutoCloseable {
 
             final File file = new File(out, name);
 
-            if (!file.exists()) {
-                file.createNewFile();
-                Files.copy(zipFile.getInputStream(entry), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(zipFile.getInputStream(entry), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
+    public boolean hasEntry(String path) {
+        return entries.stream().map(ZipEntry::getName).count() > 0;
+    }
+
+    public Optional<Reader> readEntry(String path) throws IOException {
+        if (hasEntry(path)) {
+            final Predicate<ZipEntry> filter = e -> e.getName().equals(path);
+            final Optional<ZipEntry> entry = entries.stream().filter(filter).findFirst();
+
+            if (entry.isPresent()) {
+                final InputStream is = zipFile.getInputStream(entry.get());
+                return Optional.of(new InputStreamReader(is));
             }
         }
+
+        return Optional.empty();
     }
 
     @Override

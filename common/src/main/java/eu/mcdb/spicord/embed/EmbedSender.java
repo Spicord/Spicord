@@ -17,12 +17,12 @@
 
 package eu.mcdb.spicord.embed;
 
-import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.requests.restaction.MessageAction;
 
 public class EmbedSender {
 
-    public static MessageAction prepare(TextChannel channel, Embed embed) {
+    public static MessageAction prepare(MessageChannel channel, Embed embed) {
         if (embed.hasEmbedData() && embed.hasContent())
             return channel.sendMessage(embed.toJdaEmbed()).append(embed.getContent());
         else if (embed.hasEmbedData())
