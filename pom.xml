@@ -11,11 +11,12 @@
     <name>Spicord-Parent</name>
 
     <modules>
+        <module>all</module>
+        <module>cli</module>
+        <module>common</module>
         <module>bukkit</module>
         <module>bungee</module>
         <module>velocity</module>
-        <module>common</module>
-        <module>all</module>
     </modules>
 
     <repositories>
@@ -99,16 +100,15 @@
                 <directory>${basedir}/src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>plugin.yml</include>
-                    <include>bungee.yml</include>
-                    <include>config.toml</include>
+                    <include>**.yml</include>
+                    <include>**.toml</include>
                 </includes>
             </resource>
             <resource>
                 <directory>${basedir}/src/main/resources</directory>
                 <filtering>false</filtering>
                 <includes>
-                    <include>libraries.libinfo</include>
+                    <include>**.libinfo</include>
                 </includes>
             </resource>
         </resources>
@@ -133,6 +133,9 @@
                 <version>3.0.2</version>
                 <configuration>
                     <archive>
+                        <manifest>
+                            <mainClass>org.spicord.cli.SpicordMain</mainClass>
+                        </manifest>
                         <manifestEntries>
                             <Implementation-Version>${project.version}</Implementation-Version>
                         </manifestEntries>

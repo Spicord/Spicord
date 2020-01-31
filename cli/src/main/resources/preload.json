@@ -1,0 +1,19 @@
+{
+  "libraries": [
+    {
+      "name": "com.google.guava:guava:28.1-jre",
+      "sha1": "b0e91dcb6a44ffb6221b5027e12a5cb34b841145",
+      "url": "https://repo1.maven.org/maven2/com/google/guava/guava/28.1-jre/guava-28.1-jre.jar"
+    },
+    {
+      "name": "com.google.code.gson:gson:2.8.6",
+      "sha1": "9180733b7df8542621dc12e21e87557e8c99b8cb",
+      "url": "https://repo1.maven.org/maven2/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar"
+    },
+    {
+      "name": "org.jline:jline:3.13.2",
+      "sha1": "a1c05da3a6409c63f368254fd85e1ca54069eed6",
+      "url": "https://repo1.maven.org/maven2/org/jline/jline/3.13.2/jline-3.13.2.jar"
+    }
+  ]
+}
