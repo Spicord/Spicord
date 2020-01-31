@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class SpicordClassLoader {
 
@@ -37,11 +38,20 @@ public class SpicordClassLoader {
     }
 
     /**
-     * Loads the classes of a Jar file
+     * Load the classes of a Jar file.
      * 
      * @param file the {@link Path} of the Jar file
      */
     public static void loadJar(Path file) throws Exception {
         addURL.invoke(classLoader, file.toUri().toURL());
+    }
+
+    /**
+     * Load the classes of a Jar file.
+     * 
+     * @param path the path of the Jar file
+     */
+    public static void loadJar(String path) throws Exception {
+        loadJar(Paths.get(path));
     }
 }

@@ -23,11 +23,12 @@ import java.io.IOException;
 import java.io.Reader;
 import javax.script.Invocable;
 import javax.script.ScriptEngineManager;
+import org.spicord.script.module.Path;
 import org.spicord.util.AbsoluteFile;
 import org.spicord.util.FileSystem;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
-@SuppressWarnings({ "unchecked", "restriction" })
+@SuppressWarnings({ "unchecked" })
 class NashornScriptEngine implements ScriptEngine {
 
     protected final javax.script.ScriptEngine nashorn;
@@ -124,7 +125,10 @@ class NashornScriptEngine implements ScriptEngine {
             return (T) moduleManager.getModule(name);
         }
 
-        final File file = AbsoluteFile.of(dir, name);
+        File file = AbsoluteFile.of(dir, name);
+
+        if (file.isDirectory())
+            file = new File(file, "index.js");
 
         if (file.exists() && file.isFile()) {
             final String script = buildScript(file);
@@ -154,7 +158,7 @@ class NashornScriptEngine implements ScriptEngine {
     private String buildScript(final File file) throws IOException {
         final String parent = file.toPath().getParent().toString();
         return BASE_SCRIPT
-                .replace("{{{dirname}}}", parent)
+                .replace("{{{dirname}}}", Path.normalize(parent))
                 .replace("{{{body}}}", FileSystem.readFile(file));
     }
 

@@ -19,8 +19,8 @@ package org.spicord.script;
 
 import java.util.HashMap;
 import java.util.Map;
+import jdk.internal.dynalink.beans.StaticClass;
 
-@SuppressWarnings("restriction")
 public final class NashornModuleManager implements ModuleManager {
 
     private final Map<String, Object> modules;
@@ -62,6 +62,6 @@ public final class NashornModuleManager implements ModuleManager {
     }
 
     private Object getClass(Class<?> clazz) {
-        return jdk.internal.dynalink.beans.StaticClass.forClass(clazz);
+        return StaticClass.forClass(clazz);
     }
 }

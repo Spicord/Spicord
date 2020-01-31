@@ -39,6 +39,9 @@ public enum ServerType {
     }
 
     public static ServerType auto() {
+        if ("1".equals(System.getenv("SPICORD_CONSOLE")))
+            return UNKNOWN;
+
         for (ServerType val : ServerType.values())
             if (val.check()) return val;
 

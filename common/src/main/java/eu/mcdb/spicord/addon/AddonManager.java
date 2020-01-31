@@ -20,6 +20,7 @@ package eu.mcdb.spicord.addon;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Collections;
@@ -149,9 +150,12 @@ public class AddonManager implements Node {
         runtimeDir.deleteOnExit();
 
         for (final String name : addonsDir.list()) {
-            if (name.endsWith(".sp") || name.endsWith(".zip")) {
-                final File file = new File(addonsDir, name);
-                if (file.isFile()) this.loadZipAddon(file, runtimeDir);
+            final File file = new File(addonsDir, name);
+
+            if (file.isDirectory()) {
+                this.loadDirAddon(file);
+            } else if (name.endsWith(".sp") || name.endsWith(".zip")) {
+                this.loadZipAddon(file, runtimeDir);
             }
         }
     }
@@ -170,14 +174,10 @@ public class AddonManager implements Node {
                 final String key = checkNotNull(data.getKey(), "key");
                 final String name = checkNotNull(data.getName(), "name");
                 final String author = checkNotNull(data.getAuthor(), "author");
-                final String main;
+                final String main = checkNotNull(data.getMain(), "main");
 
-                if (ex.hasEntry("index.js")) {
-                    main = "index.js";
-                } else if (ex.hasEntry("src/index.js")) {
-                    main = "src/index.js";
-                } else {
-                    throw new ScriptException("index.js not found for addon " + name);
+                if (!ex.hasEntry(main)) {
+                    throw new ScriptException(main + " not found for addon " + name);
                 }
 
                 final File tempDir = new File(runtimeDir, key);
@@ -202,5 +202,43 @@ public class AddonManager implements Node {
         } catch (IOException e) {
             getLogger().warning(String.format("The file '%s' cannot be loaded: %s", file.getName(), e.getCause()));
         }
+    }
+
+    private void loadDirAddon(final File addonDir) {
+        try {
+            final File addonJson = new File(addonDir, "addon.json");
+
+            if (addonJson.exists()) {
+                final Reader reader = new FileReader(addonJson);
+                final AddonData data = GSON.fromJson(reader, AddonData.class);
+
+                final String key = checkNotNull(data.getKey(), "key");
+                final String name = checkNotNull(data.getName(), "name");
+                final String author = checkNotNull(data.getAuthor(), "author");
+                final String main = checkNotNull(data.getMain(), "main");
+
+                final File addonMain = new File(addonDir, main);
+
+                if (!addonMain.exists()) {
+                    throw new ScriptException(main + " not found for addon " + name);
+                }
+
+                final Object res = ENGINE.java(ENGINE.require(addonMain));
+
+                if (res instanceof JavaScriptBaseAddon) {
+                    final JavaScriptAddon addon = new JavaScriptAddon(name, key, author, (JavaScriptBaseAddon) res, ENGINE);
+                    this.registerAddon(addon);
+                } else {
+                    throw new ScriptException("the index.js file needs to export the addon instance");
+                }
+            } else {
+                getLogger().warning(String.format(
+                        "The folder '%s' doesn't contains the 'addon.json' file on its root directory, ignoring it",
+                        addonDir.getName()));
+            }
+        } catch (IOException e) {
+            getLogger().warning(String.format("The addon on folder '%s' cannot be loaded: %s", addonDir.getName(), e.getCause()));
+            e.printStackTrace();
+        }    
     }
 }

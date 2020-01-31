@@ -24,6 +24,8 @@ import java.util.Map.Entry;
 import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.bot.command.DiscordBotCommand;
+import eu.mcdb.universal.Server;
+import eu.mcdb.universal.ServerType;
 import net.dv8tion.jda.core.EmbedBuilder;
 
 public class PlayersAddon extends SimpleAddon {
@@ -34,7 +36,7 @@ public class PlayersAddon extends SimpleAddon {
 
     @Override
     public void onCommand(DiscordBotCommand command, String[] args) {
-        if (getServer().isBungeeCord()) {
+        if (Server.getServerType() == ServerType.BUNGEECORD) {
             String desc = "";
 
             if (getServer().getOnlineCount() == 0) {

@@ -27,6 +27,7 @@ import org.mozilla.javascript.NativeJavaArray;
 import org.mozilla.javascript.NativeJavaClass;
 import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.ScriptableObject;
+import org.spicord.script.module.Path;
 import org.spicord.util.AbsoluteFile;
 import org.spicord.util.FileSystem;
 
@@ -115,7 +116,10 @@ class RhinoScriptEngine implements ScriptEngine {
         if (moduleManager.isRegistered(name))
             return (T) moduleManager.getModule(name);
 
-        final File file = AbsoluteFile.of(dir, name);
+        File file = AbsoluteFile.of(dir, name);
+
+        if (file.isDirectory())
+            file = new File(file, "index.js");
 
         if (file.exists() && file.isFile()) {
             final String script = buildScript(file);
@@ -152,7 +156,7 @@ class RhinoScriptEngine implements ScriptEngine {
     private String buildScript(final File file) throws IOException {
         final String parent = file.toPath().getParent().toString();
         return BASE_SCRIPT
-                .replace("{{{dirname}}}", parent)
+                .replace("{{{dirname}}}", Path.normalize(parent))
                 .replace("{{{body}}}", FileSystem.readFile(file));
     }
 

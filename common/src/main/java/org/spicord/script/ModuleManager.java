@@ -17,8 +17,10 @@
 
 package org.spicord.script;
 
+import org.spicord.script.module.*;
 import eu.mcdb.spicord.api.addon.JavaScriptBaseAddon;
 import eu.mcdb.universal.Server;
+import eu.mcdb.universal.config.YamlConfiguration;
 
 /**
  * The ModuleManager utility provides methods for module registrations,
@@ -79,7 +81,12 @@ public interface ModuleManager {
      * Register the default modules for this ModuleManager instance.
      */
     default void registerDefaultModules() {
-        this.register("server", Server.getInstance());
+        // classes
+        this.register("path", Path.class);
         this.register("base-addon", JavaScriptBaseAddon.class);
+        this.register("yaml", YamlConfiguration.class);
+
+        // instances
+        this.register("server", Server.getInstance());
     }
 }
