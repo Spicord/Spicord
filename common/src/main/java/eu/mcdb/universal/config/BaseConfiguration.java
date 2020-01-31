@@ -23,6 +23,8 @@ import java.util.Map;
 
 public interface BaseConfiguration {
 
+    void set(String path, Object value);
+
     Object get(String path);
     Object get(String path, Object def);
 
@@ -58,4 +60,5 @@ public interface BaseConfiguration {
     Map<String, Object> getValues();
 
     void save() throws IOException;
+
 }

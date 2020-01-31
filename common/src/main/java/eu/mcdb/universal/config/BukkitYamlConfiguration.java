@@ -19,8 +19,10 @@ package eu.mcdb.universal.config;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 class BukkitYamlConfiguration extends YamlConfiguration {
@@ -28,9 +30,18 @@ class BukkitYamlConfiguration extends YamlConfiguration {
     private final File file;
     private final FileConfiguration config;
 
+    public static void main(String[] args) {
+        new BukkitYamlConfiguration(new File("/home/sheidy/test.yml"));
+    }
+
     BukkitYamlConfiguration(final File file) {
         this.file = file;
         this.config = org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(file);
+    }
+
+    @Override
+    public void set(String path, Object value) {
+        config.set(path, value);
     }
 
     @Override
@@ -135,7 +146,23 @@ class BukkitYamlConfiguration extends YamlConfiguration {
 
     @Override
     public Map<String, Object> getValues() {
-        return config.getValues(true);
+        return dig(config);
+    }
+
+    private Map<String, Object> dig(MemorySection c) {
+        final Map<String, Object> values = new HashMap<String, Object>();
+
+        for (final String key : c.getKeys(false)) {
+            Object o = c.get(key);
+
+            if (o instanceof MemorySection) {
+                o = dig((MemorySection) o);
+            }
+
+            values.put(key, o);
+        }
+
+        return values;
     }
 
     @Override

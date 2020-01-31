@@ -42,6 +42,11 @@ class BungeeYamlConfiguration extends YamlConfiguration {
     }
 
     @Override
+    public void set(String path, Object value) {
+        config.set(path, value);
+    }
+
+    @Override
     public Object get(String path) {
         return config.get(path);
     }
@@ -143,10 +148,20 @@ class BungeeYamlConfiguration extends YamlConfiguration {
 
     @Override
     public Map<String, Object> getValues() {
+        return dig(config);
+    }
+
+    private Map<String, Object> dig(Configuration c) {
         final Map<String, Object> values = new HashMap<String, Object>();
 
-        for (final String key : config.getKeys()) {
-            values.put(key, get(key));
+        for (final String key : c.getKeys()) {
+            Object o = c.get(key);
+
+            if (o instanceof Configuration) {
+                o = dig((Configuration) o);
+            }
+
+            values.put(key, o);
         }
 
         return values;
