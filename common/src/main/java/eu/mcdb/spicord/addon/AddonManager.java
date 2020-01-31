@@ -150,6 +150,8 @@ public class AddonManager implements Node {
         runtimeDir.deleteOnExit();
 
         for (final String name : addonsDir.list()) {
+            if (name.startsWith(".")) continue;
+
             final File file = new File(addonsDir, name);
 
             if (file.isDirectory()) {
