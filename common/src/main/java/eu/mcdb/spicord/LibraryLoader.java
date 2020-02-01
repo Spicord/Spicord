@@ -43,11 +43,8 @@ public class LibraryLoader {
         this.log = log;
         this.libFolder = new File(dataFolder, "lib");
 
-        if (!dataFolder.exists())
-            dataFolder.mkdir();
-
         if (!libFolder.exists())
-            libFolder.mkdir();
+            libFolder.mkdirs();
 
         if (!libFolder.isDirectory())
             throw new IllegalStateException("File 'lib' must be a directory.");

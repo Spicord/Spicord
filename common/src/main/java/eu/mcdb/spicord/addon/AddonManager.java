@@ -62,13 +62,13 @@ public class AddonManager implements Node {
     }
 
     /**
-     * Check if the given addon key is registered.
+     * Check if the given addon id is registered.
      * 
-     * @param key the addon key
+     * @param id the addon id
      * @return true if the addon is registered
      */
-    public boolean isRegistered(String key) {
-        return addons.stream().map(SimpleAddon::getKey).anyMatch(key::equals);
+    public boolean isRegistered(String id) {
+        return addons.stream().map(SimpleAddon::getId).anyMatch(id::equals);
     }
 
     /**
@@ -80,7 +80,7 @@ public class AddonManager implements Node {
      */
     public boolean registerAddon(SimpleAddon addon) {
         if (!isRegistered(addon)) {
-            final Object[] args = new Object[] { addon.getName(), addon.getKey(), addon.getAuthor() };
+            final Object[] args = new Object[] { addon.getName(), addon.getId(), addon.getAuthor() };
 
             getLogger().info(String.format("Registered addon '%s' (%s) by %s", args));
 
@@ -100,30 +100,30 @@ public class AddonManager implements Node {
     }
 
     /**
-     * Unregister an addon by its key.
+     * Unregister an addon by its id.
      * 
-     * @param key the addon key
+     * @param id the addon id
      * @return true if it was unregistered, or false if not
      */
-    public boolean unregisterAddon(String key) {
-        return addons.removeIf(addon -> addon.getKey().equals(key));
+    public boolean unregisterAddon(String id) {
+        return addons.removeIf(addon -> addon.getId().equals(id));
     }
 
     /**
-     * Get an addon instance by its key.
+     * Get an addon instance by its id.
      * 
-     * @param key the addon key
+     * @param id the addon id
      * @return the addon instance, or null if not found
      */
-    public SimpleAddon getAddonByKey(String key) {
-        checkNotNull(key, "The addon key cannot be null.");
-        checkArgument(!key.trim().isEmpty(), "The addon key cannot be empty.");
+    public SimpleAddon getAddonById(String id) {
+        checkNotNull(id, "The addon id cannot be null.");
+        checkArgument(!id.trim().isEmpty(), "The addon id cannot be empty.");
 
         for (final SimpleAddon addon : addons)
-            if (addon.getKey().equals(key))
+            if (addon.getId().equals(id))
                 return addon;
 
-        getLogger().warning("The addon with the key '" + key + "' was not found.");
+        getLogger().warning("The addon with the id '" + id + "' was not found.");
         return null;
     }
 
@@ -138,7 +138,7 @@ public class AddonManager implements Node {
         if (bot.getAddons().isEmpty())
             return;
 
-        bot.getAddons().stream().map(this::getAddonByKey).filter(Objects::nonNull).forEach(bot::loadAddon);
+        bot.getAddons().stream().map(this::getAddonById).filter(Objects::nonNull).forEach(bot::loadAddon);
     }
 
     public void loadAddons(File dir) {
@@ -173,7 +173,7 @@ public class AddonManager implements Node {
                 final Reader reader = entry.get();
                 final AddonData data = GSON.fromJson(reader, AddonData.class);
 
-                final String key = checkNotNull(data.getKey(), "key");
+                final String id = checkNotNull(data.getId(), "id");
                 final String name = checkNotNull(data.getName(), "name");
                 final String author = checkNotNull(data.getAuthor(), "author");
                 final String main = checkNotNull(data.getMain(), "main");
@@ -182,7 +182,7 @@ public class AddonManager implements Node {
                     throw new ScriptException(main + " not found for addon " + name);
                 }
 
-                final File tempDir = new File(runtimeDir, key);
+                final File tempDir = new File(runtimeDir, id);
                 tempDir.mkdirs();
 
                 ex.extract(tempDir);
@@ -191,7 +191,7 @@ public class AddonManager implements Node {
                 final Object res = ENGINE.java(ENGINE.require(addonMain));
 
                 if (res instanceof JavaScriptBaseAddon) {
-                    final JavaScriptAddon addon = new JavaScriptAddon(name, key, author, (JavaScriptBaseAddon) res, ENGINE);
+                    final JavaScriptAddon addon = new JavaScriptAddon(name, id, author, (JavaScriptBaseAddon) res, ENGINE);
                     this.registerAddon(addon);
                 } else {
                     throw new ScriptException("the index.js file needs to export the addon instance");
@@ -214,7 +214,7 @@ public class AddonManager implements Node {
                 final Reader reader = new FileReader(addonJson);
                 final AddonData data = GSON.fromJson(reader, AddonData.class);
 
-                final String key = checkNotNull(data.getKey(), "key");
+                final String id = checkNotNull(data.getId(), "id");
                 final String name = checkNotNull(data.getName(), "name");
                 final String author = checkNotNull(data.getAuthor(), "author");
                 final String main = checkNotNull(data.getMain(), "main");
@@ -228,7 +228,7 @@ public class AddonManager implements Node {
                 final Object res = ENGINE.java(ENGINE.require(addonMain));
 
                 if (res instanceof JavaScriptBaseAddon) {
-                    final JavaScriptAddon addon = new JavaScriptAddon(name, key, author, (JavaScriptBaseAddon) res, ENGINE);
+                    final JavaScriptAddon addon = new JavaScriptAddon(name, id, author, (JavaScriptBaseAddon) res, ENGINE);
                     this.registerAddon(addon);
                 } else {
                     throw new ScriptException("the index.js file needs to export the addon instance");

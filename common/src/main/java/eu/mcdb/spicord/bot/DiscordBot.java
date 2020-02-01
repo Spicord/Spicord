@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  OopsieWoopsie
+ * Copyright (C) 2020  OopsieWoopsie
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 import javax.security.auth.login.LoginException;
 import com.google.common.base.Preconditions;
-import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.api.Node;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.api.bot.SimpleBot;
@@ -43,48 +42,28 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class DiscordBot extends SimpleBot implements Node {
 
-    /**
-     * If the bot is enabled on the config, this will be true.
-     */
     private final boolean enabled;
-
-    /**
-     * The JDA instance.
-     */
-    @Getter
-    protected JDA jda;
-
-    /**
-     * The addons key of the addons which this bot use.
-     */
-    @Getter
-    private final Collection<String> addons;
 
     protected final Collection<SimpleAddon> loadedAddons;
 
-    /**
-     * The 'command-support' flag.
-     */
-    @Getter
-    private boolean commandSupportEnabled;
+    @Getter protected JDA jda;
+    @Getter private final Collection<String> addons;
+    @Getter private boolean commandSupportEnabled;
+    @Getter private final String commandPrefix;
+    @Getter protected final Map<String, Consumer<DiscordBotCommand>> commands;
+    @Getter protected BotStatus status;
 
     /**
-     * The bot's command prefix. (ex. "-" or "!").
+     * Create a new Discord bot instance.<br>
+     * 
+     * @param name                  the bot name
+     * @param token                 the bot token
+     * @param enabled               true if the bot should start
+     * @param addons                the list of addons IDs
+     * @param commandSupportEnabled true if this bot should support commands
+     * @param prefix                the command prefix for this bot
+     * @see {@link DiscordBotLoader#startBot(DiscordBot)}
      */
-    @Getter
-    private final String commandPrefix;
-
-    /**
-     * The commands provided by the addons (to THIS bot).
-     */
-    @Getter
-    protected final Map<String, Consumer<DiscordBotCommand>> commands;
-
-    @Getter
-    protected BotStatus status;
-
-    private final Spicord spicord;
-
     public DiscordBot(String name, String token, boolean enabled, List<String> addons, boolean commandSupportEnabled,
             String prefix) {
         super(name, token);
@@ -95,14 +74,13 @@ public class DiscordBot extends SimpleBot implements Node {
         this.commandSupportEnabled = commandSupportEnabled;
         this.commandPrefix = prefix.trim();
         this.commands = new HashMap<String, Consumer<DiscordBotCommand>>();
-        this.spicord = getSpicord();
         this.status = BotStatus.OFFLINE;
 
         if (commandSupportEnabled) {
             if (prefix.isEmpty()) {
                 this.commandSupportEnabled = false;
 
-                spicord.getLogger().severe(
+                getLogger().severe(
                         "The command prefix cannot be empty. The command-support feature is now disabled on bot '"
                                 + name + "'.");
             }
@@ -111,6 +89,8 @@ public class DiscordBot extends SimpleBot implements Node {
 
     @Override
     protected boolean startBot() {
+        if (!enabled) return false;
+
         try {
             this.jda = new JDABuilder(AccountType.BOT).setToken(token).setAutoReconnect(true).build();
 
@@ -119,22 +99,21 @@ public class DiscordBot extends SimpleBot implements Node {
             if (commandSupportEnabled)
                 jda.addEventListener(new BotCommandListener(this));
 
-            spicord.getAddonManager().loadAddons(this);
+            getSpicord().getAddonManager().loadAddons(this);
             return true;
         } catch (LoginException e) {
             this.status = BotStatus.OFFLINE;
-            spicord.getLogger()
-                    .severe("An error ocurred while starting the bot '" + getName() + "'. " + e.getMessage());
+            getLogger().severe("An error ocurred while starting the bot '" + getName() + "'. " + e.getMessage());
         }
 
         return false;
     }
 
-    public void onReady(ReadyEvent event) {
+    protected void onReady(ReadyEvent event) {
         loadedAddons.forEach(addon -> addon.onReady(this));
     }
 
-    public void onMessageReceived(MessageReceivedEvent event) {
+    protected void onMessageReceived(MessageReceivedEvent event) {
         loadedAddons.forEach(addon -> addon.onMessageReceived(this, event));
     }
 
@@ -164,13 +143,12 @@ public class DiscordBot extends SimpleBot implements Node {
 
         if (commandSupportEnabled) {
             if (commands.containsKey(name)) {
-                spicord.getLogger()
-                        .warning("The command '" + name + "' is already registered on bot '" + getName() + "'.");
+                getLogger().warning("The command '" + name + "' is already registered on bot '" + getName() + "'.");
             } else {
                 commands.put(name, command);
             }
         } else {
-            spicord.getLogger().warning("Cannot register command '" + name + "' on bot '" + getName()
+            getLogger().warning("Cannot register command '" + name + "' on bot '" + getName()
                     + "' because the 'command-support' option is disabled.");
         }
     }
@@ -180,6 +158,7 @@ public class DiscordBot extends SimpleBot implements Node {
      * 
      * @param name    the command name (without prefix)
      * @param command the action to be performed when the command is executed
+     * 
      * @throws NullPointerException if one of the arguments is null
      * @throws IllegalArgumentException if the {@code name} is empty or contains spaces
      */
@@ -189,23 +168,8 @@ public class DiscordBot extends SimpleBot implements Node {
 
     /**
      * Register a command for this bot.
-     * Alias of {@link #onCommand(String, BotCommand)}.
      * 
-     * @param name    the command name (without prefix)
-     * @param command the action to be performed when the command is executed
-     * 
-     * @throws NullPointerException if one of the arguments is null
-     * @throws IllegalArgumentException if the {@code name} is empty or contains spaces
-     */
-    @Deprecated
-    public void registerCommand(String name, BotCommand command) {
-        this.onCommand(name, command);
-    }
-
-    /**
-     * 
-     * 
-     * @param command the command
+     * @param command the command to be registered
      */
     public void registerCommand(final DiscordCommand command) {
         this.onCommand(command.getName(), command);
@@ -226,7 +190,7 @@ public class DiscordBot extends SimpleBot implements Node {
     }
 
     /**
-     * Check if the bot is enabled..
+     * Check if the bot is enabled.
      * 
      * @see #isDisabled()
      * @return true if the bot is enabled
@@ -246,7 +210,7 @@ public class DiscordBot extends SimpleBot implements Node {
     }
 
     /**
-     * Check if the bot has started and is running.
+     * Check if the bot is running.
      * 
      * @return true if the bot is running
      */
@@ -255,7 +219,11 @@ public class DiscordBot extends SimpleBot implements Node {
     }
 
     public enum BotStatus {
-        READY("Ready"), OFFLINE("Offline"), STARTING("Starting"), STOPPING("Stopping"), UNKNOWN("Unknown");
+        READY("Ready"),
+        OFFLINE("Offline"),
+        STARTING("Starting"),
+        STOPPING("Stopping"),
+        UNKNOWN("Unknown");
 
         private final String value;
 

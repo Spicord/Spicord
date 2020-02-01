@@ -19,22 +19,21 @@ package eu.mcdb.spicord.api.bot.command;
 
 public abstract class SimpleCommand {
 
-    /**
-     * The command arguments.
-     */
     private final String[] arguments;
 
     /**
-     * The constructor.
+     * Constructor.
      * 
-     * @param args the command arguments.
+     * @param args the command arguments
      */
     public SimpleCommand(String[] args) {
         this.arguments = args;
     }
 
     /**
-     * @return the command arguments.
+     * Get the command arguments.
+     * 
+     * @return the command arguments
      */
     public String[] getArguments() {
         return arguments;

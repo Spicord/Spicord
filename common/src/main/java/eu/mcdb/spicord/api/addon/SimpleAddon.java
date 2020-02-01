@@ -27,7 +27,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 public abstract class SimpleAddon implements Node {
 
     private final String name;
-    private final String key;
+    private final String id;
     private final String author;
     private final String[] commands;
 
@@ -35,36 +35,36 @@ public abstract class SimpleAddon implements Node {
      * Create an addon.
      * 
      * @param name   the addon name
-     * @param key    the addon key
+     * @param id     the addon id
      * @param author the addon author
      */
-    public SimpleAddon(String name, String key, String author) {
-        this(name, key, author, new String[0]);
+    public SimpleAddon(String name, String id, String author) {
+        this(name, id, author, new String[0]);
     }
 
     /**
      * Create an addon and pass the command name that the addon will use.
-     * 
-     * The method {@link #onCommand(DiscordBotCommand, String[])} will be called
+     * <br><br>
+     * The method {@link #onCommand(DiscordBotCommand, String[])} will be called<br>
      * when one of the given commands are executed by an user.
-     * 
-     * You can use this if this addon will only provide one command with some
+     * <br><br>
+     * You can use this if this addon will only provide one command with some<br>
      * aliases to it, for example:
-     * 
-     * new SimpleAddon(_,_,_, new String[] {"hello", "hi"})
-     * 
-     * If the addon will have different commands with different functions, you
-     * should use {@link DiscordBotCommand#getName()} to know what command is being
-     * executed.
+     * <br><br>
+     * <code>new SimpleAddon(_,_,_, new String[] {"hello", "hi"})</code>
+     * <br><br>
+     * If the addon will have different commands with different functions, you<br>
+     * should use {@link DiscordBotCommand#getName()} to know what command is being<br>
+     * executed.<br>
      * 
      * @param name     the addon name
-     * @param key      the addon key
+     * @param id       the addon id
      * @param author   the addon author
      * @param commands the command list or aliases
      */
-    public SimpleAddon(String name, String key, String author, String[] commands) {
+    public SimpleAddon(String name, String id, String author, String[] commands) {
         this.name = name;
-        this.key = key;
+        this.id = id;
         this.author = author;
         this.commands = commands;
     }

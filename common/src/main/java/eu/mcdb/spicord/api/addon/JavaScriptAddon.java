@@ -35,8 +35,8 @@ public final class JavaScriptAddon extends SimpleAddon {
     private final Object ready;
     private final Map<String[], Object> _commands;
 
-    public JavaScriptAddon(String name, String key, String author, JavaScriptBaseAddon addon, ScriptEngine engine) {
-        super(name, key, author);
+    public JavaScriptAddon(String name, String id, String author, JavaScriptBaseAddon addon, ScriptEngine engine) {
+        super(name, id, author);
 
         this.engine = engine;
         this._commands = addon.buildCommands();

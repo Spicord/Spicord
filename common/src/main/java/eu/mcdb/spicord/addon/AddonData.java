@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public class AddonData {
 
-    private String key;
+    private String id;
     private String name;
     private String author;
     //private String[] authors = new String[0];

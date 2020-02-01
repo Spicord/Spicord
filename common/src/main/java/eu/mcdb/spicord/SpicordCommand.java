@@ -45,7 +45,7 @@ public final class SpicordCommand extends Command {
         Command bot = new Command("bot", "spicord.admin.bot");
         bot.setParameter(0, new CommandParameter("botname"));
         bot.setParameter(1, new CommandParameter("action", "add/remove", false));
-        bot.setParameter(2, new CommandParameter("key", "addon-key", false));
+        bot.setParameter(2, new CommandParameter("id", "addon-id", false));
         bot.setCommandHandler(this::handleBot);
 
         // stop command
@@ -76,26 +76,26 @@ public final class SpicordCommand extends Command {
     private boolean handleBot(UniversalCommandSender sender, CommandParameters params) {
         String botname = params.getValue("botname");
         String action = params.getValue("action");
-        String key = params.getValue("key");
+        String id = params.getValue("id");
 
         if (action.equals("add") || action.equals("remove")) {
             DiscordBot bot = spicord.getBotByName(botname);
 
             if (bot != null) {
-                SimpleAddon addon = spicord.getAddonManager().getAddonByKey(key);
+                SimpleAddon addon = spicord.getAddonManager().getAddonById(id);
 
                 if (addon != null) {
                     if (action.equals("add")) {
                         sender.sendFormattedMessage("&eAdded the addon '%s' to bot '%s'", addon.getName(), bot.getName());
-                        spicord.getConfig().getManager().addAddonToBot(addon.getKey(), bot.getName());
+                        spicord.getConfig().getManager().addAddonToBot(addon.getId(), bot.getName());
                     } else {
                         sender.sendFormattedMessage("&eRemoved the addon '%s' from the bot '%s'", addon.getName(), bot.getName());
-                        spicord.getConfig().getManager().removeAddonFromBot(addon.getKey(), bot.getName());
+                        spicord.getConfig().getManager().removeAddonFromBot(addon.getId(), bot.getName());
                     }
                     sender.sendFormattedMessage("&aDo &6/spicord restart &ato apply the changes");
                     return true;
                 } else {
-                    sender.sendFormattedMessage("&cCannot find the addon '%s'", key);
+                    sender.sendFormattedMessage("&cCannot find the addon '%s'", id);
                     //sender.sendFormattedMessage("&aExecute &6/sp confirm &ato force the removal"); - soon
                 }
             } else sender.sendFormattedMessage("&cCannot find the bot '%s'", botname);
