@@ -17,11 +17,15 @@
 
 package eu.mcdb.universal;
 
+import java.util.Arrays;
+import java.util.List;
 import org.bukkit.plugin.java.JavaPlugin;
 import eu.mcdb.universal.command.BukkitCommandExecutor;
 import eu.mcdb.universal.command.BungeeCommandExecutor;
+import eu.mcdb.universal.command.SpongeCommandExecutor;
 import eu.mcdb.universal.command.UniversalCommand;
 import eu.mcdb.universal.command.VelocityCommandExecutor;
+import eu.mcdb.universal.plugin.SpongePlugin;
 import eu.mcdb.universal.plugin.VelocityPlugin;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -42,6 +46,8 @@ public final class MCDB {
             new registerBukkitCommand((JavaPlugin) plugin, command);
         else if (isInstance(plugin, "eu.mcdb.universal.plugin.VelocityPlugin"))
             new registerVelocityCommand((VelocityPlugin) plugin, command);
+        else if (isInstance(plugin, "eu.mcdb.universal.plugin.SpongePlugin"))
+            new registerSpongeCommand((SpongePlugin) plugin, command);
         else
             throw new IllegalArgumentException();
     }
@@ -50,7 +56,7 @@ public final class MCDB {
         try {
             final Class<?> clazz = Class.forName(className);
             return clazz.isInstance(plugin);
-        } catch (Exception e) {}
+        } catch (ClassNotFoundException e) {}
         return false;
     }
 
@@ -68,8 +74,16 @@ public final class MCDB {
 
     private static class registerVelocityCommand {
         registerVelocityCommand(VelocityPlugin plugin, UniversalCommand command) {
-            // TODO: Add also command aliases
-            plugin.getCommandManager().register(new VelocityCommandExecutor(command), command.getName());
+            final List<String> aliases = Arrays.asList(command.getAliases());
+            aliases.add(command.getName());
+
+            plugin.getCommandManager().register(new VelocityCommandExecutor(command), aliases.toArray(new String[aliases.size()]));
+        }
+    }
+
+    private static class registerSpongeCommand {
+        registerSpongeCommand(SpongePlugin plugin, UniversalCommand command) {
+            plugin.getCommandManager().register(plugin, new SpongeCommandExecutor(command).get(), command.getAliases());
         }
     }
 }

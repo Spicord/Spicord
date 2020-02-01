@@ -25,6 +25,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Server;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.plugin.PluginContainer;
 import eu.mcdb.universal.player.UniversalPlayer;
@@ -32,10 +33,15 @@ import eu.mcdb.util.SLF4JWrapper;
 
 class SpongeServer extends eu.mcdb.universal.Server {
 
-    private static Game handle;
-    private static Server server;
+    private final Game game;
+    private final Server server;
+    private final Logger logger;
 
-    private final Logger logger = new SLF4JWrapper();
+    SpongeServer() {
+        this.game = Sponge.getGame();
+        this.server = Sponge.getServer();
+        this.logger = new SLF4JWrapper();
+    }
 
     @Override
     public int getOnlineCount() {
@@ -64,19 +70,19 @@ class SpongeServer extends eu.mcdb.universal.Server {
 
     @Override
     public String getVersion() {
-        return "Sponge " + handle.getPlatform().getMinecraftVersion().getName();
+        return "Sponge " + game.getPlatform().getMinecraftVersion().getName();
     }
 
     @Override
     public String[] getPlugins() {
-        return handle.getPluginManager().getPlugins().stream()
+        return game.getPluginManager().getPlugins().stream()
                 .map(PluginContainer::getName)
                 .toArray(String[]::new);
     }
 
     @Override
     public boolean dispatchCommand(String command) {
-        handle.getCommandManager().process(server.getConsole(), command);
+        game.getCommandManager().process(server.getConsole(), command);
         return true;
     }
 
@@ -99,13 +105,5 @@ class SpongeServer extends eu.mcdb.universal.Server {
                 return player;
             }
         };
-    }
-
-    protected static void setHandle(Game ins) {
-        if (ins == null) return;
-        if (handle != null) return;
-
-        handle = ins;
-        server = ins.getServer();
     }
 }

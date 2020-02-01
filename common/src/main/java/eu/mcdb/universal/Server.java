@@ -17,7 +17,6 @@
 
 package eu.mcdb.universal;
 
-import org.spongepowered.api.Game;
 import com.velocitypowered.api.proxy.ProxyServer;
 import lombok.Getter;
 import lombok.Setter;
@@ -56,13 +55,6 @@ public abstract class Server implements IServer {
     public static class setVelocityHandle { // prevent java.lang.NoClassDefFoundError: ...ProxyServer
         public setVelocityHandle(ProxyServer proxy) {
             VelocityServer.setHandle(proxy);
-        }
-    }
-
-    // TODO: look for a better way to do this
-    public static class setSpongeHandle {
-        public setSpongeHandle(Game game) {
-            SpongeServer.setHandle(game);
         }
     }
 }

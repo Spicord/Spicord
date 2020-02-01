@@ -20,20 +20,19 @@ package eu.mcdb.universal.plugin;
 import java.io.File;
 import java.util.logging.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginManager;
-import eu.mcdb.universal.Server;
 import eu.mcdb.util.SLF4JWrapper;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NonNull;
 
 @Getter
 public abstract class SpongePlugin {
 
-    private final static File pluginsDir = new File("plugins");
+    private final static File configDir = new File("config");
 
     private final Game game;
     private final CommandManager commandManager;
@@ -46,13 +45,11 @@ public abstract class SpongePlugin {
     @Getter(value = AccessLevel.NONE)
     private Plugin plugin;
 
-    public SpongePlugin(@NonNull Game game) {
-        this.game = game;
+    public SpongePlugin() {
+        this.game = Sponge.getGame();
         this.commandManager = game.getCommandManager();
         this.pluginManager = game.getPluginManager();
         this.eventManager = game.getEventManager();
-
-        new Server.setSpongeHandle(game);
 
         this.setup();
         this.onLoad();
@@ -70,7 +67,7 @@ public abstract class SpongePlugin {
 
             final String name = plugin.name().isEmpty() ? plugin.id() : plugin.name();
 
-            this.dataFolder = new File(pluginsDir, name);
+            this.dataFolder = new File(configDir, name);
             this.logger = new SLF4JWrapper(name);
 
             return;
