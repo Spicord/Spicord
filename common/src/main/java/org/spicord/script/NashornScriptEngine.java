@@ -21,15 +21,20 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Map;
 import javax.script.Invocable;
 import javax.script.ScriptEngineManager;
 import org.spicord.script.module.Path;
 import org.spicord.util.AbsoluteFile;
 import org.spicord.util.FileSystem;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
-@SuppressWarnings({ "unchecked" })
+@SuppressWarnings("all")
 class NashornScriptEngine implements ScriptEngine {
+
+    private static final Gson GSON = new Gson();
 
     protected final javax.script.ScriptEngine nashorn;
     private final NashornModuleManager moduleManager;
@@ -42,15 +47,19 @@ class NashornScriptEngine implements ScriptEngine {
         if (nashorn == null)
             throw new IllegalStateException("the nashorn engine is not present on this JVM");
 
-        this.moduleManager = new NashornModuleManager();
+        this.moduleManager = new NashornModuleManager(this);
 
         final String setup = "const console = { log: print };"
-                + "const __core = { require: {} };"
+                + "const __core = { require: {}, __engine: {} };"
                 + "__setup = function(core) {"
                 + "    __core.require = function(dir, str) {"
                 + "        return core.require(dir, str);"
                 + "    };"
+                + "    __core.__engine = core;"
                 + "    delete __setup;"
+                + "};"
+                + "const J = function(obj) {"
+                + "    return __core.__engine.java(obj);"
                 + "};";
 
         this.eval(setup);
@@ -63,7 +72,7 @@ class NashornScriptEngine implements ScriptEngine {
                 + "        return __core.require(__dirname, name)"
                 + "    };"
                 + "    {{{body}}}"
-                + ""
+                + ";"
                 + "    return module.exports;"
                 + "})();";
     }
@@ -152,7 +161,28 @@ class NashornScriptEngine implements ScriptEngine {
 
     @Override
     public <T> T java(final Object obj) {
-        return (T) obj; // nothing changes
+        if (obj instanceof ScriptObjectMirror) {
+            final ScriptObjectMirror som = (ScriptObjectMirror) obj;
+
+            if (som.isFunction()) {
+                return (T) new Function(obj, this);
+            }
+        }
+        return (T) obj;
+    }
+
+    @Override
+    public <T> T java(Class<T> clazzOfT, Object object) {
+        if (object instanceof ScriptObjectMirror) {
+            final ScriptObjectMirror som = (ScriptObjectMirror) object;
+
+            if (som.getClassName().equals("Object")) {
+                final JsonElement json = GSON.toJsonTree((Map) som);
+
+                return GSON.fromJson(json, clazzOfT);
+            }
+        }
+        return java(object);
     }
 
     private String buildScript(final File file) throws IOException {

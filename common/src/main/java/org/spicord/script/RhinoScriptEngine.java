@@ -21,18 +21,24 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Map;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeJavaArray;
 import org.mozilla.javascript.NativeJavaClass;
 import org.mozilla.javascript.NativeJavaObject;
+import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.ScriptableObject;
 import org.spicord.script.module.Path;
 import org.spicord.util.AbsoluteFile;
 import org.spicord.util.FileSystem;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 
 @SuppressWarnings("unchecked")
 class RhinoScriptEngine implements ScriptEngine {
+
+    private static final Gson GSON = new Gson();
 
     protected final Context ctx;
     protected final ScriptableObject scope;
@@ -50,10 +56,14 @@ class RhinoScriptEngine implements ScriptEngine {
                 + "    return java.lang.System.out.println(java.lang.String.valueOf(print));"
                 + "};"
                 + "const console = { log: print };"
-                + "const __core = { require: {} };"
+                + "const __core = { require: {}, __engine: {} };"
                 + "__setup = function(core) {"
                 + "    __core.require = (dir, str) => core.require(dir, str);"
+                + "    __core.__engine = core;"
                 + "    delete __setup;"
+                + "};"
+                + "const J = function(obj) {"
+                + "    return __core.__engine.java(obj);"
                 + "};";
 
         this.eval(base);
@@ -64,7 +74,7 @@ class RhinoScriptEngine implements ScriptEngine {
                 + "    const __dirname = \"{{{dirname}}}\";"
                 + "    const require = (name) => __core.require(__dirname, name);"
                 + "    {{{body}}}"
-                + ""
+                + ";"
                 + "    return module.exports;"
                 + "})();";
     }
@@ -149,8 +159,20 @@ class RhinoScriptEngine implements ScriptEngine {
             return (T) ((NativeJavaClass) obj).unwrap();
         else if (obj instanceof NativeJavaArray)
             return (T) ((NativeJavaArray) obj).unwrap();
+        else if (obj instanceof Function)
+            return (T) new org.spicord.script.Function(obj, this);
 
         return (T) obj;
+    }
+
+    @Override
+    public <T> T java(Class<T> clazzOfT, Object object) {
+        if (object instanceof NativeObject) {
+            final NativeObject nobj = (NativeObject) object;
+            final JsonElement json = GSON.toJsonTree((Map<?, ?>) nobj);
+            return GSON.fromJson(json, clazzOfT);
+        }
+        return java(object);
     }
 
     private String buildScript(final File file) throws IOException {

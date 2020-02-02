@@ -15,26 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.spicord.script.module;
+package org.spicord.script;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+public class Function {
 
-// https://nodejs.org/api/fs.html
-public class FileSystem {
+    private final Object func;
+    private final ScriptEngine engine;
 
-    private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
-
-    private FileSystem() {}
-
-    // 'encoding' is ignored for now, that will be done in the future :)
-    public static String readFileSync(String path, String encoding) throws IOException {
-        return new String(readBytes(path), DEFAULT_CHARSET);
+    Function(Object func, ScriptEngine engine) {
+        this.func = func;
+        this.engine = engine;
     }
 
-    private static byte[] readBytes(String file) throws IOException {
-        return Files.readAllBytes(Paths.get(file));
+    public Object call(Object... args) {
+        return engine.java(engine.callFunction(func, args));
     }
 }

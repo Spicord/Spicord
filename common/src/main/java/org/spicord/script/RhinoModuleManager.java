@@ -64,10 +64,15 @@ public final class RhinoModuleManager implements ModuleManager {
     }
 
     private Object getClass(String name) {
-        return engine.eval(name);
+        return engine.eval("Packages." + name);
     }
 
     private Object javaToJS(Object obj) {
         return Context.javaToJS(obj, engine.scope);
+    }
+
+    @Override
+    public ScriptEngine getEngine() {
+        return engine;
     }
 }

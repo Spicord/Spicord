@@ -104,6 +104,8 @@ public interface IScriptEngine {
      */
     <T> T java(Object object);
 
+    <T> T java(Class<T> clazz, Object object);
+
     /**
      * Get the module manager.
      * 

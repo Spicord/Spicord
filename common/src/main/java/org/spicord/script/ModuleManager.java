@@ -77,16 +77,19 @@ public interface ModuleManager {
      */
     Object getModule(String name);
 
+    ScriptEngine getEngine();
+
     /**
      * Register the default modules for this ModuleManager instance.
      */
     default void registerDefaultModules() {
         // classes
-        this.register("path", Path.class);
         this.register("base-addon", JavaScriptBaseAddon.class);
         this.register("yaml", YamlConfiguration.class);
+        this.register("fs", FileSystem.class);
 
         // instances
+        this.register("path", new Path(getEngine()));
         this.register("server", Server.getInstance());
     }
 }

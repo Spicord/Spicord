@@ -21,11 +21,14 @@ import java.util.HashMap;
 import java.util.Map;
 import jdk.internal.dynalink.beans.StaticClass;
 
+@SuppressWarnings("all")
 public final class NashornModuleManager implements ModuleManager {
 
+    private final NashornScriptEngine engine;
     private final Map<String, Object> modules;
 
-    public NashornModuleManager() {
+    public NashornModuleManager(NashornScriptEngine engine) {
+        this.engine = engine;
         this.modules = new HashMap<String, Object>();
         this.registerDefaultModules();
     }
@@ -63,5 +66,10 @@ public final class NashornModuleManager implements ModuleManager {
 
     private Object getClass(Class<?> clazz) {
         return StaticClass.forClass(clazz);
+    }
+
+    @Override
+    public ScriptEngine getEngine() {
+        return engine;
     }
 }

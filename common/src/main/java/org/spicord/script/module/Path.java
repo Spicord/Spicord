@@ -19,6 +19,10 @@ package org.spicord.script.module;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import org.spicord.script.ScriptEngine;
 
 /*
  * https://nodejs.org/api/path.html
@@ -28,6 +32,12 @@ public class Path {
     public static final String sep = File.separator;
     public static final String delimiter = File.pathSeparator;
     private static final String EMPTY_STRING = "";
+
+    private final ScriptEngine engine;
+
+    public Path(ScriptEngine engine) {
+        this.engine = engine;
+    }
 
     public static String basename(final String path) {
         if (path == null) return null;
@@ -67,8 +77,21 @@ public class Path {
         return path.substring(i);
     }
 
-    public static String format(Object obj) {
-        return null; // TODO
+    public String format(Object obj) {
+        final PathObject path;
+        if (obj instanceof PathObject)
+            path = (PathObject) obj;
+        else
+            path = engine.java(PathObject.class, obj);
+
+        final String dir = path.dir == null ? path.root : path.dir;
+        final String base = path.base == null ? (path.name + path.ext) : path.base;
+
+        if (dir == null || base == null) {
+            return EMPTY_STRING;
+        }
+
+        return join(dir, base);
     }
 
     public static boolean isAbsolute(String path) {
@@ -98,11 +121,42 @@ public class Path {
         return Paths.get(path).normalize().toString();
     }
 
-    public static Object parse(String path) {
+    public static PathObject parse(String path) {
         return null; // TODO
     }
 
+//    private String removeTrailingSeparators(String path) {
+//        return path.replaceAll("(\\/+)$", EMPTY_STRING);
+//    }
+
     public static String resolve(String... paths) {
-        return null; // TODO
+        if (paths == null) return null;
+        if (paths.length == 0) return EMPTY_STRING;
+
+        final List<String> list = new LinkedList<>();
+
+        for (int i = paths.length - 1; i >= 0; i--) {
+            final String path = paths[i];
+            list.add(path);
+            if (path.startsWith("/")) break;
+        }
+
+        final String last = list.get(list.size() - 1);
+
+        if (!last.startsWith("/")) {
+            list.add(".");
+        }
+
+        Collections.reverse(list);
+
+        return join(list.toArray(new String[list.size()]));
+    }
+
+    public class PathObject {
+        public String root;
+        public String dir;
+        public String base;
+        public String ext;
+        public String name;
     }
 }
