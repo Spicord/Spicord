@@ -12,6 +12,7 @@
 * Custom commands support
   * Different command prefix for each bot!
 * Addon support
+  * JavaScript support!
   * Integrated simple addons (for testing the plugin)!
   * Independent addons for each bot!
 * Integrated easy-to-use API
@@ -20,6 +21,7 @@
 * Compatible with Spigot/Bukkit
 * Compatible with BungeeCord
 * Compatible with Velocity
+* Compatible with Sponge
 * Spicord is open-source!
 
 ## Commands
@@ -28,7 +30,7 @@
 | sp bot \<botname> <add/remove> \<addon-key> | Add or remove an addon for that bot |
 | sp stop [botname] | Stop/shutdown a bot |
 | sp start [botname] | Start a bot |
-| sp restart | Restart Spicord's config and bots |
+| sp restart | Restart the configuration and the bots |
 | sp status | Show the status of your bots (ready/offline) |
 
 ## Maven repository
@@ -40,8 +42,8 @@
 
 <dependency>
     <groupId>eu.mcdb</groupId>
-    <artifactId>spicord</artifactId>
-    <version>2.5.0-SNAPSHOT</version>
+    <artifactId>spicord-common</artifactId>
+    <version>3.0.0-SNAPSHOT</version>
     <scope>provided</scope>
 </dependency>
 ```
@@ -57,12 +59,12 @@ Clone this repository and 'cd' into it
 `git clone https://github.com/OopsieWoopsie/Spicord.git && cd Spicord`
 
 
-Then run
+Build the project
 
 `mvn clean verify`
 
 
-The final jar compatible with Bukkit/Bungee/Velocity will be located at `all/target/Spicord_VERSION.jar`
+The universal jar will be located at `all/target/Spicord_VERSION.jar`
 
 
 
