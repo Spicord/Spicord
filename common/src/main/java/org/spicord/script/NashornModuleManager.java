@@ -19,7 +19,7 @@ package org.spicord.script;
 
 import java.util.HashMap;
 import java.util.Map;
-import jdk.internal.dynalink.beans.StaticClass;
+import nashorn.internal.dynalink.beans.StaticClass;
 
 @SuppressWarnings("all")
 public final class NashornModuleManager implements ModuleManager {

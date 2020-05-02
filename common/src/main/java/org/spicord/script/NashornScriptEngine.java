@@ -29,7 +29,8 @@ import org.spicord.util.AbsoluteFile;
 import org.spicord.util.FileSystem;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import nashorn.api.scripting.NashornScriptEngineFactory;
+import nashorn.api.scripting.ScriptObjectMirror;
 
 @SuppressWarnings("all")
 class NashornScriptEngine implements ScriptEngine {
@@ -42,7 +43,7 @@ class NashornScriptEngine implements ScriptEngine {
 
     public NashornScriptEngine() {
         System.setProperty("nashorn.args", "--language=es6");
-        this.nashorn = new ScriptEngineManager().getEngineByName("nashorn");
+        this.nashorn = new NashornScriptEngineFactory().getScriptEngine();
 
         if (nashorn == null)
             throw new IllegalStateException("the nashorn engine is not present on this JVM");
@@ -65,16 +66,16 @@ class NashornScriptEngine implements ScriptEngine {
         this.eval(setup);
         this.callFunction("__setup", this);
 
-        this.BASE_SCRIPT = "(function() {"
+        this.BASE_SCRIPT = "(function(dirname) {"
                 + "    const module = { exports: {} };"
-                + "    const __dirname = \"{{{dirname}}}\";"
+                + "    const __dirname = dirname; delete dirname;"
                 + "    const require = function(name) {"
                 + "        return __core.require(__dirname, name)"
                 + "    };"
                 + "    {{{body}}}"
                 + ";"
                 + "    return module.exports;"
-                + "})();";
+                + "})";
     }
 
     @Override
@@ -140,8 +141,7 @@ class NashornScriptEngine implements ScriptEngine {
             file = new File(file, "index.js");
 
         if (file.exists() && file.isFile()) {
-            final String script = buildScript(file);
-            return eval(script);
+            return require(file);
         } else {
             if (name.endsWith(".js")) {
                 return null;
@@ -153,8 +153,9 @@ class NashornScriptEngine implements ScriptEngine {
     @Override
     public <T> T require(final File file) throws IOException {
         if (file.exists() && file.isFile()) {
-            final String script = buildScript(file);
-            return eval(script);
+            final Function script = buildScript(file);
+            final String parent = file.toPath().getParent().toString();
+            return (T) script.call(Path.normalize(parent));
         }
         return null;
     }
@@ -172,7 +173,7 @@ class NashornScriptEngine implements ScriptEngine {
     }
 
     @Override
-    public <T> T java(Class<T> clazzOfT, Object object) {
+    public <T> T toJava(Class<T> clazzOfT, Object object) {
         if (object instanceof ScriptObjectMirror) {
             final ScriptObjectMirror som = (ScriptObjectMirror) object;
 
@@ -185,11 +186,14 @@ class NashornScriptEngine implements ScriptEngine {
         return java(object);
     }
 
-    private String buildScript(final File file) throws IOException {
-        final String parent = file.toPath().getParent().toString();
-        return BASE_SCRIPT
-                .replace("{{{dirname}}}", Path.normalize(parent))
-                .replace("{{{body}}}", FileSystem.readFile(file));
+    @Override
+    public Function buildScript(final File file) throws ScriptException {
+        try {
+            final String script = BASE_SCRIPT.replace("{{{body}}}", FileSystem.readFile(file));
+            return new Function(eval(script), this);
+        } catch (IOException e) {
+            throw new ScriptException(e);
+        }
     }
 
     @Override
