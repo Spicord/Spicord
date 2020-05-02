@@ -41,7 +41,7 @@ class SnakeYamlConfiguration extends YamlConfiguration {
             options.setIndicatorIndent(1);
             this.yaml = new Yaml(options);
             this.map = yaml.load(new FileReader(file));
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

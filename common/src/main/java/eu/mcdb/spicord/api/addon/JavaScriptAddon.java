@@ -22,9 +22,7 @@ import java.util.Map.Entry;
 import org.spicord.script.ScriptEngine;
 import eu.mcdb.spicord.api.bot.command.BotCommand;
 import eu.mcdb.spicord.bot.DiscordBot;
-import eu.mcdb.spicord.bot.command.DiscordBotCommand;
 import lombok.Getter;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 @Getter
 public final class JavaScriptAddon extends SimpleAddon {
@@ -54,14 +52,6 @@ public final class JavaScriptAddon extends SimpleAddon {
     public void onReady(DiscordBot bot) {
         call(ready, bot);
     }
-
-    @Override
-    public void onCommand(DiscordBotCommand command, String[] args) {
-        // will not be used
-    }
-
-    @Override
-    public void onMessageReceived(DiscordBot bot, MessageReceivedEvent event) {}
 
     private void setupCommands(DiscordBot bot) {
         for (final Entry<String[], Object> entry : _commands.entrySet()) {

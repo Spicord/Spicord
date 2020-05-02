@@ -91,7 +91,7 @@ public class ZipExtractor implements AutoCloseable {
     }
 
     public boolean hasEntry(String path) {
-        return entries.stream().map(ZipEntry::getName).count() > 0;
+        return entries.stream().map(ZipEntry::getName).anyMatch(path::equals);
     }
 
     public Optional<Reader> readEntry(String path) throws IOException {

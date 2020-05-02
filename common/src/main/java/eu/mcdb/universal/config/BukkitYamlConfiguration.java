@@ -30,10 +30,6 @@ class BukkitYamlConfiguration extends YamlConfiguration {
     private final File file;
     private final FileConfiguration config;
 
-    public static void main(String[] args) {
-        new BukkitYamlConfiguration(new File("/home/sheidy/test.yml"));
-    }
-
     BukkitYamlConfiguration(final File file) {
         this.file = file;
         this.config = org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(file);

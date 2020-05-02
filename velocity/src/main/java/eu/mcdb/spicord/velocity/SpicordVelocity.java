@@ -25,7 +25,7 @@ import eu.mcdb.spicord.SpicordLoader;
 import eu.mcdb.universal.MCDB;
 import eu.mcdb.universal.plugin.VelocityPlugin;
 
-@Plugin(id = "spicord", name = "Spicord", version = "2.6.0", authors = { "OopsieWoopsie" })
+@Plugin(id = "spicord", name = "Spicord", version = "3.0.0", authors = { "OopsieWoopsie" })
 public class SpicordVelocity extends VelocityPlugin {
 
     @Inject
@@ -35,8 +35,7 @@ public class SpicordVelocity extends VelocityPlugin {
 
     @Override
     public void onEnable() {
-        SpicordLoader loader = new SpicordLoader(getLogger(), getDataFolder());
-        loader.load();
+        new SpicordLoader(getLogger(), getDataFolder());
         MCDB.registerCommand(this, new SpicordCommand(() -> {}));
     }
 }

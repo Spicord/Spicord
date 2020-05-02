@@ -82,7 +82,7 @@ public class Path {
         if (obj instanceof PathObject)
             path = (PathObject) obj;
         else
-            path = engine.java(PathObject.class, obj);
+            path = engine.toJava(PathObject.class, obj);
 
         final String dir = path.dir == null ? path.root : path.dir;
         final String base = path.base == null ? (path.name + path.ext) : path.base;
