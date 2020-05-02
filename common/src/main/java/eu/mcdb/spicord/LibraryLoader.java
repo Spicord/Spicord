@@ -27,6 +27,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.logging.Logger;
@@ -151,8 +152,11 @@ public class LibraryLoader {
 
         public byte[] download() throws IOException {
             final URL url = new URL(this.url);
+            final URLConnection conn = url.openConnection();
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+            conn.connect();
 
-            try (final InputStream in = url.openStream();
+            try (final InputStream in = conn.getInputStream();
                     final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 
                 int n;
@@ -162,7 +166,7 @@ public class LibraryLoader {
                 return baos.toByteArray();
             } catch (IOException e) {
                 throw new IOException(e);
-            }
+			}
         }
     }
 }
