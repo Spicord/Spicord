@@ -47,14 +47,12 @@ public final class SpicordLoader {
 
         this.logger = logger;
         this.libraryLoader = new LibraryLoader("/libraries.libinfo", logger, dataFolder);
-        this.spicord = new Spicord(logger);
         this.dataFolder = dataFolder;
+
+        this.load0();
     }
 
-    /**
-     * Loads Spicord
-     */
-    public void load() {
+    private void load0() {
         try {
             if (firstRun) {
                 firstRun = false;
@@ -68,15 +66,18 @@ public final class SpicordLoader {
                 }
             }
 
-            final SpicordConfiguration config = new SpicordConfiguration(dataFolder);
+            this.spicord = new Spicord(logger);
+        } catch (IOException e) {
+            handleException(e);
+        }
+    }
 
+    public void load() {
+        try {
+            final SpicordConfiguration config = new SpicordConfiguration(dataFolder);
             spicord.onLoad(config);
         } catch (IOException e) {
-            logger.severe(
-                    "Spicord could not be loaded, please report this error in \n\t -> https://github.com/OopsieWoopsie/Spicord/issues");
-            logger.severe("Error: " + e.getMessage());
-            e.printStackTrace();
-            disable();
+            handleException(e);
         }
     }
 
@@ -86,5 +87,11 @@ public final class SpicordLoader {
     public void disable() {
         this.spicord.onDisable();
         this.spicord = null;
+    }
+
+    private void handleException(final Exception e) {
+        logger.severe("Spicord could not be loaded, please report this error in \n\t -> https://github.com/OopsieWoopsie/Spicord/issues");
+        e.printStackTrace();
+        disable();
     }
 }
