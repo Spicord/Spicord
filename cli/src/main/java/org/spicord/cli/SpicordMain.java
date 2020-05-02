@@ -39,6 +39,7 @@ public class SpicordMain {
     public SpicordMain(String[] args) throws IOException {
         this.preload();
         this.loader = new SpicordLoader(this.logger, this.dataFolder);
+        this.loader.load();
 
         final LineReader lineReader = LineReaderBuilder.builder().build();
         final SpicordConsoleCommand scc = new SpicordConsoleCommand(this.logger);
