@@ -17,6 +17,12 @@
 
 package eu.mcdb.universal.command;
 
+import java.lang.annotation.Annotation;
+
+import org.bukkit.plugin.java.JavaPlugin;
+
+import net.md_5.bungee.api.plugin.Plugin;
+
 public abstract class UniversalCommand {
 
     private final String name;
@@ -84,8 +90,42 @@ public abstract class UniversalCommand {
         return aliases;
     }
 
-    @SuppressWarnings("deprecation")
-    public void register(Object pluginInstance) {
-        eu.mcdb.universal.MCDB.registerCommand(pluginInstance, this);
+    public void register(Object plugin) {
+        if (isInstance(plugin, "net.md_5.bungee.api.plugin.Plugin"))
+
+            BungeeCommandExecutor.register((Plugin) plugin, this);
+
+        else if (isInstance(plugin, "org.bukkit.plugin.java.JavaPlugin"))
+
+            BukkitCommandExecutor.register((JavaPlugin) plugin, this);
+
+        else if (isInstance(plugin, "org.spicord.plugin.VelocityPlugin"))
+
+            VelocityCommandExecutor.register(plugin, this);
+
+        else if (isSpongePlugin(plugin))
+
+            SpongeCommandExecutor.register(plugin, this);
+
+        else
+            throw new IllegalArgumentException("plugin");
+    }
+
+    private static boolean isInstance(Object plugin, String className) {
+        try {
+            final Class<?> clazz = Class.forName(className);
+            return clazz.isInstance(plugin);
+        } catch (ClassNotFoundException e) {}
+        return false;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static boolean isSpongePlugin(Object plugin) {
+        try {
+            final Class<?> pluginAnnotation = Class.forName("org.spongepowered.plugin.builtin.jvm.Plugin");
+
+            return plugin.getClass().isAnnotationPresent((Class<? extends Annotation>) pluginAnnotation);
+        } catch (ClassNotFoundException e) {}
+        return false;
     }
 }

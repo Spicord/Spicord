@@ -1,37 +1,65 @@
 package org.spicord.sponge;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import org.slf4j.Logger;
+import java.nio.file.Path;
+import java.util.logging.Logger;
+
 import org.spicord.Spicord;
 import org.spicord.SpicordLoader;
 import org.spicord.SpicordPlugin;
-import org.spicord.Version;
-import org.spicord.plugin.SpongePlugin;
 import org.spicord.reflect.ReflectUtils;
-import org.spicord.reflect.ReflectedObject;
 import org.spicord.util.SpicordClassLoader;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStoppingEvent;
-import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.event.lifecycle.LoadedGameEvent;
+import org.spongepowered.api.event.lifecycle.StoppedGameEvent;
+import org.spongepowered.plugin.builtin.jvm.Plugin;
+
 import com.google.inject.Inject;
 
-@Plugin(id = "spicord", name = "Spicord", version = Version.VERSION, authors = { "Sheidy" })
-public class SpicordSponge extends SpongePlugin implements SpicordPlugin {
-
-    private static final List<String> EXCEPTIONS = Arrays.asList(
-            "org.mozilla.javascript.",
-            "org.yaml.snakeyaml.",
-            "com.moandjiezana.toml.",
-            "net.dv8tion.jda."
-        );
+@Plugin("spicord")
+public class SpicordSponge implements SpicordPlugin {
 
     private SpicordLoader loader;
+
+    private File dataFolder;
+
+    @Inject
+    public SpicordSponge(@ConfigDir(sharedRoot = false) Path dataFolder) {
+        ClassLoader classLoader = SpicordSponge.class.getClassLoader();
+
+        this.loader = new SpicordLoader(new SpicordClassLoader(classLoader), this);
+        this.dataFolder = dataFolder.toFile();
+    }
+
+    @Listener
+    public void onLoadedGame(LoadedGameEvent event) {
+        if (this.loader != null) {
+            this.loader.load();
+        }
+    }
+
+    @Listener
+    public void onStoppedGame(StoppedGameEvent event) {
+        if (this.loader != null) {
+            this.loader.shutdown();
+        }
+    }
+
+    @Override
+    public File getFile() {
+        return ReflectUtils.getJarFile(SpicordSponge.class);
+    }
+
+    @Override
+    public Logger getLogger() {
+        return Logger.getLogger("spicord");
+    }
+
+    @Override
+    public File getDataFolder() {
+        return dataFolder;
+    }
 
     @Override
     public void reloadSpicord() {
@@ -45,42 +73,5 @@ public class SpicordSponge extends SpongePlugin implements SpicordPlugin {
     @Override
     public Spicord getSpicord() {
         return this.loader.getSpicord();
-    }
-
-    @Inject
-    public SpicordSponge(Logger logger, @ConfigDir(sharedRoot = false) File configDir) {
-        ClassLoader cl = prepareClassLoader(Sponge.class.getClassLoader());
-        SpicordClassLoader classLoader = new SpicordClassLoader(cl);
-
-        this.loader = new SpicordLoader(classLoader, this);
-    }
-
-    @Listener
-    public void init(GameInitializationEvent event) {
-        if (this.loader != null) {
-            this.loader.load();
-        }
-    }
-
-    @Listener
-    public void stop(GameStoppingEvent event) {
-        if (this.loader != null) {
-            this.loader.shutdown();
-        }
-    }
-
-    private ClassLoader prepareClassLoader(ClassLoader classLoader) {
-        ClassLoader parent = classLoader.getClass().getClassLoader();
-
-        Set<String> classLoaderExceptions = new ReflectedObject(classLoader)
-                .getField("classLoaderExceptions").setAccessible().getValue();
-
-        classLoaderExceptions.addAll(EXCEPTIONS);
-        return parent;
-    }
-
-    @Override
-    public File getFile() {
-        return ReflectUtils.getJarFile(SpicordSponge.class);
     }
 }

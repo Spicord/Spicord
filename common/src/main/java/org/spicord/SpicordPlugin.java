@@ -7,4 +7,5 @@ public interface SpicordPlugin extends PluginInterface {
     void reloadSpicord();
 
     Spicord getSpicord();
+
 }

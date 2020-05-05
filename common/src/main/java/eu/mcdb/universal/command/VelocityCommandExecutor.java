@@ -18,9 +18,12 @@
 package eu.mcdb.universal.command;
 
 import org.spicord.player.VelocityPlayer;
+import org.spicord.plugin.VelocityPlugin;
+
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
+
 import net.kyori.adventure.text.Component;
 
 /**
@@ -66,5 +69,9 @@ public final class VelocityCommandExecutor implements SimpleCommand {
         }
 
         command.onCommand(commandSender, args);
+    }
+
+    public static void register(Object plugin, UniversalCommand command) {
+        VelocityPlugin.getCommandManager().register(command.getName(), new VelocityCommandExecutor(command), command.getAliases());
     }
 }

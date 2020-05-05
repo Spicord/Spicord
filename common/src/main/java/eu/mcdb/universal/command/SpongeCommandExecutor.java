@@ -1,75 +1,73 @@
-/*
- * Copyright (C) 2020  OopsieWoopsie
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package eu.mcdb.universal.command;
 
+import java.util.Optional;
+
 import org.spicord.player.SpongePlayer;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.Command;
+import org.spongepowered.api.command.Command.Parameterized;
+import org.spongepowered.api.command.CommandExecutor;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.command.spec.CommandSpec.Builder;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.command.registrar.CommandRegistrar;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.plugin.PluginContainer;
+
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
 
 /**
  * Wrapper for the {@link UniversalCommand} class to
- * make it usable by Sponge.
+ * make it usable by Sponge v8
  * 
- * @author sheidy
+ * @author Tini
  */
 public class SpongeCommandExecutor implements CommandExecutor {
 
     private final UniversalCommand command;
-    private final CommandSpec spec;
+
+    private Command.Parameterized spongeCommand;
+
+    private Parameter.Value<String> argsParameter;
 
     public SpongeCommandExecutor(final UniversalCommand command) {
         this.command = command;
 
-        final Builder builder = CommandSpec.builder()
-                .arguments(GenericArguments.remainingJoinedStrings(Text.of("args")))
+        final Command.Builder builder = Command.builder()
+                .addParameter(
+                        argsParameter = Parameter.remainingJoinedStrings()
+                            .key("args")
+                            .consumeAllRemaining()
+                            .build()
+                )
                 .executor(this);
 
-        if (command.getPermission() != null)
+        if (command.getPermission() != null) {
             builder.permission(command.getPermission());
+        }
 
-        this.spec = builder.build();
+        spongeCommand = builder.build();
     }
 
     @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        UniversalCommandSender commandSender;
+    public CommandResult execute(CommandContext context) throws CommandException {
+        final UniversalCommandSender commandSender;
 
-        if (src instanceof Player) {
-            commandSender = new SpongePlayer((Player) src);
+        if (context.subject() instanceof ServerPlayer) {
+            commandSender = new SpongePlayer((ServerPlayer) context.subject());
         } else {
             commandSender = new UniversalCommandSender() {
 
                 @Override
                 public boolean hasPermission(String permission) {
-                    return isEmpty(permission) || src.hasPermission(permission);
+                    return isEmpty(permission) || context.hasPermission(permission);
                 }
 
                 @Override
                 public void sendMessage(String message) {
-                    src.sendMessage(Text.of(message));
+                    context.sendMessage(Identity.nil(), Component.text(message));
                 }
 
                 private boolean isEmpty(String string) {
@@ -78,12 +76,28 @@ public class SpongeCommandExecutor implements CommandExecutor {
             };
         }
 
-        final String[] _args = args.<String>requireOne("args").split(" ");
-        command.onCommand(commandSender, _args);
+        final String[] args = context.requireOne(argsParameter).split(" ");
+
+        command.onCommand(commandSender, args);
+
         return CommandResult.success();
     }
 
-    public CommandSpec get() {
-        return spec;
+    public Command.Parameterized getSpongeCommand() {
+        return spongeCommand;
+    }
+
+    public static void register(Object pluginInstance, UniversalCommand command) {
+        final Optional<PluginContainer> container = Sponge.game().pluginManager().fromInstance(pluginInstance);
+
+        if (container.isPresent()) {
+            final Optional<CommandRegistrar<Parameterized>> registrar = Sponge.server().commandManager().registrar(Command.Parameterized.class);
+
+            if (registrar.isPresent()) {
+                final SpongeCommandExecutor executor = new SpongeCommandExecutor(command);
+
+                registrar.get().register(container.get(), executor.getSpongeCommand(), command.getName(), command.getAliases());
+            }
+        }
     }
 }

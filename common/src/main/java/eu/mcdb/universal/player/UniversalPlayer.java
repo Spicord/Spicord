@@ -20,9 +20,10 @@ package eu.mcdb.universal.player;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import eu.mcdb.universal.command.UniversalCommandSender;
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -61,7 +62,7 @@ public class UniversalPlayer extends UniversalCommandSender {
         return null;
     }
 
-    public org.spongepowered.api.entity.living.player.Player getSpongePlayer() {
+    public ServerPlayer getSpongePlayer() {
         return null;
     }
 
@@ -155,7 +156,7 @@ public class UniversalPlayer extends UniversalCommandSender {
 
     private static class sendMessageSponge {
         sendMessageSponge(org.spongepowered.api.entity.living.player.Player player, String message) {
-            player.sendMessage(Text.of(message));
+            player.sendMessage(Component.text(message));
         }
     }
 }

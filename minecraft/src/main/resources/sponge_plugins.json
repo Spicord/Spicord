@@ -1,0 +1,27 @@
+{
+    "loader": {
+        "name": "java_plain",
+        "version": "1.0"
+    },
+    "license": "AGPL-3.0",
+    "plugins": [
+        {
+            "id": "spicord",
+            "name": "Spicord",
+            "version": "${project.version}",
+            "entrypoint": "org.spicord.sponge.SpicordSponge",
+            "description": "Discord integration for your minecraft server",
+            "links": {
+                "homepage": "https://github.com/Spicord/Spicord",
+                "source": "https://github.com/Spicord/Spicord",
+                "issues": "https://github.com/Spicord/Spicord/issues"
+            },
+            "contributors": [
+                {
+                    "name": "Tini",
+                    "description": "Lead Developer"
+                }
+            ]
+        }
+    ]
+}

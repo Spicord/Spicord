@@ -1,20 +1,3 @@
-/*
- * Copyright (C) 2020  OopsieWoopsie
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package org.spicord.server.impl;
 
 import java.util.Arrays;
@@ -24,15 +7,18 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
+
 import org.spicord.player.SpongePlayer;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+
 import eu.mcdb.universal.player.UniversalPlayer;
 import eu.mcdb.util.SLF4JWrapper;
+import net.kyori.adventure.text.Component;
 
 final class SpongeServer extends eu.mcdb.universal.Server {
 
@@ -41,25 +27,25 @@ final class SpongeServer extends eu.mcdb.universal.Server {
     private final Logger logger;
 
     public SpongeServer() {
-        this.game = Sponge.getGame();
-        this.server = Sponge.getServer();
+        this.game = Sponge.game();
+        this.server = Sponge.server();
         this.logger = new SLF4JWrapper();
     }
 
     @Override
     public int getOnlineCount() {
-        return server.getOnlinePlayers().size();
+        return server.onlinePlayers().size();
     }
 
     @Override
     public int getPlayerLimit() {
-        return server.getMaxPlayers();
+        return server.maxPlayers();
     }
 
     @Override
     public String[] getOnlinePlayers() {
-        return server.getOnlinePlayers().stream()
-                .map(Player::getName)
+        return server.onlinePlayers().stream()
+                .map(Player::name)
                 .toArray(String[]::new);
     }
 
@@ -73,20 +59,24 @@ final class SpongeServer extends eu.mcdb.universal.Server {
 
     @Override
     public String getVersion() {
-        return "Sponge " + game.getPlatform().getMinecraftVersion().getName();
+        return "Sponge " + game.platform().minecraftVersion().name();
     }
 
     @Override
     public String[] getPlugins() {
-        return game.getPluginManager().getPlugins().stream()
-                .map(PluginContainer::getName)
+        return game.pluginManager().plugins().stream()
+                .map(c -> c.metadata().name().orElse(c.metadata().id()))
                 .toArray(String[]::new);
     }
 
     @Override
     public boolean dispatchCommand(String command) {
-        game.getCommandManager().process(server.getConsole(), command);
-        return true;
+        try {
+            return server.commandManager().process(game.systemSubject(), command).isSuccess();
+        } catch (CommandException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
@@ -96,7 +86,7 @@ final class SpongeServer extends eu.mcdb.universal.Server {
 
     @Override
     public UniversalPlayer getPlayer(UUID uuid) {
-        final Optional<Player> player = server.getPlayer(uuid);
+        final Optional<ServerPlayer> player = server.player(uuid);
 
         if (player.isPresent()) {
             return new SpongePlayer(player.get());
@@ -107,6 +97,6 @@ final class SpongeServer extends eu.mcdb.universal.Server {
 
     @Override
     public void broadcast(String message) {
-        server.getBroadcastChannel().send(Text.of(message));
+        server.broadcastAudience().sendMessage(Component.text(message));
     }
 }

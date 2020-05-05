@@ -19,7 +19,7 @@ public class ServerUtil {
         default:
             return new DummyServer();
         }
-    }    
+    }
 
     public static void setVelocityHandle(Object proxy) {
         VelocityServer.setHandle((ProxyServer) proxy);

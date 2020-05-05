@@ -1,20 +1,20 @@
 package org.spicord.player;
 
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import eu.mcdb.universal.player.UniversalPlayer;
 
 public class SpongePlayer extends UniversalPlayer {
 
-    private final Player player;
+    private final ServerPlayer player;
 
-    public SpongePlayer(Player player) {
-        super(player.getName(), player.getUniqueId());
+    public SpongePlayer(ServerPlayer player) {
+        super(player.name(), player.uniqueId());
         this.player = player;
     }
 
     @Override
-    public Player getSpongePlayer() {
+    public ServerPlayer getSpongePlayer() {
         return player;
     }
 }

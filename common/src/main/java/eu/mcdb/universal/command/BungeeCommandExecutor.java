@@ -22,6 +22,7 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.Plugin;
 
 /**
  * Wrapper for the {@link UniversalCommand} class to
@@ -64,5 +65,9 @@ public final class BungeeCommandExecutor extends Command {
         }
 
         command.onCommand(commandSender, args);
+    }
+
+    public static void register(Plugin plugin, UniversalCommand command) {
+        plugin.getProxy().getPluginManager().registerCommand(plugin, new BungeeCommandExecutor(command));
     }
 }

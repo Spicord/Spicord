@@ -21,6 +21,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.spicord.player.BukkitPlayer;
 
 /**
@@ -63,5 +64,9 @@ public final class BukkitCommandExecutor implements CommandExecutor {
         }
 
         return command.onCommand(commandSender, args);
+    }
+
+    public static void register(JavaPlugin plugin, UniversalCommand command) {
+        plugin.getCommand(command.getName()).setExecutor(new BukkitCommandExecutor(command));
     }
 }
