@@ -17,8 +17,10 @@
 
 package eu.mcdb.spicord.embed;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
@@ -412,7 +414,18 @@ public class Embed implements Serializable {
             oos.writeObject(this);
             return baos.toByteArray();
         } catch (IOException e) {
-            throw new IOException(e);
+            throw e;
+        }
+    }
+
+    public Embed unserialize(byte[] data) throws IOException {
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(data);
+                ObjectInputStream ois = new ObjectInputStream(bais)) {
+            return (Embed) ois.readObject();
+        } catch (IOException e) {
+            throw e;
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException();
         }
     }
 
