@@ -63,7 +63,7 @@ public class LibraryLoader {
         for (final Library lib : libraries) {
             this.downloadLibrary(lib, false);
         }
-        this.sha1Check();
+        this.sha1Check(false);
     }
 
     private File downloadLibrary(Library lib, boolean replace) throws IOException {
@@ -81,7 +81,8 @@ public class LibraryLoader {
         return out;
     }
 
-    private void sha1Check() {
+    private void sha1Check(boolean failed) {
+        boolean recheck = false;
         for (final Library lib : libraries) {
             if (lib.getSha1() != null) {
                 try {
@@ -98,12 +99,16 @@ public class LibraryLoader {
                         log.info("[Loader] expected sha1sum: " + lib.getSha1());
                         log.info("[Loader] current  sha1sum: " + sha1);
                         downloadLibrary(lib, true);
+                        recheck = true;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
+        if (recheck && failed) {
+            throw new RuntimeException("Failed second attemp to check library integrity");
+        } else if (recheck) sha1Check(true);
     }
 
     /**
