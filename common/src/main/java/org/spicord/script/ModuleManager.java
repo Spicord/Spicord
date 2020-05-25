@@ -89,7 +89,7 @@ public interface ModuleManager {
         this.register("fs", FileSystem.class);
 
         // instances
-        this.register("path", new Path(getEngine()));
+        this.register("path", Path.class); //new Path(getEngine())
         this.register("server", Server.getInstance());
     }
 }

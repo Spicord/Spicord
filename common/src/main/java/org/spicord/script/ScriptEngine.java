@@ -30,8 +30,6 @@ public interface ScriptEngine extends IScriptEngine {
         final ScriptEngine engine;
 
         switch (name) {
-        case "nashorn":
-            engine = new NashornScriptEngine(); break;
         case "rhino":
             engine = new RhinoScriptEngine(); break;
         default:
@@ -39,5 +37,9 @@ public interface ScriptEngine extends IScriptEngine {
         }
 
         return engine;
+    }
+
+    public static ScriptEngine getDefaultEngine() {
+        return getEngine("rhino");
     }
 }

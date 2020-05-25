@@ -94,6 +94,13 @@ public interface IServer {
      */
     Logger getLogger();
 
+    /**
+     * Broadcast a message to all players.
+     * 
+     * @param message the message
+     */
+    void broadcast(String message);
+
     // DEPRECATED METHODS BELOW THIS LINE
 
     /**

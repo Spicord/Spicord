@@ -15,15 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.api.services;
+package org.spicord.reflect;
 
-import eu.mcdb.spicord.api.Node;
+@FunctionalInterface
+public interface ReflectErrorHandler {
 
-public interface Service extends Node {
-
-    String id();
-
-    default void save() {};
-    default void stop() {};
-    default void reload() {};
+    void handle(ReflectException e);
 }

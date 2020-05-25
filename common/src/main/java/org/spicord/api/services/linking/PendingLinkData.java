@@ -15,13 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.api.services.linking;
+package org.spicord.api.services.linking;
 
 import java.util.UUID;
 import eu.mcdb.universal.player.UniversalPlayer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Class containing information about the player.
+ */
 @Getter
 @RequiredArgsConstructor
 public class PendingLinkData {

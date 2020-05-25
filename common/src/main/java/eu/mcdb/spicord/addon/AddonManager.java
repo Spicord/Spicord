@@ -36,6 +36,7 @@ import eu.mcdb.spicord.api.addon.JavaScriptAddon;
 import eu.mcdb.spicord.api.addon.JavaScriptBaseAddon;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.bot.DiscordBot;
+import eu.mcdb.util.FileUtils;
 import eu.mcdb.util.ZipExtractor;
 import lombok.Getter;
 
@@ -68,7 +69,9 @@ public class AddonManager implements Node {
      * @return true if the addon is registered
      */
     public boolean isRegistered(String id) {
-        return addons.stream().map(SimpleAddon::getId).anyMatch(id::equals);
+        return addons.stream()
+        		.map(SimpleAddon::getId)
+        		.anyMatch(id::equals);
     }
 
     /**
@@ -138,16 +141,25 @@ public class AddonManager implements Node {
         if (bot.getAddons().isEmpty())
             return;
 
-        bot.getAddons().stream().map(this::getAddonById).filter(Objects::nonNull).forEach(bot::loadAddon);
+        bot.getAddons().stream()
+        		.map(this::getAddonById)
+        		.filter(Objects::nonNull)
+        		.forEach(bot::loadAddon);
     }
 
+	private File addonsDir;
+
+	/**
+	 * 
+	 * @param dir
+	 */
     public void loadAddons(File dir) {
         checkNotNull(dir);
 
-        final File addonsDir = new File(dir, "addons");
+        this.addonsDir = new File(dir, "addons");
         final File runtimeDir = new File(addonsDir, ".runtime-" + System.nanoTime());
         runtimeDir.mkdirs();
-        runtimeDir.deleteOnExit();
+        FileUtils.deleteOnExit(runtimeDir);
 
         for (final String name : addonsDir.list()) {
             if (name.startsWith(".")) continue;
@@ -163,7 +175,7 @@ public class AddonManager implements Node {
     }
 
     private static final Gson GSON = new Gson();
-    private static final ScriptEngine ENGINE = ScriptEngine.getEngine("nashorn");
+    private static final ScriptEngine ENGINE = ScriptEngine.getDefaultEngine();
 
     private void loadZipAddon(final File file, final File runtimeDir) {
         try (final ZipExtractor ex = new ZipExtractor(file)) {
@@ -187,14 +199,29 @@ public class AddonManager implements Node {
 
                 ex.extract(tempDir);
 
+                File dataDir = new File(tempDir, "data");
+
+                if (dataDir.exists()) {
+                    final File addonsDir = FileUtils.getParent(runtimeDir);
+                    final File addonDir = new File(addonsDir, name);
+
+                    if (!addonDir.exists()) {
+                        dataDir.renameTo(addonDir);
+                    }
+                    dataDir = addonDir;
+                }
+
                 final File addonMain = new File(tempDir, main);
-                final Object res = ENGINE.java(ENGINE.require(addonMain));
+
+                final Object res = ENGINE.buildScript(addonMain)
+                		.call(FileUtils.getParent(addonMain).getAbsolutePath(), // __dirname
+                				dataDir.getAbsolutePath()); // __data
 
                 if (res instanceof JavaScriptBaseAddon) {
                     final JavaScriptAddon addon = new JavaScriptAddon(name, id, author, (JavaScriptBaseAddon) res, ENGINE);
                     this.registerAddon(addon);
                 } else {
-                    throw new ScriptException("the index.js file needs to export the addon instance");
+                    throw new ScriptException("the '" + main + "' file needs to export the addon instance");
                 }
             } else {
                 getLogger().warning(String.format(
@@ -203,6 +230,7 @@ public class AddonManager implements Node {
             }
         } catch (IOException e) {
             getLogger().warning(String.format("The file '%s' cannot be loaded: %s", file.getName(), e.getCause()));
+            e.printStackTrace();
         }
     }
 
@@ -222,21 +250,21 @@ public class AddonManager implements Node {
                 final File addonMain = new File(addonDir, main);
 
                 if (!addonMain.exists()) {
-                    throw new ScriptException(main + " not found for addon " + name);
+                    throw new ScriptException(main + " not found in addon " + name);
                 }
 
-                final Object res = ENGINE.java(ENGINE.require(addonMain));
+                final File dataDir = new File(addonDir, "data");
+
+                final Object res = ENGINE.buildScript(addonMain)
+                		.call(FileUtils.getParent(addonMain).getAbsolutePath(), // __dirname
+                				dataDir.getAbsolutePath()); // __data
 
                 if (res instanceof JavaScriptBaseAddon) {
                     final JavaScriptAddon addon = new JavaScriptAddon(name, id, author, (JavaScriptBaseAddon) res, ENGINE);
                     this.registerAddon(addon);
                 } else {
-                    throw new ScriptException("the index.js file needs to export the addon instance");
+                    throw new ScriptException("the '" + main + "' file needs to export the addon instance");
                 }
-            } else {
-                getLogger().warning(String.format(
-                        "The folder '%s' doesn't contains the 'addon.json' file on its root directory, ignoring it",
-                        addonDir.getName()));
             }
         } catch (IOException e) {
             getLogger().warning(String.format("The addon on folder '%s' cannot be loaded: %s", addonDir.getName(), e.getCause()));

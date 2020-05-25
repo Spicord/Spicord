@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  OopsieWoopsie
+ * Copyright (C) 2020  OopsieWoopsie
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,16 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.util.chat;
+package org.spicord.api.services;
 
-public class ChatColor {
+public interface Service {
 
-    public static String stripColor(String str) {
-        return str.replaceAll("(?i)(&|§)[a-f0-9klmnor]", "");
-    }
+    String id();
 
-    // temp. solution, this is not safe
-    public static String translateAlternateColorCodes(char magic, String text) {
-        return text.replace(magic, '\u00a7');
-    }
+    default void load() {};
+    default void stop() {};
+    default void reload() {};
 }

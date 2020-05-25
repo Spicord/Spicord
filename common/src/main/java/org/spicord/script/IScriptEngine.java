@@ -104,7 +104,9 @@ public interface IScriptEngine {
      */
     <T> T java(Object object);
 
-    <T> T java(Class<T> clazz, Object object);
+    <T> T toJava(Class<T> clazz, Object object);
+
+    Function buildScript(File file) throws ScriptException;
 
     /**
      * Get the module manager.

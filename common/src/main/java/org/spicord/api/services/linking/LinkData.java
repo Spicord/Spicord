@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  OopsieWoopsie
+ * Copyright (C) 2020  OopsieWoopsie
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,16 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.util.chat;
+package org.spicord.api.services.linking;
 
-public class ChatColor {
+import java.util.UUID;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-    public static String stripColor(String str) {
-        return str.replaceAll("(?i)(&|§)[a-f0-9klmnor]", "");
-    }
+/**
+ * Class containing information about the player and the discord id.
+ */
+@RequiredArgsConstructor
+public class LinkData {
 
-    // temp. solution, this is not safe
-    public static String translateAlternateColorCodes(char magic, String text) {
-        return text.replace(magic, '\u00a7');
+    @Getter private final Long id;
+    @Getter private final String name;
+    private final String uuid;
+
+    public UUID getUniqueId() {
+        return UUID.fromString(uuid);
     }
 }

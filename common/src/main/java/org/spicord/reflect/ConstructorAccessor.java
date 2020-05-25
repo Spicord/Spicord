@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  OopsieWoopsie
+ * Copyright (C) 2020  OopsieWoopsie
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,16 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.util.chat;
+package org.spicord.reflect;
 
-public class ChatColor {
+public final class ConstructorAccessor extends ReflectBase<ConstructorAccessor> {
 
-    public static String stripColor(String str) {
-        return str.replaceAll("(?i)(&|§)[a-f0-9klmnor]", "");
+    private final ReflectedMethod method;
+
+    ConstructorAccessor(Object accessor) {
+        if (accessor == null) throw new NullPointerException();
+
+        this.method = new ReflectedObject(accessor)
+                .setErrorRule(getErrorRule())
+                .getMethod("newInstance", Object[].class).setAccessible();
     }
 
-    // temp. solution, this is not safe
-    public static String translateAlternateColorCodes(char magic, String text) {
-        return text.replace(magic, '\u00a7');
+    public Object newInstance(Object[] args) {
+        return method.invoke(new Object[] { args });
     }
 }

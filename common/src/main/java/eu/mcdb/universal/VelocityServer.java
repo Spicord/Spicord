@@ -30,6 +30,7 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.util.ProxyVersion;
 import eu.mcdb.universal.player.UniversalPlayer;
 import eu.mcdb.util.SLF4JWrapper;
+import net.kyori.text.TextComponent;
 
 class VelocityServer extends Server {
 
@@ -117,5 +118,10 @@ class VelocityServer extends Server {
         if (handle != null) return;
 
         handle = server;
+    }
+
+    @Override
+    public void broadcast(String message) {
+        handle.broadcast(TextComponent.of(message));
     }
 }

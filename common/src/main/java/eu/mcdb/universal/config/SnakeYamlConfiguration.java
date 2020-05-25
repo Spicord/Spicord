@@ -22,13 +22,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 @SuppressWarnings({"serial", "unchecked"})
-class SnakeYamlConfiguration extends YamlConfiguration {
+class SnakeYamlConfiguration extends YamlConfiguration implements GetBasedConfiguration {
 
     private final File file;
     private final Yaml yaml;
@@ -41,7 +40,7 @@ class SnakeYamlConfiguration extends YamlConfiguration {
             options.setIndicatorIndent(1);
             this.yaml = new Yaml(options);
             this.map = yaml.load(new FileReader(file));
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -114,108 +113,6 @@ class SnakeYamlConfiguration extends YamlConfiguration {
     }
 
     @Override
-    public Object get(String path, Object def) {
-        final Object o = get(path);
-        return o == null ? def : o;
-    }
-
-    @Override
-    public boolean getBoolean(String path) {
-        return Boolean.valueOf(getString(path));
-    }
-
-    @Override
-    public boolean getBoolean(String path, boolean def) {
-        final Boolean bool = getBoolean(path);
-        return bool == null ? def : bool;
-    }
-
-    @Override
-    public List<Boolean> getBooleanList(String path) {
-        return getList(Boolean.class, path);
-    }
-
-    @Override
-    public double getDouble(String path) {
-        return Double.valueOf(getString(path));
-    }
-
-    @Override
-    public double getDouble(String path, double def) {
-        final Double d = getDouble(path);
-        return d == null ? def : d;
-    }
-
-    @Override
-    public List<Double> getDoubleList(String path) {
-        return getList(Double.class, path);
-    }
-
-    @Override
-    public List<Float> getFloatList(String path) {
-        return getList(Float.class, path);
-    }
-
-    @Override
-    public int getInt(String path) {
-        return Integer.valueOf(getString(path));
-    }
-
-    @Override
-    public int getInt(String path, int def) {
-        final Integer i = getInt(path);
-        return i == null ? def : i;
-    }
-
-    @Override
-    public List<Integer> getIntegerList(String path) {
-        return getList(Integer.class, path);
-    }
-
-    @Override
-    public List<?> getList(String path) {
-        return getList(Object.class, path);
-    }
-
-    @Override
-    public List<?> getList(String path, List<?> def) {
-        final List<?> l = getList(path);
-        return l == null ? def : l;
-    }
-
-    @Override
-    public long getLong(String path) {
-        return Long.valueOf(getString(path));
-    }
-
-    @Override
-    public long getLong(String path, long def) {
-        final Long l = getLong(path);
-        return l == null ? def : l;
-    }
-
-    @Override
-    public List<Long> getLongList(String path) {
-        return getList(Long.class, path);
-    }
-
-    @Override
-    public String getString(String path) {
-        return String.valueOf(get(path));
-    }
-
-    @Override
-    public String getString(String path, String def) {
-        final String s = getString(path);
-        return s == null ? def : s;
-    }
-
-    @Override
-    public List<String> getStringList(String path) {
-        return getList(String.class, path);
-    }
-
-    @Override
     public Map<String, Object> getValues() {
         return map;
     }
@@ -227,15 +124,5 @@ class SnakeYamlConfiguration extends YamlConfiguration {
         fw.write(str.toCharArray());
         fw.flush();
         fw.close();
-    }
-
-    private <T> List<T> getList(Class<T> type, String path) {
-        final Object o = get(path);
-
-        if (o instanceof List) {
-            return (List<T>) o;
-        }
-
-        return null;
     }
 }

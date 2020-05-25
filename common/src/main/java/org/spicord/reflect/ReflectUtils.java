@@ -15,22 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.api.services.linking;
+package org.spicord.reflect;
 
-import eu.mcdb.spicord.api.services.Service;
-import eu.mcdb.universal.player.UniversalPlayer;
+import java.lang.reflect.Array;
 
-public interface LinkingService extends Service {
+public final class ReflectUtils {
 
-    boolean isPending(UniversalPlayer player);
-    boolean isLinked(UniversalPlayer player);
-    LinkData link(PendingLinkData data, long id);
-    boolean unlink(LinkData data);
-    boolean addPendingLink(PendingLinkData data);
+    public static Class<?> getArrayClass(Class<?> clazz) {
+        return Array.newInstance(clazz, 0).getClass();
+    }
 
-    default boolean isValidMinecraftName(String name) {
-        return name.length() >= 3
-                && name.length() <= 16
-                && name.replaceAll("[A-Za-z0-9_]", "").length() == 0;
+    public static <T> T nullOnException(ExceptionConsumer<T> action) {
+        return action.runHandled();
     }
 }

@@ -27,6 +27,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.logging.Logger;
@@ -62,7 +63,7 @@ public class LibraryLoader {
         for (final Library lib : libraries) {
             this.downloadLibrary(lib, false);
         }
-        this.sha1Check();
+        this.sha1Check(false);
     }
 
     private File downloadLibrary(Library lib, boolean replace) throws IOException {
@@ -80,7 +81,8 @@ public class LibraryLoader {
         return out;
     }
 
-    private void sha1Check() {
+    private void sha1Check(boolean failed) {
+        boolean recheck = false;
         for (final Library lib : libraries) {
             if (lib.getSha1() != null) {
                 try {
@@ -97,12 +99,16 @@ public class LibraryLoader {
                         log.info("[Loader] expected sha1sum: " + lib.getSha1());
                         log.info("[Loader] current  sha1sum: " + sha1);
                         downloadLibrary(lib, true);
+                        recheck = true;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
+        if (recheck && failed) {
+            throw new RuntimeException("Failed second attemp to check library integrity");
+        } else if (recheck) sha1Check(true);
     }
 
     /**
@@ -151,8 +157,11 @@ public class LibraryLoader {
 
         public byte[] download() throws IOException {
             final URL url = new URL(this.url);
+            final URLConnection conn = url.openConnection();
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+            conn.connect();
 
-            try (final InputStream in = url.openStream();
+            try (final InputStream in = conn.getInputStream();
                     final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 
                 int n;
@@ -162,7 +171,7 @@ public class LibraryLoader {
                 return baos.toByteArray();
             } catch (IOException e) {
                 throw new IOException(e);
-            }
+			}
         }
     }
 }

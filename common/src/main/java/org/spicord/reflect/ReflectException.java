@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  OopsieWoopsie
+ * Copyright (C) 2020  OopsieWoopsie
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,16 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.util.chat;
+package org.spicord.reflect;
 
-public class ChatColor {
+public class ReflectException extends RuntimeException {
 
-    public static String stripColor(String str) {
-        return str.replaceAll("(?i)(&|§)[a-f0-9klmnor]", "");
+    private static final long serialVersionUID = 1L;
+
+    public ReflectException() {}
+
+    public ReflectException(String message) {
+        super(message);
     }
 
-    // temp. solution, this is not safe
-    public static String translateAlternateColorCodes(char magic, String text) {
-        return text.replace(magic, '\u00a7');
+    public ReflectException(Exception cause) {
+        super(cause);
+    }
+
+    public ReflectException(String message, Exception cause) {
+        super(message, cause);
+    }
+
+    @Override
+    public Exception getCause() {
+        return (Exception) super.getCause();
     }
 }

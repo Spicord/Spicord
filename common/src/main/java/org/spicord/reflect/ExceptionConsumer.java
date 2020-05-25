@@ -15,20 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.api.services.linking;
+package org.spicord.reflect;
 
-import java.util.UUID;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+@FunctionalInterface
+public interface ExceptionConsumer<T> {
 
-@RequiredArgsConstructor
-public class LinkData {
+    T run() throws Exception;
 
-    @Getter private final Long id;
-    @Getter private final String name;
-    private final String uuid;
-
-    public UUID getUniqueId() {
-        return UUID.fromString(uuid);
+    default T runHandled() {
+        try {
+            return run();
+        } catch (Exception e) {}
+        return null;
     }
 }

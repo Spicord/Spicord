@@ -28,6 +28,7 @@ import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.text.Text;
 import eu.mcdb.universal.player.UniversalPlayer;
 import eu.mcdb.util.SLF4JWrapper;
 
@@ -105,5 +106,10 @@ class SpongeServer extends eu.mcdb.universal.Server {
                 return player;
             }
         };
+    }
+
+    @Override
+    public void broadcast(String message) {
+        server.getBroadcastChannel().send(Text.of(message));
     }
 }

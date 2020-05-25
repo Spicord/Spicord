@@ -26,6 +26,7 @@ import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -92,17 +93,22 @@ class BukkitServer extends eu.mcdb.universal.Server {
 
     @Override
     public UniversalPlayer getPlayer(UUID uuid) {
-        final Player player = bukkit.getPlayer(uuid);
+        final OfflinePlayer player = bukkit.getOfflinePlayer(uuid);
 
-        if (player == null || !player.isOnline())
+        if (player == null)
             return null;
 
         return new UniversalPlayer(player.getName(), uuid) {
 
             @Override
             public Player getBukkitPlayer() {
-                return player;
+                return player.isOnline() ? player.getPlayer() : null;
             }
         };
+    }
+
+    @Override
+    public void broadcast(String message) {
+        bukkit.broadcastMessage(message);
     }
 }

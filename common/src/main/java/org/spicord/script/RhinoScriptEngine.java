@@ -29,7 +29,6 @@ import org.mozilla.javascript.NativeJavaClass;
 import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.ScriptableObject;
-import org.spicord.script.module.Path;
 import org.spicord.util.AbsoluteFile;
 import org.spicord.util.FileSystem;
 import com.google.gson.Gson;
@@ -69,14 +68,14 @@ class RhinoScriptEngine implements ScriptEngine {
         this.eval(base);
         this.callFunction("__setup", this);
 
-        this.BASE_SCRIPT = "(function() {"
+        this.BASE_SCRIPT = "(function(dirname) {"
                 + "    const module = { exports: {} };"
-                + "    const __dirname = \"{{{dirname}}}\";"
+                + "    const __dirname = dirname; delete dirname;"
                 + "    const require = (name) => __core.require(__dirname, name);"
                 + "    {{{body}}}"
                 + ";"
                 + "    return module.exports;"
-                + "})();";
+                + "})";
     }
 
     @Override
@@ -132,8 +131,7 @@ class RhinoScriptEngine implements ScriptEngine {
             file = new File(file, "index.js");
 
         if (file.exists() && file.isFile()) {
-            final String script = buildScript(file);
-            return eval(script);
+            return null; // TODO
         } else {
             if (name.endsWith(".js")) {
                 throw new ScriptException("the module/script '" + name + "' was not found");
@@ -145,8 +143,7 @@ class RhinoScriptEngine implements ScriptEngine {
     @Override
     public <T> T require(final File file) throws IOException {
         if (file.exists() && file.isFile()) {
-            final String script = buildScript(file);
-            return eval(script);
+            return null; // TODO
         }
         return null;
     }
@@ -166,7 +163,7 @@ class RhinoScriptEngine implements ScriptEngine {
     }
 
     @Override
-    public <T> T java(Class<T> clazzOfT, Object object) {
+    public <T> T toJava(Class<T> clazzOfT, Object object) {
         if (object instanceof NativeObject) {
             final NativeObject nobj = (NativeObject) object;
             final JsonElement json = GSON.toJsonTree((Map<?, ?>) nobj);
@@ -175,11 +172,14 @@ class RhinoScriptEngine implements ScriptEngine {
         return java(object);
     }
 
-    private String buildScript(final File file) throws IOException {
-        final String parent = file.toPath().getParent().toString();
-        return BASE_SCRIPT
-                .replace("{{{dirname}}}", Path.normalize(parent))
-                .replace("{{{body}}}", FileSystem.readFile(file));
+    @Override
+    public org.spicord.script.Function buildScript(final File file) throws ScriptException {
+        try {
+            final String script = BASE_SCRIPT.replace("{{{body}}}", FileSystem.readFile(file));
+            return new org.spicord.script.Function(eval(script), this);
+        } catch (IOException e) {
+            throw new ScriptException(e);
+        }
     }
 
     @Override

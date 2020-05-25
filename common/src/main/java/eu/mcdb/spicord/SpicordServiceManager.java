@@ -19,8 +19,8 @@ package eu.mcdb.spicord;
 
 import java.util.HashMap;
 import java.util.Map;
-import eu.mcdb.spicord.api.services.Service;
-import eu.mcdb.spicord.api.services.ServiceManager;
+import org.spicord.api.services.Service;
+import org.spicord.api.services.ServiceManager;
 import lombok.NonNull;
 
 @SuppressWarnings("unchecked")
@@ -45,6 +45,11 @@ public class SpicordServiceManager implements ServiceManager {
     @Override
     public boolean unregisterService(@NonNull Class<? extends Service> serviceClass) {
         return services.remove(serviceClass, getService(serviceClass));
+    }
+
+    @Override
+    public boolean unregisterService(Service service) {
+        return services.values().remove(service);
     }
 
     @Override

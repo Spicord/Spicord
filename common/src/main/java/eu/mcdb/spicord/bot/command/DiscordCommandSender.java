@@ -30,7 +30,7 @@ public class DiscordCommandSender extends UniversalCommandSender {
     private PrivateChannel _channel;
 
     public DiscordCommandSender(final DiscordBotCommand command) {
-        this.member = command.getMember();
+        this.member = command.getSender();
         this.channel = command.getChannel();
     }
 

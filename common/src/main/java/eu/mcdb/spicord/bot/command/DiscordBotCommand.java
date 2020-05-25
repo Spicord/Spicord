@@ -28,16 +28,15 @@ import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
-@Getter
 public class DiscordBotCommand extends SimpleCommand {
 
-    private final Message message;
-    private final User author;
+    @Getter private final Message message;
+    @Getter private final User author;
     private final Member member;
-    private final Guild guild;
-    private final TextChannel channel;
-    private final String name;
-    private final String prefix;
+    @Getter private final Guild guild;
+    @Getter private final TextChannel channel;
+    @Getter private final String name;
+    @Getter private final String prefix;
 
     /**
      * The constructor.
@@ -72,6 +71,18 @@ public class DiscordBotCommand extends SimpleCommand {
 
     public void reply(MessageEmbed embed) {
         channel.sendMessage(embed).queue();
+    }
+
+    /**
+     * @deprecated use {@link #getSender()} instead.
+     */
+    @Deprecated
+    public Member getMember() {
+        return member;
+    }
+
+    public Member getSender() {
+        return member;
     }
 
     @Override

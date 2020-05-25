@@ -75,4 +75,9 @@ class DummyServer extends Server {
     public UniversalPlayer getPlayer(UUID uuid) {
         return null;
     }
+
+    @Override
+    public void broadcast(String message) {
+        getLogger().info(message);
+    }
 }

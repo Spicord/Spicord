@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.api.services;
+package org.spicord.api.services;
 
 public interface ServiceManager {
 
@@ -49,6 +49,13 @@ public interface ServiceManager {
      * @return true if the service was successfully unregistered
      */
     boolean unregisterService(Class<? extends Service> serviceClass);
+
+    /**
+     * 
+     * @param service
+     * @return
+     */
+    boolean unregisterService(Service service);
 
     /**
      * 

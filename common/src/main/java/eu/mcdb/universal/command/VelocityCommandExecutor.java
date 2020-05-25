@@ -19,6 +19,8 @@ package eu.mcdb.universal.command;
 
 import com.velocitypowered.api.command.Command;
 import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.proxy.Player;
+import eu.mcdb.universal.player.UniversalPlayer;
 import net.kyori.text.TextComponent;
 
 /**
@@ -53,6 +55,18 @@ public final class VelocityCommandExecutor implements Command {
                 return s == null || "".equals(s);
             }
         };
+
+        if (source instanceof Player) {
+            Player player = (Player) source;
+
+            commandSender.setPlayer(new UniversalPlayer(player.getUsername(), player.getUniqueId()) {
+
+                @Override
+                public Player getVelocityPlayer() {
+                    return player;
+                }
+            });
+        }
 
         command.onCommand(commandSender, args);
     }
