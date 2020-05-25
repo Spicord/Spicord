@@ -175,7 +175,7 @@ public class AddonManager implements Node {
     }
 
     private static final Gson GSON = new Gson();
-    private static final ScriptEngine ENGINE = ScriptEngine.getEngine("nashorn");
+    private static final ScriptEngine ENGINE = ScriptEngine.getDefaultEngine();
 
     private void loadZipAddon(final File file, final File runtimeDir) {
         try (final ZipExtractor ex = new ZipExtractor(file)) {
@@ -195,11 +195,11 @@ public class AddonManager implements Node {
                 }
 
                 final File tempDir = new File(runtimeDir, id);
-                tempDir.mkdir();
+                tempDir.mkdirs();
 
                 ex.extract(tempDir);
 
-                final File dataDir = new File(tempDir, "data");
+                File dataDir = new File(tempDir, "data");
 
                 if (dataDir.exists()) {
                     final File addonsDir = FileUtils.getParent(runtimeDir);
@@ -208,6 +208,7 @@ public class AddonManager implements Node {
                     if (!addonDir.exists()) {
                         dataDir.renameTo(addonDir);
                     }
+                    dataDir = addonDir;
                 }
 
                 final File addonMain = new File(tempDir, main);
@@ -229,6 +230,7 @@ public class AddonManager implements Node {
             }
         } catch (IOException e) {
             getLogger().warning(String.format("The file '%s' cannot be loaded: %s", file.getName(), e.getCause()));
+            e.printStackTrace();
         }
     }
 

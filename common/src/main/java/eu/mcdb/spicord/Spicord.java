@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
+import org.spicord.api.services.ServiceManager;
 import eu.mcdb.spicord.addon.AddonManager;
 import eu.mcdb.spicord.addon.InfoAddon;
 import eu.mcdb.spicord.addon.PlayersAddon;
@@ -51,7 +52,7 @@ public final class Spicord {
     private SpicordConfiguration config;
 
     @Getter
-    private SpicordServiceManager serviceManager;
+    private ServiceManager serviceManager;
 
     @Getter
     private AddonManager addonManager;

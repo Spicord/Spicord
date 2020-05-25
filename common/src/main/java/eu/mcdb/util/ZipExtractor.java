@@ -81,10 +81,13 @@ public class ZipExtractor implements AutoCloseable {
      */
     public void extract(final File out) throws IOException {
         for (final ZipEntry entry : entries) {
-            String name = entry.getName();
-            name = name.substring(name.lastIndexOf('/') + 1);
-
+            final String name = entry.getName();
             final File file = new File(out, name);
+
+            if (name.endsWith("/")) {
+            	file.mkdirs();
+            	continue;
+            }
 
             Files.copy(zipFile.getInputStream(entry), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }

@@ -17,24 +17,21 @@
 
 package eu.mcdb.spicord.util;
 
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.spicord.reflect.ReflectUtils;
+import org.spicord.reflect.ReflectedMethod;
+import org.spicord.reflect.ReflectedObject;
 
 public class SpicordClassLoader {
 
-    private final static URLClassLoader classLoader;
-    private final static Method addURL;
+    private static ReflectedMethod addURL;
 
     static {
-        try {
-            (addURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class)).setAccessible(true);
-             classLoader = (URLClassLoader) SpicordClassLoader.class.getClassLoader();
-        } catch (NoSuchMethodException | SecurityException e) {
-            throw new RuntimeException(e);
-        }
+        addURL = new ReflectedObject(URLClassLoader.class, SpicordClassLoader.class.getClassLoader())
+                .getMethod("addURL", URL.class).setAccessible();
     }
 
     /**
@@ -42,8 +39,8 @@ public class SpicordClassLoader {
      * 
      * @param file the {@link Path} of the Jar file
      */
-    public static void loadJar(Path file) throws Exception {
-        addURL.invoke(classLoader, file.toUri().toURL());
+    public static void loadJar(Path file) {
+        addURL.invoke(ReflectUtils.nullOnException(() -> file.toUri().toURL()));
     }
 
     /**

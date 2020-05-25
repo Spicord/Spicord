@@ -30,7 +30,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 
 @Getter
-public abstract class SpongePlugin {
+public class SpongePlugin {
 
     private final static File configDir = new File("config");
 
@@ -53,7 +53,7 @@ public abstract class SpongePlugin {
 
         this.setup();
         this.onLoad();
-        this.onEnable(); // TODO
+        this.onEnable();
     }
 
     public void onLoad() {}

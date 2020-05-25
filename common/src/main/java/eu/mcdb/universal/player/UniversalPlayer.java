@@ -91,7 +91,7 @@ public class UniversalPlayer extends UniversalCommandSender {
         } else if (isSpongePlayer()) {
             getSpongePlayer().sendMessage(new SpongeText().get(message));
         } else {
-            throw new IllegalStateException("The player instance was not set");
+            System.out.println("The message was not send because there's no player instance set.");
         }
     }
 
@@ -118,7 +118,23 @@ public class UniversalPlayer extends UniversalCommandSender {
         } else if (isSpongePlayer()) {
             return getSpongePlayer().hasPermission(permission);
         } else {
-            throw new IllegalStateException("The player instance was not set");
+            System.out.println("Can't check player permission because there's no player instance set.");
         }
+        return false;
+    }
+
+    public boolean isOnline() {
+        if (isProxiedPlayer()) {
+            return getProxiedPlayer().isConnected();
+        } else if (isBukkitPlayer()) {
+            return getBukkitPlayer().isOnline();
+        } else if (isVelocityPlayer()) {
+            return getVelocityPlayer().isActive();
+        } else if (isSpongePlayer()) {
+            return getSpongePlayer().isOnline();
+        } else {
+            System.out.println("Can't check if the player is online because there's no player instance set.");
+        }
+        return false;
     }
 }

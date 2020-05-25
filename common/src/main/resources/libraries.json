@@ -81,9 +81,9 @@
       "url": "https://repo1.maven.org/maven2/org/mozilla/rhino/1.7.12/rhino-1.7.12.jar"
     },
     {
-      "name": "org.spicord:nashorn:9.1",
-      "sha1": "a8bb9aecafd5a91884ca9854726dc51cfc7ded8d",
-      "url": "https://repo.spicord.org/org/spicord/nashorn/9.1/nashorn-9.1.jar"
+      "name": "org.yaml:snakeyaml:1.21",
+      "sha1": "18775fdda48574784f40b47bf478ab0593f92e4d",
+      "url": "https://repo1.maven.org/maven2/org/yaml/snakeyaml/1.21/snakeyaml-1.21.jar"
     }
   ]
 }
