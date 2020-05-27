@@ -58,8 +58,29 @@ public interface IScriptEngine {
      */
     <T> T callFunction(final Object ins, final Object... args);
 
+    /**
+     * 
+     * @param <T>
+     * @param object
+     * @return
+     */
+    <T> T wrap(Object object);
+
+    /**
+     * 
+     * @param <T>
+     * @param object
+     * @return
+     */
     <T> T toJava(Object object);
 
+    /**
+     * 
+     * @param <T>
+     * @param clazz
+     * @param object
+     * @return
+     */
     <T> T toJava(Class<T> clazz, Object object);
 
     /**

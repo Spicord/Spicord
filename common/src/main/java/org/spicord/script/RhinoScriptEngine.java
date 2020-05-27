@@ -38,7 +38,7 @@ import org.mozilla.javascript.ScriptableObject;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "unchecked", "static-access" })
 class RhinoScriptEngine extends ScriptEngine {
 
     static {
@@ -90,6 +90,18 @@ class RhinoScriptEngine extends ScriptEngine {
     }
 
     @Override
+    public <T> T wrap(Object object) {
+        if (object == null)
+            return null;
+
+        if (object instanceof Class<?>) {
+            return (T) new NativeJavaClass(scope, (Class<?>)object);
+        }
+
+        return (T) context().javaToJS(object, scope);
+    }
+
+    @Override
     public <T> T toJava(Object obj) {
         if (obj instanceof NativeJavaObject)
             return (T) ((NativeJavaObject) obj).unwrap();
@@ -130,9 +142,8 @@ class RhinoScriptEngine extends ScriptEngine {
                 .toArray();
     }
 
-    @SuppressWarnings("static-access")
     public Object javaToJS(Object obj) {
-        return context().javaToJS(obj, scope);
+        return context().javaToJS(obj, scope); // thread safe
     }
 
     private static ScriptableObject createScope(Context ctx) {
