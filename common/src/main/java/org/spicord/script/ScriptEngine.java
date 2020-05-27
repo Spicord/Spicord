@@ -17,7 +17,17 @@
 
 package org.spicord.script;
 
-public interface ScriptEngine extends IScriptEngine {
+import java.util.HashMap;
+import java.util.Map;
+
+public abstract class ScriptEngine implements IScriptEngine {
+
+    private final static Map<String, Class<? extends ScriptEngine>> engines;
+
+    static {
+        engines = new HashMap<>();
+        registerEngine("rhino", RhinoScriptEngine.class);
+    }
 
     /**
      * Get a new ScriptEngine instance for the requested engine.
@@ -25,18 +35,23 @@ public interface ScriptEngine extends IScriptEngine {
      * @param name the engine name
      * @return the new ScriptEngine instance
      * @throws IllegalArgumentException if the engine was not found
+     * @throws RuntimeException if the engine throws an error while creating a new instance
      */
     public static ScriptEngine getEngine(String name) {
-        final ScriptEngine engine;
-
-        switch (name) {
-        case "rhino":
-            engine = new RhinoScriptEngine(); break;
-        default:
+        if (engines.containsKey(name)) {
+            Class<? extends ScriptEngine> c = engines.get(name);
+            try {
+                return c.newInstance();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
             throw new IllegalArgumentException("engine '" + name + "' not found");
         }
+    }
 
-        return engine;
+    public static void registerEngine(String name, Class<? extends ScriptEngine> engineClass) {
+        engines.put(name, engineClass);
     }
 
     public static ScriptEngine getDefaultEngine() {
