@@ -17,139 +17,80 @@
 
 package org.spicord.script;
 
+import static org.mozilla.javascript.ScriptableObject.DONTENUM;
+import static org.mozilla.javascript.ScriptableObject.PERMANENT;
+import static org.mozilla.javascript.ScriptableObject.READONLY;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
+import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Stream;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
+import org.mozilla.javascript.FunctionObject;
 import org.mozilla.javascript.NativeJavaArray;
 import org.mozilla.javascript.NativeJavaClass;
 import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
-import org.spicord.util.AbsoluteFile;
-import org.spicord.util.FileSystem;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 @SuppressWarnings("unchecked")
-class RhinoScriptEngine implements ScriptEngine {
+class RhinoScriptEngine extends ScriptEngine {
+
+    static {
+        try {
+            method = RhinoScriptEngine.class.getMethod("require", Context.class, Scriptable.class, Object[].class, Function.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private static final Gson GSON = new Gson();
+    private static final Method method;
+    private static final int UNMODIFIABLE = READONLY|DONTENUM|PERMANENT;
 
-    protected final Context ctx;
-    protected final ScriptableObject scope;
-    private final RhinoModuleManager moduleManager;
-    private final String BASE_SCRIPT;
+    private final ScriptableObject scope;
+    private static RhinoModuleManager moduleManager; // this souldn't be static!! :( but it need to be accessed from require()
 
-    public RhinoScriptEngine() {
-        this.ctx = Context.enter();
-        this.scope = ctx.initStandardObjects();
-        this.moduleManager = new RhinoModuleManager(this);
-
-        final String base = "const print = (print) => {"
-                + "    if (print == null)"
-                + "        print = 'null';"
-                + "    return java.lang.System.out.println(java.lang.String.valueOf(print));"
-                + "};"
-                + "const console = { log: print };"
-                + "const __core = { require: {}, __engine: {} };"
-                + "__setup = function(core) {"
-                + "    __core.require = (dir, str) => core.require(dir, str);"
-                + "    __core.__engine = core;"
-                + "    delete __setup;"
-                + "};"
-                + "const J = function(obj) {"
-                + "    return __core.__engine.java(obj);"
-                + "};";
-
-        this.eval(base);
-        this.callFunction("__setup", this);
-
-        this.BASE_SCRIPT = "(function(dirname) {"
-                + "    const module = { exports: {} };"
-                + "    const __dirname = dirname; delete dirname;"
-                + "    const require = (name) => __core.require(__dirname, name);"
-                + "    {{{body}}}"
-                + ";"
-                + "    return module.exports;"
-                + "})";
-    }
-
-    @Override
-    public <T> T eval(final String script) {
-        return (T) ctx.evaluateString(scope, script, "<eval>", 0, null);
-    }
-
-    @Override
-    public <T> T callFunction(final String name, final Object... args) {
-        final Function func = (Function) scope.get(name, scope);
-
-        return (T) func.call(ctx, scope, scope, convertArgs(args));
+    public RhinoScriptEngine() throws IOException {
+        this.scope = context().initStandardObjects();
+        moduleManager = new RhinoModuleManager(this);
     }
 
     @Override
     public <T> T callFunction(final Object ins, final Object... args) {
         if (ins instanceof Function) {
             final Function func = (Function) ins;
-
-            return (T) func.call(ctx, scope, scope, convertArgs(args));
+            Scriptable scope = func.getParentScope();
+            return (T) func.call(context(), scope, scope, javaToJS(args));
         } else {
-            throw new IllegalArgumentException("given object is not a javascript object");
-        }
-    }
-
-    private Object[] convertArgs(Object... args) {
-        final Object[] _args = new Object[args.length];
-
-        for (int i = 0; i < args.length; i++)
-            _args[i] = Context.javaToJS(args[i], scope);
-
-        return _args;
-    }
-
-    @Override
-    public <T> T loadScript(final File file) throws IOException {
-        return (T) ctx.evaluateReader(scope, new FileReader(file), file.getName(), 0, null);
-    }
-
-    @Override
-    public <T> T loadScript(final Reader reader) throws IOException, ScriptException {
-        return (T) ctx.evaluateReader(scope, reader, "<script>", 0, null);
-    }
-
-    @Override
-    public <T> T require(final String dir, final String name) throws IOException {
-        if (moduleManager.isRegistered(name))
-            return (T) moduleManager.getModule(name);
-
-        File file = AbsoluteFile.of(dir, name);
-
-        if (file.isDirectory())
-            file = new File(file, "index.js");
-
-        if (file.exists() && file.isFile()) {
-            return null; // TODO
-        } else {
-            if (name.endsWith(".js")) {
-                throw new ScriptException("the module/script '" + name + "' was not found");
-            }
-            return require(dir, name + ".js");
+            throw new IllegalArgumentException("given object is not a function");
         }
     }
 
     @Override
-    public <T> T require(final File file) throws IOException {
-        if (file.exists() && file.isFile()) {
-            return null; // TODO
-        }
-        return null;
+    public <T> T loadScript(File file) throws IOException {
+        return loadScript(file, new ScriptEnvironment());
     }
 
     @Override
-    public <T> T java(final Object obj) {
+    public <T> T loadScript(File file, ScriptEnvironment env) throws IOException {
+        ScriptInfo info = new ScriptInfo(file, env);
+        info.getEnvironment().put("__engine", this);
+        return toJava(require(context(), info));
+    }
+
+    @Override
+    public Object eval(String script) {
+        return context().evaluateString(scope, script, "<eval>", 1, null);
+    }
+
+    @Override
+    public <T> T toJava(Object obj) {
         if (obj instanceof NativeJavaObject)
             return (T) ((NativeJavaObject) obj).unwrap();
         else if (obj instanceof NativeJavaClass)
@@ -169,21 +110,95 @@ class RhinoScriptEngine implements ScriptEngine {
             final JsonElement json = GSON.toJsonTree((Map<?, ?>) nobj);
             return GSON.fromJson(json, clazzOfT);
         }
-        return java(object);
-    }
-
-    @Override
-    public org.spicord.script.Function buildScript(final File file) throws ScriptException {
-        try {
-            final String script = BASE_SCRIPT.replace("{{{body}}}", FileSystem.readFile(file));
-            return new org.spicord.script.Function(eval(script), this);
-        } catch (IOException e) {
-            throw new ScriptException(e);
-        }
+        return toJava(object);
     }
 
     @Override
     public ModuleManager getModuleManager() {
         return moduleManager;
+    }
+
+    // custom methods below this line ---
+
+    private Context context() {
+        return Context.enter();
+    }
+
+    private Object[] javaToJS(Object... args) {
+        return Stream.of(args)
+                .map(this::javaToJS)
+                .toArray();
+    }
+
+    @SuppressWarnings("static-access")
+    public Object javaToJS(Object obj) {
+        return context().javaToJS(obj, scope);
+    }
+
+    private static ScriptableObject createScope(Context ctx) {
+        ScriptableObject newScope = ctx.initStandardObjects();
+        FunctionObject fun = new FunctionObject("require", method, newScope);
+        newScope.defineProperty("require", fun, UNMODIFIABLE);
+
+        NativeObject module = new NativeObject();
+        module.defineProperty("exports", new NativeObject(), 0);
+
+        newScope.defineProperty("module", module, 0);
+        return newScope;
+    }
+
+    public static Object require(Context cx, ScriptInfo info) throws IOException {
+        ScriptableObject newScope = createScope(cx);
+        newScope.defineProperty("__dirname", info.getDirectory(), UNMODIFIABLE);
+
+        if (info.hasEnvironment()) {
+            for (Entry<String, Object> e : info.getEnvironment().entrySet()) {
+                Object val = Context.javaToJS(e.getValue(), newScope);
+                newScope.defineProperty(e.getKey(), val, UNMODIFIABLE);
+            }
+        }
+
+        cx.evaluateReader(newScope, info.getReader(), info.getFileName(), 0, null);
+        Object m = newScope.get("module", newScope);
+        if (m != null && m instanceof NativeObject) {
+            NativeObject obj = (NativeObject) m;
+            return obj.get("exports", newScope);
+        }
+        return null;
+    }
+
+    public static Object require(Context cx, Scriptable thisObj, Object[] args, Function funObj) throws IOException {
+        if (args.length == 1) {
+            String module = String.valueOf(args[0]);
+
+            if (moduleManager.isRegistered(module)) {
+                return moduleManager.getModule(module);
+            }
+
+            String dirname = (String) thisObj.get("__dirname", thisObj);
+            File file = resolve(dirname, module);
+            if (file == null) return null;
+            ScriptInfo dir = new ScriptInfo(file);
+            return require(cx, dir);
+        }
+        return null;
+    }
+
+    private static File resolve(String dirname, String module) {
+        File file = new File(dirname, module);
+
+        if (file.exists()) {
+            if (file.isDirectory()) {
+                file = new File(file, "index.js");
+            }
+        } else {
+            file = new File(dirname, module + ".js");
+        }
+
+        return (
+                file.exists() &&
+                file.isFile() &&
+                file.getName().endsWith(".js")
+            ) ? file : null;
     }
 }

@@ -19,9 +19,8 @@ package org.spicord.script;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.mozilla.javascript.Context;
 
-public final class RhinoModuleManager implements ModuleManager {
+class RhinoModuleManager implements ModuleManager {
 
     private final Map<String, Object> modules;
     private final RhinoScriptEngine engine;
@@ -39,14 +38,14 @@ public final class RhinoModuleManager implements ModuleManager {
 
     @Override
     public void register(String name, Object obj) {
-        modules.put(name, javaToJS(obj));
+        modules.put(name, engine.javaToJS(obj));
     }
 
     @Override
     public boolean isRegistered(String name) {
-        boolean b = modules.containsKey(name);
+        boolean registered = modules.containsKey(name);
 
-        if (name.startsWith("class:") && !b) {
+        if (name.startsWith("class:") && !registered) {
             final String className = name.substring("class:".length());
             try {
                 final Class<?> clazz = Class.forName(className);
@@ -55,7 +54,7 @@ public final class RhinoModuleManager implements ModuleManager {
             } catch (Exception e) {}
         }
 
-        return b;
+        return registered;
     }
 
     @Override
@@ -63,16 +62,12 @@ public final class RhinoModuleManager implements ModuleManager {
         return modules.get(name);
     }
 
-    private Object getClass(String name) {
-        return engine.eval("Packages." + name);
-    }
-
-    private Object javaToJS(Object obj) {
-        return Context.javaToJS(obj, engine.scope);
-    }
-
     @Override
     public ScriptEngine getEngine() {
         return engine;
+    }
+
+    private Object getClass(String name) {
+        return engine.eval("Packages." + name);
     }
 }
