@@ -28,11 +28,6 @@ public class Function {
     }
 
     public Object call(Object... args) {
-        return call(true, args);
-    }
-
-    public Object call(boolean wrap, Object... args) {
-    	final Object res = engine.callFunction(func, args);
-        return wrap ? engine.java(res) : res;
+        return engine.callFunction(func, args);
     }
 }

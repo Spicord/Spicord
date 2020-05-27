@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.spicord.script.ScriptEngine;
+import org.spicord.script.ScriptEnvironment;
 import org.spicord.script.ScriptException;
 import com.google.gson.Gson;
 import eu.mcdb.spicord.api.Node;
@@ -213,9 +214,10 @@ public class AddonManager implements Node {
 
                 final File addonMain = new File(tempDir, main);
 
-                final Object res = ENGINE.buildScript(addonMain)
-                		.call(FileUtils.getParent(addonMain).getAbsolutePath(), // __dirname
-                				dataDir.getAbsolutePath()); // __data
+                final ScriptEnvironment env = new ScriptEnvironment()
+                        .addEnv("__data", dataDir.toString());
+
+                final Object res = ENGINE.loadScript(addonMain, env);
 
                 if (res instanceof JavaScriptBaseAddon) {
                     final JavaScriptAddon addon = new JavaScriptAddon(name, id, author, (JavaScriptBaseAddon) res, ENGINE);
@@ -255,9 +257,10 @@ public class AddonManager implements Node {
 
                 final File dataDir = new File(addonDir, "data");
 
-                final Object res = ENGINE.buildScript(addonMain)
-                		.call(FileUtils.getParent(addonMain).getAbsolutePath(), // __dirname
-                				dataDir.getAbsolutePath()); // __data
+                final ScriptEnvironment env = new ScriptEnvironment()
+                        .addEnv("__data", dataDir.toString());
+
+                final Object res = ENGINE.loadScript(addonMain, env);
 
                 if (res instanceof JavaScriptBaseAddon) {
                     final JavaScriptAddon addon = new JavaScriptAddon(name, id, author, (JavaScriptBaseAddon) res, ENGINE);

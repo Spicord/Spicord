@@ -78,6 +78,6 @@ class DummyServer extends Server {
 
     @Override
     public void broadcast(String message) {
-        getLogger().info(message);
+        getLogger().info("Broadcast: " + message);
     }
 }

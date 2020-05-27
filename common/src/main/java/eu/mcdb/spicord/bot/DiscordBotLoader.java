@@ -61,13 +61,11 @@ public class DiscordBotLoader {
     public static boolean shutdownBot(DiscordBot bot) {
         Preconditions.checkNotNull(bot, "bot");
 
-        if (bot.isReady()) {
-            bot.status = BotStatus.STOPPING;
+        bot.status = BotStatus.STOPPING;
+        if (bot.jda != null)
             bot.jda.shutdownNow();
-            bot.jda = null;
-            bot.status = BotStatus.OFFLINE;
-            return true;
-        }
-        return false;
+        bot.jda = null;
+        bot.status = BotStatus.OFFLINE;
+        return true;
     }
 }

@@ -145,10 +145,10 @@ public final class Spicord {
     }
 
     /**
-     * Get a bot by its name.
+     * Get a bot instance by its name.
      * 
-     * @param name the bot name.
-     * @return the {@link DiscordBot} object if the bot exists, or null if not.
+     * @param name the bot name
+     * @return the bot instance, or null if the bot was not found
      */
     public DiscordBot getBotByName(String name) {
         for (DiscordBot bot : config.getBots())
