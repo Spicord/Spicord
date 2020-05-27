@@ -24,7 +24,7 @@ import eu.mcdb.universal.command.UniversalCommandSender;
 class SpicordConsoleCommand {
 
     private final UniversalCommandSender commandSender;
-    private final SpicordCommand command = new SpicordCommand(() -> {});
+    private final SpicordCommand command = new SpicordCommand(SpicordMain.RESTART);
 
     public SpicordConsoleCommand(final Logger logger) {
         this.command.detachChilds();

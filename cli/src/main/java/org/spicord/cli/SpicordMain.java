@@ -30,7 +30,9 @@ public class SpicordMain {
 
     private final Logger logger = FormattedLogger.getLogger("Spicord");
     private final File dataFolder = this.getLocation();
-    private final SpicordLoader loader;
+    private SpicordLoader loader;
+
+    public static Runnable RESTART;
 
     public static void main(String[] args) throws IOException {
         new SpicordMain(args);
@@ -38,8 +40,15 @@ public class SpicordMain {
 
     public SpicordMain(String[] args) throws IOException {
         this.preload();
-        this.loader = new SpicordLoader(this.logger, this.dataFolder);
-        this.loader.load();
+
+        RESTART = () -> {
+            if (loader != null)
+                loader.disable();
+            this.loader = new SpicordLoader(this.logger, this.dataFolder);
+            this.loader.load();
+        };
+
+        RESTART.run();
 
         final LineReader lineReader = LineReaderBuilder.builder().build();
         final SpicordConsoleCommand scc = new SpicordConsoleCommand(this.logger);
