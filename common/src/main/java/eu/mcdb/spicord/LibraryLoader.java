@@ -171,7 +171,7 @@ public class LibraryLoader {
                 return baos.toByteArray();
             } catch (IOException e) {
                 throw new IOException(e);
-			}
+            }
         }
     }
 }

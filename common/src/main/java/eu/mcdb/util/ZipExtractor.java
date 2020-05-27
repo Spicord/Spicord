@@ -85,8 +85,8 @@ public class ZipExtractor implements AutoCloseable {
             final File file = new File(out, name);
 
             if (name.endsWith("/")) {
-            	file.mkdirs();
-            	continue;
+                file.mkdirs();
+                continue;
             }
 
             Files.copy(zipFile.getInputStream(entry), file.toPath(), StandardCopyOption.REPLACE_EXISTING);

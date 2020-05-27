@@ -71,8 +71,8 @@ public class AddonManager implements Node {
      */
     public boolean isRegistered(String id) {
         return addons.stream()
-        		.map(SimpleAddon::getId)
-        		.anyMatch(id::equals);
+                .map(SimpleAddon::getId)
+                .anyMatch(id::equals);
     }
 
     /**
@@ -143,17 +143,17 @@ public class AddonManager implements Node {
             return;
 
         bot.getAddons().stream()
-        		.map(this::getAddonById)
-        		.filter(Objects::nonNull)
-        		.forEach(bot::loadAddon);
+                .map(this::getAddonById)
+                .filter(Objects::nonNull)
+                .forEach(bot::loadAddon);
     }
 
-	private File addonsDir;
+    private File addonsDir;
 
-	/**
-	 * 
-	 * @param dir
-	 */
+    /**
+     * 
+     * @param dir
+     */
     public void loadAddons(File dir) {
         checkNotNull(dir);
 
