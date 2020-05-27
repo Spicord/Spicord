@@ -94,5 +94,6 @@ public interface ModuleManager {
         this.register("server", Server.getInstance());
         this.register("spicord", Spicord.getInstance());
         this.register("worker", new Worker(getEngine()));
+        this.register("native", new Native(getEngine()));
     }
 }
