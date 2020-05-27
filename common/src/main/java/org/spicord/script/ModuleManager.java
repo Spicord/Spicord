@@ -18,6 +18,7 @@
 package org.spicord.script;
 
 import org.spicord.script.module.*;
+import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.api.addon.JavaScriptBaseAddon;
 import eu.mcdb.universal.Server;
 import eu.mcdb.universal.config.YamlConfiguration;
@@ -89,7 +90,9 @@ public interface ModuleManager {
         this.register("fs", FileSystem.class);
 
         // instances
-        this.register("path", Path.class); //new Path(getEngine())
+        this.register("path", new Path(getEngine()));
         this.register("server", Server.getInstance());
+        this.register("spicord", Spicord.getInstance());
+        this.register("worker", new Worker(getEngine()));
     }
 }
