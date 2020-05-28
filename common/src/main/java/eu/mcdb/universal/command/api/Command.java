@@ -155,13 +155,13 @@ public class Command extends UniversalCommand {
     @Override
     public final boolean onCommand(final UniversalCommandSender sender, final String[] args) {
         if (args.length == 0) {
-            if (commandHandler != null) {
-                if (sender.hasPermission(getPermission())) {
+            if (sender.hasPermission(getPermission())) {
+                if (commandHandler != null) {
                     if (parameters.size() == 0) {
-                        return commandHandler.handle(sender, null);
+                        return commandHandler.handle(sender, new CommandParameters());
                     } else sendAllUsage(sender);
-                } else sendMissingPermissionMessage(sender);
-            } else sendAllUsage(sender);
+                } else sendAllUsage(sender);
+            } else sendMissingPermissionMessage(sender);
             return false;
         } else {
             final String sub = args[0];
@@ -180,14 +180,14 @@ public class Command extends UniversalCommand {
                 }
             }
 
-            if (commandHandler != null) {
-                if (sender.hasPermission(getPermission())) {
+            if (sender.hasPermission(getPermission())) {
+                if (commandHandler != null) {
                     if (isApplicable(args)) {
                         final CommandParameters params = buildParameters(args);
                         return commandHandler.handle(sender, params);
                     } else sendAllUsage(sender);
-                } else sendMissingPermissionMessage(sender);
-            }
+                }
+            } else sendMissingPermissionMessage(sender);
         }
         return false;
     }
@@ -291,5 +291,18 @@ public class Command extends UniversalCommand {
         for (final Command sc : subCommands) {
             sc.prefix = prefix;
         }
+    }
+
+    public Command createHelpCommand() {
+        Command help = new Command("help");
+        help.setCommandHandler(sender -> {
+            sendAllUsage(sender);
+            return true;
+        });
+        return help;
+    }
+
+    public void setupHelpCommand() {
+        addSubCommand(createHelpCommand());
     }
 }
