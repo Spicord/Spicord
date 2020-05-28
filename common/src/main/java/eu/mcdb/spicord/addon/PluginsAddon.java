@@ -26,7 +26,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 public class PluginsAddon extends SimpleAddon {
 
     public PluginsAddon() {
-        super("Plugin List", "spicord::plugins", "OopsieWoopsie", new String[] { "plugins" });
+        super("Plugin List", "spicord::plugins", "Sheidy", new String[] { "plugins" });
     }
 
     @Override

@@ -31,7 +31,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 public class PlayersAddon extends SimpleAddon {
 
     public PlayersAddon() {
-        super("Player List", "spicord::players", "OopsieWoopsie", new String[] { "players" });
+        super("Player List", "spicord::players", "Sheidy", new String[] { "players" });
     }
 
     @Override

@@ -26,7 +26,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 public class InfoAddon extends SimpleAddon {
 
     public InfoAddon() {
-        super("Server Information", "spicord::info", "OopsieWoopsie", new String[] { "info" });
+        super("Server Information", "spicord::info", "Sheidy", new String[] { "info" });
     }
 
     @Override
