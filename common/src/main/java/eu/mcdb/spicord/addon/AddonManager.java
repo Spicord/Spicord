@@ -39,14 +39,12 @@ import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.util.FileUtils;
 import eu.mcdb.util.ZipExtractor;
-import lombok.Getter;
 
 /**
  * This class is used for manage and register addons.
  */
 public class AddonManager implements Node {
 
-    @Getter
     private static final Set<SimpleAddon> addons;
 
     static {
@@ -148,6 +146,10 @@ public class AddonManager implements Node {
                 .forEach(bot::loadAddon);
     }
 
+    public Set<SimpleAddon> getAddons() {
+        return addons;
+    }
+
     private File addonsDir;
 
     /**
@@ -247,6 +249,7 @@ public class AddonManager implements Node {
                 final String id = checkNotNull(data.getId(), "id");
                 final String name = checkNotNull(data.getName(), "name");
                 final String author = checkNotNull(data.getAuthor(), "author");
+                //final String version = checkNotNull(data.getVersion(), "version");
                 final String main = checkNotNull(data.getMain(), "main");
 
                 final File addonMain = new File(addonDir, main);
