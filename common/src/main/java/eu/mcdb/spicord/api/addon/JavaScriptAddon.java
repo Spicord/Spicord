@@ -53,6 +53,11 @@ public final class JavaScriptAddon extends SimpleAddon {
         call(ready, bot);
     }
 
+    @Override
+    public boolean isJavaScriptAddon() {
+        return true;
+    }
+
     private void setupCommands(DiscordBot bot) {
         for (final Entry<String[], Object> entry : _commands.entrySet()) {
             final String[] aliases = entry.getKey();

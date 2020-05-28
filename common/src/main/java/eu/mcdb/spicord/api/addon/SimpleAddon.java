@@ -105,4 +105,8 @@ public abstract class SimpleAddon implements Node {
      */
     public void onMessageReceived(DiscordBot bot, MessageReceivedEvent event) {
     }
+
+    public boolean isJavaScriptAddon() {
+        return false;
+    }
 }
