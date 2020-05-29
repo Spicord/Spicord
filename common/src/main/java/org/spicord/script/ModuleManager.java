@@ -78,6 +78,10 @@ public interface ModuleManager {
      */
     Object getModule(String name);
 
+    /**
+     * 
+     * @return
+     */
     ScriptEngine getEngine();
 
     /**
@@ -96,4 +100,10 @@ public interface ModuleManager {
         this.register("worker", new Worker(getEngine()));
         this.register("native", new Native(getEngine()));
     }
+
+    /**
+     * 
+     * @param res
+     */
+    void registerNative(Object res);
 }

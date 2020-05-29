@@ -19,6 +19,7 @@ package org.spicord.script;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.mozilla.javascript.NativeObject;
 
 class RhinoModuleManager implements ModuleManager {
 
@@ -65,6 +66,15 @@ class RhinoModuleManager implements ModuleManager {
     @Override
     public ScriptEngine getEngine() {
         return engine;
+    }
+
+    @Override
+    public void registerNative(Object ins) {
+        if (ins instanceof NativeObject) {
+            NativeObject obj = (NativeObject) ins;
+            String name = String.valueOf(obj.get("__moduleName"));
+            modules.put(name, obj);
+        }
     }
 
     private Object getClass(String name) {
