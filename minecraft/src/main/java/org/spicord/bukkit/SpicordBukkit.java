@@ -17,7 +17,9 @@
 
 package org.spicord.bukkit;
 
+import java.io.File;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.spicord.fix.FixClassLoaderPosition;
 import eu.mcdb.spicord.SpicordCommand;
 import eu.mcdb.spicord.SpicordLoader;
 import eu.mcdb.universal.MCDB;
@@ -40,6 +42,16 @@ public class SpicordBukkit extends JavaPlugin {
             reload.run();
             loader.load();
         }));
+
+        if (new File(getDataFolder(), "fixloader.txt").exists()) {
+            try {
+                FixClassLoaderPosition.bukkit();
+                getLogger().info("Successfully applied the Loader fix");
+            } catch (Exception e) {
+                getLogger().warning("An error ocurred while applying the Loader fix");
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override

@@ -17,7 +17,9 @@
 
 package org.spicord.bungee;
 
+import java.io.File;
 import java.util.concurrent.TimeUnit;
+import org.spicord.fix.FixClassLoaderPosition;
 import eu.mcdb.spicord.SpicordCommand;
 import eu.mcdb.spicord.SpicordLoader;
 import eu.mcdb.universal.MCDB;
@@ -41,6 +43,16 @@ public class SpicordBungee extends Plugin {
             reload.run();
             loader.load();
         }));
+
+        if (new File(getDataFolder(), "fixloader.txt").exists()) {
+            try {
+                FixClassLoaderPosition.bungee();
+                getLogger().info("Successfully applied the Loader fix");
+            } catch (Exception e) {
+                getLogger().warning("An error ocurred while applying the Loader fix");
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
