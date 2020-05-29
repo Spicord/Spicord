@@ -106,6 +106,23 @@ public abstract class SimpleAddon implements Node {
     public void onMessageReceived(DiscordBot bot, MessageReceivedEvent event) {
     }
 
+    /**
+     * Method called when the bot goes shutdown by Spicord.
+     * You should use this method to stop interacting with JDA and this bot.
+     * 
+     * @param bot the shutdown bot
+     */
+    public void onShutdown(DiscordBot bot) {
+        getLogger().warning(String.format("The addon %s (%s) does not implement the onShutdown() method", name, id));
+    }
+
+    /**
+     * Method called when Spicord is being disabled (for example when the server shutdowns).
+     * You can use this method to release resources.
+     */
+    public void onDisable() {
+    }
+
     public boolean isJavaScriptAddon() {
         return false;
     }
