@@ -34,6 +34,11 @@ public final class SLF4JWrapper extends java.util.logging.Logger {
         this.logger = LoggerFactory.getLogger(name);
     }
 
+    public SLF4JWrapper(Logger logger) {
+        super(logger.getName(), null);
+        this.logger = logger;
+    }
+
     @Override
     public void log(LogRecord record) {
         final String message = record.getMessage();
