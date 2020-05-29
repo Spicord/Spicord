@@ -11,12 +11,9 @@
     <name>Spicord-Parent</name>
 
     <modules>
-        <module>all</module>
         <module>cli</module>
         <module>common</module>
-        <module>bukkit</module>
-        <module>bungee</module>
-        <module>velocity</module>
+        <module>minecraft</module>
     </modules>
 
     <repositories>

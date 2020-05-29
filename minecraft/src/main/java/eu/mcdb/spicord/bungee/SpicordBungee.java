@@ -36,6 +36,7 @@ public class SpicordBungee extends Plugin {
         reload.run();
 
         getProxy().getScheduler().schedule(this, () -> loader.load(), 10, TimeUnit.SECONDS);
+
         MCDB.registerCommand(this, new SpicordCommand(() -> {
             reload.run();
             loader.load();

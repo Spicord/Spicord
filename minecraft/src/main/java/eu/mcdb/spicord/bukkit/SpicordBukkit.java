@@ -35,6 +35,7 @@ public class SpicordBukkit extends JavaPlugin {
         reload.run();
 
         getServer().getScheduler().scheduleSyncDelayedTask(this, () -> loader.load(), 200);
+
         MCDB.registerCommand(this, new SpicordCommand(() -> {
             reload.run();
             loader.load();

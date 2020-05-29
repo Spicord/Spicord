@@ -1,4 +1,4 @@
 name: Spicord
-author: OopsieWoopsie
+author: Sheidy
 version: ${project.version}
 main: eu.mcdb.spicord.bungee.SpicordBungee
