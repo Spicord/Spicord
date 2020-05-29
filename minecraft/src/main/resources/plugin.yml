@@ -1,7 +1,7 @@
 name: Spicord
 author: Sheidy
 version: ${project.version}
-main: eu.mcdb.spicord.bukkit.SpicordBukkit
+main: org.spicord.bukkit.SpicordBukkit
 description: Discord integration for BungeeCord and Bukkit/Spigot servers.
 commands:
   spicord:

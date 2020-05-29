@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.velocity;
+package org.spicord.velocity;
 
 import com.google.inject.Inject;
 import com.velocitypowered.api.plugin.Plugin;
@@ -28,15 +28,13 @@ import eu.mcdb.universal.plugin.VelocityPlugin;
 @Plugin(id = "spicord", name = "Spicord", version = "3.0.0", authors = { "Sheidy" })
 public class SpicordVelocity extends VelocityPlugin {
 
+    private SpicordLoader loader;
+
     @Inject
     public SpicordVelocity(ProxyServer proxyServer) {
         super(proxyServer);
-    }
-
-    @Override
-    public void onEnable() {
-        new SpicordLoader(getLogger(), getDataFolder());
-
+        this.loader = new SpicordLoader(getLogger(), getDataFolder());
+        this.loader.load();
         MCDB.registerCommand(this, new SpicordCommand(() -> {}));
     }
 }

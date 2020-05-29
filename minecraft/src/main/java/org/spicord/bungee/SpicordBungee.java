@@ -15,14 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.bukkit;
+package org.spicord.bungee;
 
-import org.bukkit.plugin.java.JavaPlugin;
+import java.util.concurrent.TimeUnit;
 import eu.mcdb.spicord.SpicordCommand;
 import eu.mcdb.spicord.SpicordLoader;
 import eu.mcdb.universal.MCDB;
+import net.md_5.bungee.api.plugin.Plugin;
 
-public class SpicordBukkit extends JavaPlugin {
+public class SpicordBungee extends Plugin {
 
     private SpicordLoader loader;
 
@@ -34,7 +35,7 @@ public class SpicordBukkit extends JavaPlugin {
         };
         reload.run();
 
-        getServer().getScheduler().scheduleSyncDelayedTask(this, () -> loader.load(), 200);
+        getProxy().getScheduler().schedule(this, () -> loader.load(), 10, TimeUnit.SECONDS);
 
         MCDB.registerCommand(this, new SpicordCommand(() -> {
             reload.run();
