@@ -46,7 +46,7 @@ public class DiscordBot extends SimpleBot implements Node {
 
     protected final Collection<SimpleAddon> loadedAddons;
 
-    @Getter protected JDA jda;
+    @Getter private JDA jda;
     @Getter private final Collection<String> addons;
     @Getter private boolean commandSupportEnabled;
     @Getter private final String commandPrefix;
@@ -88,10 +88,11 @@ public class DiscordBot extends SimpleBot implements Node {
     }
 
     @Override
-    protected boolean startBot() {
+    protected boolean start() {
         if (!enabled) return false;
 
         try {
+            this.status = BotStatus.STARTING;
             this.jda = new JDABuilder(AccountType.BOT).setToken(token).setAutoReconnect(true).build();
 
             jda.addEventListener(new BotStatusListener(this));
@@ -103,6 +104,7 @@ public class DiscordBot extends SimpleBot implements Node {
             return true;
         } catch (LoginException e) {
             this.status = BotStatus.OFFLINE;
+            this.jda = null;
             getLogger().severe("An error ocurred while starting the bot '" + getName() + "'. " + e.getMessage());
         }
 
@@ -216,6 +218,31 @@ public class DiscordBot extends SimpleBot implements Node {
      */
     public boolean isReady() {
         return status == BotStatus.READY;
+    }
+
+    /**
+     * Check if the bot is connected to the Discord endpoint.
+     * 
+     * @return true if the bot is connected
+     */
+    public boolean isConnected() {
+        return isReady();
+    }
+
+    protected void shutdown(boolean force) {
+        status = BotStatus.STOPPING;
+        loadedAddons.forEach(a -> a.onShutdown(this));
+
+        if (jda != null) {
+            if (force) {
+                jda.shutdownNow();
+            } else {
+                jda.shutdown();
+            }
+        }
+
+        jda = null;
+        status = BotStatus.OFFLINE;
     }
 
     public enum BotStatus {

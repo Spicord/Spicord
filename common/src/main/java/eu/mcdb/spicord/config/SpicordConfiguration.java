@@ -25,7 +25,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -35,30 +34,20 @@ import com.moandjiezana.toml.TomlWriter;
 import eu.mcdb.spicord.api.Node;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.config.SpicordConfiguration.SpicordConfig.Bot;
-import eu.mcdb.util.ArrayUtils;
 import lombok.Getter;
 
 public final class SpicordConfiguration implements Node {
 
-    @Getter
-    private final Set<DiscordBot> bots;
-
-    @Getter
-    private boolean debugEnabled;
-
-    @Getter
-    private boolean jdaMessagesEnabled;
-
-    @Getter
-    private final File dataFolder;
+    @Getter private final Set<DiscordBot> bots;
+    @Getter private final File dataFolder;
+    @Getter private boolean debugEnabled;
+    @Getter private boolean jdaMessagesEnabled;
 
     private final File configFile;
     private final TomlWriter writer;
-
     private SpicordConfig config;
 
-    @Getter
-    private final ConfigurationManager manager;
+    @Getter private final ConfigurationManager manager;
 
     public SpicordConfiguration(final File dataFolder) {
         this.bots = Collections.synchronizedSet(new HashSet<DiscordBot>());
@@ -88,7 +77,7 @@ public final class SpicordConfiguration implements Node {
                     botData.name,
                     botData.token,
                     botData.enabled,
-                    Arrays.asList(botData.addons),
+                    botData.addons,
                     botData.command_support,
                     botData.command_prefix
                 );
@@ -204,7 +193,7 @@ public final class SpicordConfiguration implements Node {
         public void addAddonToBot(String addonKey, String botName) {
             for (Bot b : conf.bots) {
                 if (b.name.equals(botName)) {
-                    b.addons = ArrayUtils.push(b.addons, addonKey);
+                    b.addons.add(addonKey);
                     save();
                     return;
                 }
@@ -214,7 +203,7 @@ public final class SpicordConfiguration implements Node {
         public void removeAddonFromBot(String addonKey, String botName) {
             for (Bot b : conf.bots) {
                 if (b.name.equals(botName)) {
-                    b.addons = ArrayUtils.remove(b.addons, addonKey);
+                    b.addons.remove(addonKey);
                     save();
                     return;
                 }
@@ -239,7 +228,7 @@ public final class SpicordConfiguration implements Node {
             private String token;
             private boolean command_support;
             private String command_prefix;
-            private String[] addons;
+            private List<String> addons;
         }
 
         public class Messages {

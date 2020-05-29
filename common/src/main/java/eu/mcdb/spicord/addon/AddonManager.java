@@ -191,7 +191,12 @@ public class AddonManager implements Node {
                 final String id = checkNotNull(data.getId(), "id");
                 final String name = checkNotNull(data.getName(), "name");
                 final String author = checkNotNull(data.getAuthor(), "author");
-                final String main = checkNotNull(data.getMain(), "main");
+                //final String version = checkNotNull(data.getVersion(), "version");
+                final String main = data.getMain();
+                final String[] modules = data.getModules();
+
+                if (main == null && modules.length == 0)
+                    throw new ScriptException("script file not set");
 
                 if (!ex.hasEntry(main)) {
                     throw new ScriptException(main + " not found for addon " + name);

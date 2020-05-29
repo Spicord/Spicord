@@ -17,6 +17,7 @@
 
 package eu.mcdb.spicord;
 
+import java.util.Set;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.bot.DiscordBot.BotStatus;
@@ -108,15 +109,20 @@ public final class SpicordCommand extends Command {
         String botname = params.getOptionalValue("botname").orElse("default");
 
         DiscordBot bot = spicord.getBotByName(botname);
-
         if (bot == null) {
-            sender.sendFormattedMessage("&cCannot find the bot '%s'", botname);
-        } else {
-            if (bot.getStatus() == BotStatus.READY) {
-                DiscordBotLoader.shutdownBot(bot);
+            Set<DiscordBot> bots = spicord.getConfig().getBots();
+            if (bots.size() == 1) {
+                bot = bots.iterator().next();
+                sender.sendFormattedMessage("&cCannot find the bot '%s', using: %s", botname, bot.getName());
             } else {
-                sender.sendFormattedMessage("&7The bot is not online and cannot be stopped");
+                sender.sendFormattedMessage("&cCannot find the bot '%s'", botname);
             }
+        }
+
+        if (bot.getStatus() != BotStatus.OFFLINE && bot.getStatus() != BotStatus.STOPPING) {
+            DiscordBotLoader.shutdownBot(bot);
+        } else {
+            sender.sendFormattedMessage("&7The bot cannot be stopped, status: " + bot.getStatus());
         }
 
         return true;

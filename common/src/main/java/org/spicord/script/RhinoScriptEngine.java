@@ -189,8 +189,8 @@ class RhinoScriptEngine extends ScriptEngine {
             String dirname = (String) thisObj.get("__dirname", thisObj);
             File file = resolve(dirname, module);
             if (file == null) return null;
-            ScriptInfo dir = new ScriptInfo(file);
-            return require(cx, dir);
+            ScriptInfo info = new ScriptInfo(file);
+            return require(cx, info);
         }
         return null;
     }

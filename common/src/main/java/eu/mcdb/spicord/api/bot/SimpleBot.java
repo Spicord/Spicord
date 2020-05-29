@@ -31,5 +31,5 @@ public abstract class SimpleBot {
         this.token = token;
     }
 
-    protected abstract boolean startBot();
+    protected abstract boolean start();
 }

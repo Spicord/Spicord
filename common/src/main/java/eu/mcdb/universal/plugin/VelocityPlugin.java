@@ -26,24 +26,21 @@ import com.velocitypowered.api.plugin.PluginManager;
 import com.velocitypowered.api.proxy.ProxyServer;
 import eu.mcdb.universal.Server;
 import eu.mcdb.util.SLF4JWrapper;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 
-@Getter
 public abstract class VelocityPlugin {
 
     private final static File pluginsDir = new File("plugins");
 
-    private final ProxyServer proxyServer;
-    private final CommandManager commandManager;
-    private final EventManager eventManager;
-    private final PluginManager pluginManager;
+    @Getter private final ProxyServer proxyServer;
+    @Getter private final CommandManager commandManager;
+    @Getter private final EventManager eventManager;
+    @Getter private final PluginManager pluginManager;
 
-    private File dataFolder;
-    private Logger logger;
+    @Getter private File dataFolder;
+    @Getter private Logger logger;
 
-    @Getter(value = AccessLevel.NONE)
     private Plugin plugin;
 
     public VelocityPlugin(@NonNull ProxyServer proxyServer) {

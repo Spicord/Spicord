@@ -38,12 +38,11 @@ public class DiscordBotLoader {
 
         if (bot.isEnabled()) {
             if (bot.getStatus() == BotStatus.OFFLINE) {
-                bot.status = BotStatus.STARTING;
                 logger.info("Starting bot '" + bot.getName() + "'.");
-                CompletableFuture.runAsync(() -> bot.startBot());
+                CompletableFuture.runAsync(() -> bot.start());
                 return true;
             } else {
-                logger.warning("Bot '" + bot.getName() + "' has already started.");
+                logger.warning("Can't start bot '" + bot.getName() + "', status: " + bot.getStatus());
             }
         } else {
             logger.warning("Bot '" + bot.getName() + "' is disabled. Skipping.");
@@ -53,19 +52,22 @@ public class DiscordBotLoader {
     }
 
     /**
-     * Shutdowns the given bot if it is enabled.
+     * Shutdown the given bot.
      * 
-     * @param bot the bot instance.
-     * @return true if the bot was stopped.
+     * @param bot the bot instance
      */
-    public static boolean shutdownBot(DiscordBot bot) {
-        Preconditions.checkNotNull(bot, "bot");
+    public static void shutdownBot(DiscordBot bot) {
+        shutdownBot(bot, false);
+    }
 
-        bot.status = BotStatus.STOPPING;
-        if (bot.jda != null)
-            bot.jda.shutdownNow();
-        bot.jda = null;
-        bot.status = BotStatus.OFFLINE;
-        return true;
+    /**
+     * Shutdown the given bot.
+     * 
+     * @param bot the bot instance
+     * @param force true if you want to force the shutdown
+     */
+    public static void shutdownBot(DiscordBot bot, boolean force) {
+        Preconditions.checkNotNull(bot, "bot");
+        bot.shutdown(force);
     }
 }
