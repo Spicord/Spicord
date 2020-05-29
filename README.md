@@ -64,7 +64,7 @@ Build the project
 `mvn clean verify`
 
 
-The universal jar will be located at `all/target/Spicord_VERSION.jar`
+The JAR file for Minecraft server will be located at `minecraft/target/Spicord_VERSION.jar`
 
 
 
