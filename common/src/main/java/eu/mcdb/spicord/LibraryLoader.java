@@ -18,6 +18,7 @@
 package eu.mcdb.spicord;
 
 import static org.spicord.reflect.ReflectUtils.findClass;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -168,9 +169,12 @@ public class LibraryLoader {
             conn.connect();
 
             try (final InputStream in = conn.getInputStream()) {
-                byte[] buff = new byte[in.available()];
-                in.read(buff);
-                return buff;
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+                int i;
+                while ((i = in.read()) != -1) baos.write(i);
+
+                return baos.toByteArray();
             } catch (IOException e) {
                 throw e;
             }
