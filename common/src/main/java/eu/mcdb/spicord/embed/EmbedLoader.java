@@ -37,7 +37,7 @@ public class EmbedLoader implements Node {
     }
 
     /**
-     * Loads the embed files located into the {@code dir}.
+     * Load the embed files located into the given directory.
      * 
      * @param dir the directory
      */
@@ -53,11 +53,22 @@ public class EmbedLoader implements Node {
                     final String content = new String(Files.readAllBytes(file.toPath()), charset);
                     embeds.put(name, Embed.fromJson(content));
                 } catch (IOException e) {
-                    getLogger().warning("Cannot load the embed '" + file.getName() + "'.");
-                    e.printStackTrace();
+                    getLogger().warning("Cannot load the embed '" + file.getName() + "': " + e.getMessage());
                 }
             }
         }
+    }
+
+    /**
+     * Gets an embed instance previously loaded by using its name. <br>
+     * Note: The embed name has the same name as the file but without the .json extension.
+     * 
+     * @see {@link #load(File)}
+     * @param name the embed name
+     * @return the {@link Embed} instance
+     */
+    public Embed getEmbedByName(final String name) {
+        return embeds.get(name);
     }
 
     /**
@@ -68,7 +79,7 @@ public class EmbedLoader implements Node {
      * After that, all the embed files located into the {@code out} folder will be
      * loaded into a new {@link EmbedLoader} instance.
      * 
-     * @param file the file jar file
+     * @param file the jar file
      * @param out  the output directory
      * @return the {@link EmbedLoader} instance with the loaded embeds
      * @throws IOException if an I/O error has occurred
@@ -79,25 +90,13 @@ public class EmbedLoader implements Node {
 
         final ZipExtractor ex = new ZipExtractor(file);
         ex.filter("embed\\/.*\\.json");
-        ex.extract(out);
+        ex.setFlatRoot(true);
+        ex.extract(out, false);
         ex.close();
 
         final EmbedLoader loader = new EmbedLoader();
         loader.load(out);
 
         return loader;
-    }
-
-    /**
-     * Gets an embed instance previously loaded by using its name.
-     * <br>
-     * The embed name has the same name as its file but without the .json extension.
-     * 
-     * @see {@link #load(File)}
-     * @param name the embed name
-     * @return the {@link Embed} instance
-     */
-    public Embed getEmbedByName(final String name) {
-        return embeds.get(name);
     }
 }

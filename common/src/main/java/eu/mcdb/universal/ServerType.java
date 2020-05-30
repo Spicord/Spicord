@@ -17,7 +17,7 @@
 
 package eu.mcdb.universal;
 
-import eu.mcdb.util.ReflectionUtils;
+import org.spicord.reflect.ReflectUtils;
 
 public enum ServerType {
 
@@ -35,7 +35,7 @@ public enum ServerType {
 
     private boolean check() {
         if (clazz == null) return false;
-        return ReflectionUtils.classExists(clazz);
+        return ReflectUtils.findClass(clazz).isPresent();
     }
 
     public static ServerType auto() {

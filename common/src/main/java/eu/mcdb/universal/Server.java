@@ -51,6 +51,11 @@ public abstract class Server implements IServer {
         }
     }
 
+    public boolean isProxy() {
+        return serverType == ServerType.VELOCITY
+            || serverType == ServerType.BUNGEECORD;
+    }
+
     // TODO: look for a better way to do this
     public static class setVelocityHandle { // prevent java.lang.NoClassDefFoundError: ...ProxyServer
         public setVelocityHandle(ProxyServer proxy) {

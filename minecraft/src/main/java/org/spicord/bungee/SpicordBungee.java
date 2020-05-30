@@ -20,6 +20,7 @@ package org.spicord.bungee;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 import org.spicord.fix.FixClassLoaderPosition;
+import eu.mcdb.spicord.LibraryLoader;
 import eu.mcdb.spicord.SpicordCommand;
 import eu.mcdb.spicord.SpicordLoader;
 import eu.mcdb.universal.MCDB;
@@ -31,6 +32,11 @@ public class SpicordBungee extends Plugin {
 
     @Override
     public void onEnable() {
+        if (new File(getDataFolder(), "forceload.txt").exists()) {
+            getLogger().info("Libraries will be forced to load");
+            LibraryLoader.setForceLoad(true);
+        }
+
         Runnable reload = () -> {
             onDisable();
             this.loader = new SpicordLoader(getLogger(), getDataFolder());

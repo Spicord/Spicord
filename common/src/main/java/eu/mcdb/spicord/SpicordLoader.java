@@ -17,10 +17,10 @@
 
 package eu.mcdb.spicord;
 
-import static eu.mcdb.util.ReflectionUtils.classExists;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
+import org.spicord.reflect.ReflectUtils;
 import com.google.common.base.Preconditions;
 import eu.mcdb.spicord.config.SpicordConfiguration;
 
@@ -36,11 +36,6 @@ public final class SpicordLoader {
 
     /**
      * The {@link SpicordLoader} constructor.
-     * 
-     * @param logger      the {@link Spicord} instance
-     * @param classLoader the plugin class loader
-     * @param dataFolder 
-     * @param serverType  the server type
      */
     public SpicordLoader(Logger logger, File dataFolder) {
         Preconditions.checkNotNull(logger);
@@ -59,7 +54,7 @@ public final class SpicordLoader {
                 libraryLoader.downloadLibraries();
                 libraryLoader.loadLibraries();
 
-                if (!classExists("net.dv8tion.jda.core.JDA")) {
+                if (!ReflectUtils.findClass("net.dv8tion.jda.core.JDA").isPresent()) {
                     logger.severe("[Loader] JDA library is not loaded, this plugin will not work.");
                     this.disable();
                     return;
@@ -85,11 +80,12 @@ public final class SpicordLoader {
      * Turns off Spicord.
      */
     public void disable() {
-        this.spicord.onDisable();
-        this.spicord = null;
+        if (spicord != null)
+            spicord.onDisable();
+        spicord = null;
     }
 
-    private void handleException(final Exception e) {
+    private void handleException(Exception e) {
         logger.severe("Spicord could not be loaded, please report this error in \n\t -> https://github.com/OopsieWoopsie/Spicord/issues");
         e.printStackTrace();
         disable();

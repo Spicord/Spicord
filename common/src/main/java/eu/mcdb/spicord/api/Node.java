@@ -35,7 +35,7 @@ public interface Node {
     /**
      * Get the universal server instance.
      * 
-     * @return the {link Server} instance
+     * @return the Server instance
      */
     default Server getServer() {
         return Server.getInstance();
@@ -44,7 +44,7 @@ public interface Node {
     /**
      * Get the Spicord logger instance.
      * 
-     * @return the spicord logger instance
+     * @return the Logger instance
      */
     default Logger getLogger() {
         return getSpicord().getLogger();

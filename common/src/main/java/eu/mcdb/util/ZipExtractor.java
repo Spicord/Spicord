@@ -38,6 +38,7 @@ public class ZipExtractor implements AutoCloseable {
 
     private final JarFile zipFile;
     private final List<ZipEntry> entries;
+    private boolean flatRoot;
 
     /**
      * 
@@ -48,6 +49,12 @@ public class ZipExtractor implements AutoCloseable {
     public ZipExtractor(final File file) throws IOException {
         this.zipFile = new JarFile(file);
         this.entries = new ArrayList<ZipEntry>();
+
+        reset();
+    }
+
+    public void reset() {
+        entries.clear();
 
         final Enumeration<JarEntry> e = zipFile.entries();
 
@@ -80,8 +87,18 @@ public class ZipExtractor implements AutoCloseable {
      * @throws IOException if an I/O error has occurred
      */
     public void extract(final File out) throws IOException {
+        extract(out, false);
+    }
+
+    public void extract(final File out, final boolean replace) throws IOException {
         for (final ZipEntry entry : entries) {
-            final String name = entry.getName();
+            String name = entry.getName();
+
+            if (flatRoot) {
+                if (name.endsWith("/")) continue; // is dir
+                name = name.substring(name.lastIndexOf('/') + 1, name.length());
+            }
+
             final File file = new File(out, name);
 
             if (name.endsWith("/")) {
@@ -89,7 +106,13 @@ public class ZipExtractor implements AutoCloseable {
                 continue;
             }
 
-            Files.copy(zipFile.getInputStream(entry), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            if (file.exists()) {
+                if (replace) {
+                    Files.copy(zipFile.getInputStream(entry), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
+            } else {
+                Files.copy(zipFile.getInputStream(entry), file.toPath());
+            }
         }
     }
 
@@ -109,6 +132,14 @@ public class ZipExtractor implements AutoCloseable {
         }
 
         return Optional.empty();
+    }
+
+    public void setFlatRoot(boolean flatRoot) {
+        this.flatRoot = flatRoot;
+    }
+
+    public boolean isFlatRoot() {
+        return flatRoot;
     }
 
     @Override

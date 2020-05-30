@@ -20,6 +20,7 @@ package org.spicord.bukkit;
 import java.io.File;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.spicord.fix.FixClassLoaderPosition;
+import eu.mcdb.spicord.LibraryLoader;
 import eu.mcdb.spicord.SpicordCommand;
 import eu.mcdb.spicord.SpicordLoader;
 import eu.mcdb.universal.MCDB;
@@ -30,6 +31,11 @@ public class SpicordBukkit extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        if (new File(getDataFolder(), "forceload.txt").exists()) {
+            getLogger().info("Libraries will be forced to load");
+            LibraryLoader.setForceLoad(true);
+        }
+
         Runnable reload = () -> {
             onDisable();
             this.loader = new SpicordLoader(getLogger(), getDataFolder());

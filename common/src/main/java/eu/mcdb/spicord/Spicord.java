@@ -17,14 +17,18 @@
 
 package eu.mcdb.spicord;
 
+import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 import org.spicord.api.services.ServiceManager;
+import org.spicord.reflect.ReflectErrorRule;
+import org.spicord.reflect.ReflectUtils;
+import org.spicord.reflect.ReflectedMethod;
+import org.spicord.reflect.ReflectedObject;
 import eu.mcdb.spicord.addon.AddonManager;
 import eu.mcdb.spicord.addon.InfoAddon;
 import eu.mcdb.spicord.addon.PlayersAddon;
@@ -34,7 +38,6 @@ import eu.mcdb.spicord.bot.DiscordBotLoader;
 import eu.mcdb.spicord.config.SpicordConfiguration;
 import eu.mcdb.universal.Server;
 import eu.mcdb.universal.ServerType;
-import eu.mcdb.util.ReflectionUtils;
 import lombok.Getter;
 import net.dv8tion.jda.core.utils.JDALogger;
 
@@ -42,20 +45,11 @@ public final class Spicord {
 
     private static Spicord instance;
 
-    @Getter
-    private Logger logger;
-
-    @Getter
-    private ServerType serverType;
-
-    @Getter
-    private SpicordConfiguration config;
-
-    @Getter
-    private ServiceManager serviceManager;
-
-    @Getter
-    private AddonManager addonManager;
+    @Getter private Logger logger;
+    @Getter private ServerType serverType;
+    @Getter private SpicordConfiguration config;
+    @Getter private ServiceManager serviceManager;
+    @Getter private AddonManager addonManager;
 
     private List<Consumer<Spicord>> loadListeners;
 
@@ -68,14 +62,15 @@ public final class Spicord {
         instance = this;
         this.logger = logger;
         this.addonManager = new AddonManager();
+        this.serviceManager = new SpicordServiceManager();
         this.loadListeners = new ArrayList<>();
     }
 
     public void onLoad(Consumer<Spicord> action) {
-        if (config != null)
-            throw new IllegalStateException();
-
         loadListeners.add(action);
+
+        if (config != null)
+            action.accept(this);
     }
 
     protected void onLoad(SpicordConfiguration config) throws IOException {
@@ -85,11 +80,10 @@ public final class Spicord {
         loadListeners.forEach(l -> l.accept(this));
         loadListeners.clear();
 
+        File addonsDir = new File(config.getDataFolder(), "addons");
+
         this.config = config;
-        this.serviceManager = new SpicordServiceManager();
-
-        this.getAddonManager().loadAddons(config.getDataFolder());
-
+        this.addonManager.loadAddons(addonsDir);
         this.registerIntegratedAddons();
 
         Server.getInstance().setDebugEnabled(config.isDebugEnabled());
@@ -101,16 +95,22 @@ public final class Spicord {
     }
 
     private void setupLogger() {
-        if (ReflectionUtils.classExists("eu.mcdb.logger.ProvisionalLogger")) {
-            try {
-                Class<?> loggerClass = Class.forName("eu.mcdb.logger.ProvisionalLogger");
-                Constructor<?> constructor = loggerClass.getConstructor(boolean.class, boolean.class);
-                Object loggerInst = constructor.newInstance(config.isDebugEnabled(), config.isJdaMessagesEnabled());
-                boolean b = ReflectionUtils.methodExists(JDALogger.class, "setLog", loggerClass.getInterfaces()[0]);
+        Optional<Class<?>> oClass = ReflectUtils.findClass("eu.mcdb.logger.ProvisionalLogger");
 
-                if (b) {
-                    Method setLogMethod = JDALogger.class.getDeclaredMethod("setLog", loggerClass.getInterfaces()[0]);
-                    setLogMethod.invoke(null, loggerInst);
+        if (oClass.isPresent()) {
+            try {
+                Class<?> loggerClass = oClass.get();
+
+                Object loggerInst = new ReflectedObject(loggerClass)
+                        .getConstructor(boolean.class, boolean.class)
+                        .invoke(config.isDebugEnabled(), config.isJdaMessagesEnabled());
+
+                ReflectedMethod method = new ReflectedObject(JDALogger.class)
+                        .setErrorRule(ReflectErrorRule.IGNORE)
+                        .getMethod("setLog", loggerClass.getInterfaces()[0]);
+
+                if (method != null) {
+                    method.invoke(loggerInst);
 
                     if (config.isJdaMessagesEnabled()) {
                         debug("Successfully enabled JDA messages.");
@@ -134,10 +134,15 @@ public final class Spicord {
     }
 
     protected void onDisable() {
-        getLogger().info("Disabling Spicord...");
-        config.getBots().forEach(DiscordBotLoader::shutdownBot);
-        config.getBots().clear();
+        logger.info("Disabling Spicord...");
+
+        if (config != null) {
+            config.getBots().forEach(DiscordBotLoader::shutdownBot);
+            config.getBots().clear();
+        }
+
         this.addonManager = null;
+        this.serviceManager = null;
         this.serverType = null;
         this.logger = null;
         this.config = null;
@@ -159,39 +164,38 @@ public final class Spicord {
     }
 
     /**
-     * Gets the Spicord instance.
+     * Print a message in the console if the debug mode is enabled.
      * 
-     * @throws IllegalStateException if Spicord has not loaded.
-     * @return the Spicord instance.
+     * @param message the message to print
+     */
+    public void debug(String message) {
+        if (config.isDebugEnabled())
+            logger.info("[DEBUG] " + message);
+    }
+
+    /**
+     * Get the Spicord instance.
+     * 
      * @see {@link #isLoaded()}
+     * @return the Spicord instance, may be null
      */
     public static Spicord getInstance() {
-        if (!isLoaded())
-            throw new IllegalStateException("Spicord has not loaded yet.");
-
         return instance;
     }
 
+    /**
+     * Get the Spicord version.
+     */
     public static String getVersion() {
         return Spicord.class.getPackage().getImplementationVersion();
     }
 
     /**
-     * Check if Spicord was loaded.
+     * Check if Spicord is loaded.
      * 
-     * @return true if Spicord is loaded, or false if not.
+     * @return true if Spicord is loaded, or false if not
      */
     public static boolean isLoaded() {
         return instance != null;
-    }
-
-    /**
-     * Displays a message if the debug mode if enabled.
-     * 
-     * @param msg the message to be displayed.
-     */
-    public void debug(String msg) {
-        if (config.isDebugEnabled())
-            getLogger().info("[DEBUG] " + msg);
     }
 }

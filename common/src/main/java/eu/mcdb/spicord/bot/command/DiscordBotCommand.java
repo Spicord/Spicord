@@ -19,7 +19,6 @@ package eu.mcdb.spicord.bot.command;
 
 import eu.mcdb.spicord.api.bot.command.SimpleCommand;
 import eu.mcdb.spicord.embed.Embed;
-import eu.mcdb.spicord.embed.EmbedSender;
 import lombok.Getter;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
@@ -66,7 +65,7 @@ public class DiscordBotCommand extends SimpleCommand {
     }
 
     public void reply(Embed embed) {
-        EmbedSender.prepare(channel, embed).queue();
+        embed.sendToChannel(channel);
     }
 
     public void reply(MessageEmbed embed) {

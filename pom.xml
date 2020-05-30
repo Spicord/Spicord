@@ -91,7 +91,7 @@
     </properties>
 
     <build>
-        <finalName>${project.name}_${project.version}</finalName>
+        <finalName>Spicord_${project.version}</finalName>
         <resources>
             <resource>
                 <directory>${basedir}/src/main/resources</directory>

@@ -17,8 +17,7 @@
 
 package eu.mcdb.spicord;
 
-import static eu.mcdb.util.ReflectionUtils.classExists;
-import java.io.ByteArrayOutputStream;
+import static org.spicord.reflect.ReflectUtils.findClass;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,12 +32,15 @@ import java.security.MessageDigest;
 import java.util.logging.Logger;
 import eu.mcdb.spicord.util.SpicordClassLoader;
 import lombok.Getter;
+import lombok.Setter;
 
 public class LibraryLoader {
 
     private final Logger log;
     private File libFolder;
     private Library[] libraries;
+
+    @Setter private static boolean forceLoad;
 
     public LibraryLoader(String libinfo, Logger log, File dataFolder) {
         this.log = log;
@@ -116,10 +118,14 @@ public class LibraryLoader {
      */
     public void loadLibraries() {
         for (Library lib : libraries) {
+            boolean loaded = false;
             if (lib.getDontloadifclassfound() != null) {
-                if (classExists(lib.getDontloadifclassfound())) {
-                    log.info("[Loader] The library '" + lib.getName() + "' wasn't loaded by Spicord, errors may occur.");
-                    continue;
+                if (findClass(lib.getDontloadifclassfound()).isPresent()) {
+                    if (!forceLoad) {
+                        log.info("[Loader] The library '" + lib.getName() + "' wasn't loaded by Spicord, errors may occur.");
+                        continue;
+                    }
+                    loaded = true;
                 }
             }
 
@@ -129,7 +135,7 @@ public class LibraryLoader {
                 if (file.exists()) {
                     try {
                         SpicordClassLoader.loadJar(file.toPath());
-                        log.info("[Loader] Loaded library '" + file.getName() + "'.");
+                        log.info("[Loader] Loaded library '" + file.getName() + "'" + (loaded ? " (Forced)" : ""));
                     } catch (Exception e) {
                         log.severe("[Loader] Cannot load library '" + file.getName() + "'. " + e.getMessage());
                         e.printStackTrace();
@@ -161,16 +167,12 @@ public class LibraryLoader {
             conn.setRequestProperty("User-Agent", "Mozilla/5.0");
             conn.connect();
 
-            try (final InputStream in = conn.getInputStream();
-                    final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-
-                int n;
-                while ((n = in.read()) != -1)
-                    baos.write(n);
-
-                return baos.toByteArray();
+            try (final InputStream in = conn.getInputStream()) {
+                byte[] buff = new byte[in.available()];
+                in.read(buff);
+                return buff;
             } catch (IOException e) {
-                throw new IOException(e);
+                throw e;
             }
         }
     }

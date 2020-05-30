@@ -18,11 +18,19 @@
 package org.spicord.reflect;
 
 import java.lang.reflect.Array;
+import java.util.Optional;
 
 public final class ReflectUtils {
 
     public static Class<?> getArrayClass(Class<?> clazz) {
         return Array.newInstance(clazz, 0).getClass();
+    }
+
+    public static Optional<Class<?>> findClass(String name) {
+        try {
+            return Optional.of(Class.forName(name));
+        } catch (ClassNotFoundException e) {}
+        return Optional.empty();
     }
 
     public static <T> T nullOnException(ExceptionConsumer<T> action) {

@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 
+@Deprecated
 public class ReflectionUtils {
 
     public static Field setAccessible(Field field) {

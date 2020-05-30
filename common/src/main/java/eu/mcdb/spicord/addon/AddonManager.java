@@ -150,16 +150,13 @@ public class AddonManager implements Node {
         return addons;
     }
 
-    private File addonsDir;
-
     /**
      * 
      * @param dir
      */
-    public void loadAddons(File dir) {
-        checkNotNull(dir);
+    public void loadAddons(File addonsDir) {
+        checkNotNull(addonsDir);
 
-        this.addonsDir = new File(dir, "addons");
         final File runtimeDir = new File(addonsDir, ".runtime-" + System.nanoTime());
         runtimeDir.mkdirs();
         FileUtils.deleteOnExit(runtimeDir);
