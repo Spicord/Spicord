@@ -21,6 +21,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.spicord.reflect.ReflectErrorRule;
@@ -30,7 +32,7 @@ import org.spicord.reflect.ReflectedObject;
 @SuppressWarnings("all")
 public class FixClassLoaderPosition {
 
-    public static void bukkit() {
+    public static boolean bukkit() {
         ClassLoader loader = FixClassLoaderPosition.class.getClassLoader();
 
         ReflectedField loadersField = new ReflectedObject(loader)
@@ -38,14 +40,27 @@ public class FixClassLoaderPosition {
                 .getReflectValue()
                 .getField("loaders").setAccessible().setModifiable();
 
-        Map<String, Object> loaders = loadersField.getValue();
-        Map<String, Object> newMap = new LinkedHashMap<String, Object>(loaders.size()+1);
-        newMap.put("Spicord", loader);
-        newMap.putAll(loaders);
-        loadersField.setValue(newMap);
+        Object loadersObj = loadersField.getValue();
+
+        if (loadersObj instanceof Map) {
+            Map loaders = (Map) loadersObj;
+            Map newMap = new LinkedHashMap(loaders.size()+1);
+            newMap.put("Spicord", loader);
+            newMap.putAll(loaders);
+            loadersField.setValue(newMap);
+        } else if (loadersObj instanceof List) {
+            List loaders = (List) loadersObj;
+            List newList = new LinkedList();
+            newList.add(loader);
+            newList.addAll(loaders);
+            loadersField.setValue(newList);
+        } else {
+            return false;
+        }
+        return true;
     }
 
-    public static void bungee() {
+    public static boolean bungee() {
         ClassLoader loader = FixClassLoaderPosition.class.getClassLoader();
 
         ReflectedField allLoadersField = new ReflectedObject(loader)
@@ -56,5 +71,6 @@ public class FixClassLoaderPosition {
         newSet.add(loader);
         newSet.addAll(allLoaders);
         allLoadersField.setValue(newSet);
+        return true;
     }
 }

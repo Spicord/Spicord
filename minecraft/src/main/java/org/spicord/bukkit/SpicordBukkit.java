@@ -51,11 +51,13 @@ public class SpicordBukkit extends JavaPlugin {
 
         if (new File(getDataFolder(), "fixloader.txt").exists()) {
             try {
-                FixClassLoaderPosition.bukkit();
-                getLogger().info("Successfully applied the Loader fix");
+                if (FixClassLoaderPosition.bukkit()) {
+                    getLogger().info("Successfully applied the Loader fix");
+                } else {
+                    getLogger().warning("Cannot apply the Loader fix");
+                }
             } catch (Exception e) {
-                getLogger().warning("An error ocurred while applying the Loader fix");
-                e.printStackTrace();
+                getLogger().warning("An error ocurred while applying the Loader fix: " + e.getMessage());
             }
         }
     }

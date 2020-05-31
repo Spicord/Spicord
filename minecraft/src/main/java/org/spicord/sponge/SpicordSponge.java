@@ -14,12 +14,10 @@ import eu.mcdb.util.SLF4JWrapper;
 @Plugin(id = "spicord", name = "Spicord", version = "3.0.0", authors = { "Sheidy" })
 public class SpicordSponge extends SpongePlugin {
 
-    @Inject private Logger logger;
-    @Inject @ConfigDir(sharedRoot = false) private File configDir;
-
     private SpicordLoader loader;
 
-    public SpicordSponge() {
+    @Inject
+    public SpicordSponge(Logger logger, @ConfigDir(sharedRoot = false) File configDir) {
         this.loader = new SpicordLoader(new SLF4JWrapper(logger), configDir);
         this.loader.load();
         MCDB.registerCommand(this, new SpicordCommand(() -> {}));

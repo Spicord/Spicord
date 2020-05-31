@@ -52,11 +52,11 @@ public class SpicordBungee extends Plugin {
 
         if (new File(getDataFolder(), "fixloader.txt").exists()) {
             try {
-                FixClassLoaderPosition.bungee();
-                getLogger().info("Successfully applied the Loader fix");
+                if (FixClassLoaderPosition.bungee()) {
+                    getLogger().info("Successfully applied the Loader fix");
+                }
             } catch (Exception e) {
-                getLogger().warning("An error ocurred while applying the Loader fix");
-                e.printStackTrace();
+                getLogger().warning("An error ocurred while applying the Loader fix: " + e.getMessage());
             }
         }
     }
