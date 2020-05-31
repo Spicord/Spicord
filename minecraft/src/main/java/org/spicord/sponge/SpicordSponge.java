@@ -12,8 +12,10 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
 import com.google.inject.Inject;
+import eu.mcdb.spicord.SpicordCommand;
 import eu.mcdb.spicord.SpicordLoader;
 import eu.mcdb.spicord.util.SpicordClassLoader;
+import eu.mcdb.universal.MCDB;
 import eu.mcdb.universal.plugin.SpongePlugin;
 import eu.mcdb.util.SLF4JWrapper;
 
@@ -37,7 +39,7 @@ public class SpicordSponge extends SpongePlugin {
 
     @Listener
     public void init(GameInitializationEvent event) {
-        //MCDB.registerCommand(this, new SpicordCommand(() -> {}));
+        MCDB.registerCommand(this, new SpicordCommand(() -> {}));
     }
 
     private ClassLoader prepareClassLoader(ClassLoader classLoader) {
