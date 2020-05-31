@@ -31,20 +31,23 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.logging.Logger;
+import eu.mcdb.spicord.util.JarClassLoader;
 import eu.mcdb.spicord.util.SpicordClassLoader;
 import lombok.Getter;
 import lombok.Setter;
 
 public class LibraryLoader {
 
-    private final Logger log;
+    private final Logger logger;
     private File libFolder;
     private Library[] libraries;
+    private JarClassLoader loader;
 
     @Setter private static boolean forceLoad;
 
-    public LibraryLoader(String libinfo, Logger log, File dataFolder) {
-        this.log = log;
+    public LibraryLoader(JarClassLoader loader, String libinfo, Logger logger, File dataFolder) {
+        this.loader = loader;
+        this.logger = logger;
         this.libFolder = new File(dataFolder, "lib");
 
         if (!libFolder.exists())
@@ -60,6 +63,10 @@ public class LibraryLoader {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        if (loader == null) {
+            loader = new SpicordClassLoader();
+        }
     }
 
     public void downloadLibraries() throws IOException {
@@ -73,7 +80,7 @@ public class LibraryLoader {
         File out = new File(libFolder, lib.getFileName());
 
         if (!out.exists() || replace) {
-            log.info("[Loader] Downloading library " + lib.getName());
+            logger.info("[Loader] Downloading library " + lib.getName());
             byte[] data = lib.download();
             FileOutputStream fos = new FileOutputStream(out);
             fos.write(data);
@@ -98,9 +105,9 @@ public class LibraryLoader {
                     String sha1 = String.format("%040x", new BigInteger(1, digest.digest()));
 
                     if (!lib.getSha1().equals(sha1)) {
-                        log.info("[Loader] sha1sum of library '" + lib.getName() + "' is wrong");
-                        log.info("[Loader] expected sha1sum: " + lib.getSha1());
-                        log.info("[Loader] current  sha1sum: " + sha1);
+                        logger.info("[Loader] sha1sum of library '" + lib.getName() + "' is wrong");
+                        logger.info("[Loader] expected sha1sum: " + lib.getSha1());
+                        logger.info("[Loader] current  sha1sum: " + sha1);
                         downloadLibrary(lib, true);
                         recheck = true;
                     }
@@ -123,7 +130,7 @@ public class LibraryLoader {
             if (lib.getDontloadifclassfound() != null) {
                 if (findClass(lib.getDontloadifclassfound()).isPresent()) {
                     if (!forceLoad) {
-                        log.info("[Loader] The library '" + lib.getName() + "' wasn't loaded by Spicord, errors may occur.");
+                        logger.info("[Loader] The library '" + lib.getName() + "' wasn't loaded by Spicord, errors may occur.");
                         continue;
                     }
                     loaded = true;
@@ -135,14 +142,14 @@ public class LibraryLoader {
 
                 if (file.exists()) {
                     try {
-                        SpicordClassLoader.loadJar(file.toPath());
-                        log.info("[Loader] Loaded library '" + file.getName() + "'" + (loaded ? " (Forced)" : ""));
+                        loader.loadJar(file.toPath());
+                        logger.info("[Loader] Loaded library '" + file.getName() + "'" + (loaded ? " (Forced)" : ""));
                     } catch (Exception e) {
-                        log.severe("[Loader] Cannot load library '" + file.getName() + "'. " + e.getMessage());
+                        logger.severe("[Loader] Cannot load library '" + file.getName() + "'. " + e.getMessage());
                         e.printStackTrace();
                     }
                 } else {
-                    log.severe("[Loader] Library '" + file.getName() + "' was not found on the library path.");
+                    logger.severe("[Loader] Library '" + file.getName() + "' was not found on the library path.");
                 }
             }
         }

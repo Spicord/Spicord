@@ -17,20 +17,23 @@
 
 package eu.mcdb.spicord.util;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import org.spicord.reflect.ReflectUtils;
 import org.spicord.reflect.ReflectedMethod;
 import org.spicord.reflect.ReflectedObject;
 
-public class SpicordClassLoader {
+public class SpicordClassLoader implements JarClassLoader {
 
-    private static ReflectedMethod addURL;
+    private final ReflectedMethod addURL;
 
-    static {
-        addURL = new ReflectedObject(URLClassLoader.class, SpicordClassLoader.class.getClassLoader())
+    public SpicordClassLoader() {
+        this(SpicordClassLoader.class.getClassLoader());
+    }
+
+    public SpicordClassLoader(ClassLoader loader) {
+        addURL = new ReflectedObject(URLClassLoader.class, loader)
                 .getMethod("addURL", URL.class).setAccessible();
     }
 
@@ -39,16 +42,13 @@ public class SpicordClassLoader {
      * 
      * @param file the {@link Path} of the Jar file
      */
-    public static void loadJar(Path file) {
-        addURL.invoke(ReflectUtils.nullOnException(() -> file.toUri().toURL()));
-    }
-
-    /**
-     * Load the classes of a Jar file.
-     * 
-     * @param path the path of the Jar file
-     */
-    public static void loadJar(String path) throws Exception {
-        loadJar(Paths.get(path));
+    public void loadJar(Path file) {
+        if (addURL == null)
+            throw new IllegalStateException("SpicordClassLoader not initialized");
+        try {
+            addURL.invoke(file.toUri().toURL());
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 }

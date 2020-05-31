@@ -34,7 +34,7 @@ class RhinoModuleManager implements ModuleManager {
 
     @Override
     public void register(String name, Class<?> clazz) {
-        modules.put(name, getClass(clazz.getName()));
+        modules.put(name, engine.wrap(clazz));
     }
 
     @Override
@@ -75,9 +75,5 @@ class RhinoModuleManager implements ModuleManager {
             String name = String.valueOf(obj.get("__moduleName"));
             modules.put(name, obj);
         }
-    }
-
-    private Object getClass(String name) {
-        return engine.eval("Packages." + name);
     }
 }

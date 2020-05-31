@@ -14,13 +14,6 @@
 
     <name>Spicord-Common</name>
 
-    <repositories>
-        <repository>
-            <id>spicord-repo</id>
-            <url>https://repo.spicord.org/</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>org.mozilla</groupId>

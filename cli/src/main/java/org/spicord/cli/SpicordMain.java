@@ -68,7 +68,7 @@ public class SpicordMain {
     }
 
     private void preload() throws IOException {
-        LibraryLoader libraryLoader = new LibraryLoader("/preload.libinfo", this.logger, this.dataFolder);
+        LibraryLoader libraryLoader = new LibraryLoader(null, "/preload.libinfo", this.logger, this.dataFolder);
         libraryLoader.downloadLibraries();
         libraryLoader.loadLibraries();
     }

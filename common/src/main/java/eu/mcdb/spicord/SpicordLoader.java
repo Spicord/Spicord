@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import org.spicord.reflect.ReflectUtils;
 import com.google.common.base.Preconditions;
 import eu.mcdb.spicord.config.SpicordConfiguration;
+import eu.mcdb.spicord.util.JarClassLoader;
 
 public final class SpicordLoader {
 
@@ -38,10 +39,14 @@ public final class SpicordLoader {
      * The {@link SpicordLoader} constructor.
      */
     public SpicordLoader(Logger logger, File dataFolder) {
+        this(null, logger, dataFolder);
+    }
+
+    public SpicordLoader(JarClassLoader classLoader, Logger logger, File dataFolder) {
         Preconditions.checkNotNull(logger);
 
         this.logger = logger;
-        this.libraryLoader = new LibraryLoader("/libraries.libinfo", logger, dataFolder);
+        this.libraryLoader = new LibraryLoader(classLoader, "/libraries.libinfo", logger, dataFolder);
         this.dataFolder = dataFolder;
 
         this.load0();
