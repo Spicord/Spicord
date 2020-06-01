@@ -43,8 +43,6 @@ public class SpicordClassLoader implements JarClassLoader {
      * @param file the {@link Path} of the Jar file
      */
     public void loadJar(Path file) {
-        if (addURL == null)
-            throw new IllegalStateException("SpicordClassLoader not initialized");
         try {
             addURL.invoke(file.toUri().toURL());
         } catch (MalformedURLException e) {

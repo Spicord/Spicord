@@ -22,9 +22,7 @@ import java.util.Map.Entry;
 import org.spicord.script.ScriptEngine;
 import eu.mcdb.spicord.api.bot.command.BotCommand;
 import eu.mcdb.spicord.bot.DiscordBot;
-import lombok.Getter;
 
-@Getter
 public final class JavaScriptAddon extends SimpleAddon {
 
     private final ScriptEngine engine;
@@ -36,8 +34,8 @@ public final class JavaScriptAddon extends SimpleAddon {
 
     private final Map<String[], Object> _commands;
 
-    public JavaScriptAddon(String name, String id, String author, JavaScriptBaseAddon addon, ScriptEngine engine) {
-        super(name, id, author);
+    public JavaScriptAddon(String name, String id, String author, String version, JavaScriptBaseAddon addon, ScriptEngine engine) {
+        super(name, id, author, version);
 
         this.engine = engine;
         this._commands = addon.buildCommands();
@@ -65,12 +63,7 @@ public final class JavaScriptAddon extends SimpleAddon {
 
     @Override
     public void onDisable() {
-        call(shutdown);
-    }
-
-    @Override
-    public boolean isJavaScriptAddon() {
-        return true;
+        call(disable);
     }
 
     private void setupCommands(DiscordBot bot) {

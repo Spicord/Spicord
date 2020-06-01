@@ -25,7 +25,7 @@ import com.google.common.base.Preconditions;
 import eu.mcdb.spicord.config.SpicordConfiguration;
 import eu.mcdb.spicord.util.JarClassLoader;
 
-public final class SpicordLoader {
+public final class SpicordLoader implements AutoCloseable {
 
     private static boolean firstRun = true;
 
@@ -81,13 +81,18 @@ public final class SpicordLoader {
         }
     }
 
+    @Override
+    public void close() {
+        if (spicord != null)
+            spicord.onDisable();
+        spicord = null;
+    }
+
     /**
      * Turns off Spicord.
      */
     public void disable() {
-        if (spicord != null)
-            spicord.onDisable();
-        spicord = null;
+        close();
     }
 
     private void handleException(Exception e) {

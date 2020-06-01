@@ -23,41 +23,44 @@ import static org.mozilla.javascript.ScriptableObject.READONLY;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.FunctionObject;
+import org.mozilla.javascript.NativeJSON;
 import org.mozilla.javascript.NativeJavaArray;
 import org.mozilla.javascript.NativeJavaClass;
 import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.Undefined;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 @SuppressWarnings({ "unchecked", "static-access" })
 class RhinoScriptEngine extends ScriptEngine {
 
-    static {
-        try {
-            method = RhinoScriptEngine.class.getMethod("require", Context.class, Scriptable.class, Object[].class, Function.class);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private static final Gson GSON = new Gson();
-    private static final Method method;
+    private static final List<Method> nativeMethods = new ArrayList<Method>();
     private static final int UNMODIFIABLE = READONLY|DONTENUM|PERMANENT;
+    private static final Object UNDEFINED = Undefined.instance;
 
     private final ScriptableObject scope;
     private static RhinoModuleManager moduleManager; // this souldn't be static!! :( but it need to be accessed from require()
 
-    public RhinoScriptEngine() throws IOException {
-        this.scope = context().initStandardObjects();
+    static {
+        nativeMethods.addAll(findMethods(RhinoScriptEngine.class));
+    }
+
+    public RhinoScriptEngine() {
+        this.scope = getContext().initStandardObjects();
         moduleManager = new RhinoModuleManager(this);
     }
 
@@ -66,7 +69,7 @@ class RhinoScriptEngine extends ScriptEngine {
         if (ins instanceof Function) {
             final Function func = (Function) ins;
             Scriptable scope = func.getParentScope();
-            return (T) func.call(context(), scope, scope, javaToJS(args));
+            return (T) func.call(getContext(), scope, scope, javaToJS(args));
         } else {
             throw new IllegalArgumentException("given object is not a function");
         }
@@ -81,12 +84,12 @@ class RhinoScriptEngine extends ScriptEngine {
     public <T> T loadScript(File file, ScriptEnvironment env) throws IOException {
         ScriptInfo info = new ScriptInfo(file, env);
         info.getEnvironment().put("__engine", this);
-        return toJava(require(context(), info));
+        return toJava(require(getContext(), info));
     }
 
     @Override
     public Object eval(String script) {
-        return context().evaluateString(scope, script, "<eval>", 1, null);
+        return getContext().evaluateString(scope, script, "<eval>", 1, null);
     }
 
     @Override
@@ -98,7 +101,7 @@ class RhinoScriptEngine extends ScriptEngine {
             return (T) new NativeJavaClass(scope, (Class<?>)object);
         }
 
-        return (T) context().javaToJS(object, scope);
+        return (T) getContext().javaToJS(object, scope);
     }
 
     @Override
@@ -130,10 +133,19 @@ class RhinoScriptEngine extends ScriptEngine {
         return moduleManager;
     }
 
+    @Override
+    public void close() {
+
+    }
+
     // custom methods below this line ---
 
-    private Context context() {
-        return Context.enter();
+    private Context getContext() {
+        Context ctx = Context.getCurrentContext();
+        if (ctx == null) {
+            ctx = Context.enter();
+        }
+        return ctx;
     }
 
     private Object[] javaToJS(Object... args) {
@@ -142,14 +154,17 @@ class RhinoScriptEngine extends ScriptEngine {
                 .toArray();
     }
 
-    public Object javaToJS(Object obj) {
-        return context().javaToJS(obj, scope); // thread safe
+    protected Object javaToJS(Object obj) {
+        return getContext().javaToJS(obj, scope);
     }
 
-    private static ScriptableObject createScope(Context ctx) {
-        ScriptableObject newScope = ctx.initStandardObjects();
-        FunctionObject fun = new FunctionObject("require", method, newScope);
-        newScope.defineProperty("require", fun, UNMODIFIABLE);
+    private static ScriptableObject createScope(Context cx) {
+        ScriptableObject newScope = cx.initStandardObjects();
+
+        for (Method m : nativeMethods) {
+            FunctionObject fun = new FunctionObject(m.getName(), m, newScope);
+            newScope.defineProperty(m.getName(), fun, UNMODIFIABLE);
+        }
 
         NativeObject module = new NativeObject();
         module.defineProperty("exports", new NativeObject(), 0);
@@ -175,9 +190,11 @@ class RhinoScriptEngine extends ScriptEngine {
             NativeObject obj = (NativeObject) m;
             return obj.get("exports", newScope);
         }
-        return null;
+
+        return UNDEFINED;
     }
 
+    @NativeMethod
     public static Object require(Context cx, Scriptable thisObj, Object[] args, Function funObj) throws IOException {
         if (args.length == 1) {
             String module = String.valueOf(args[0]);
@@ -188,28 +205,95 @@ class RhinoScriptEngine extends ScriptEngine {
 
             String dirname = (String) thisObj.get("__dirname", thisObj);
             File file = resolve(dirname, module);
-            if (file == null) return null;
-            ScriptInfo info = new ScriptInfo(file);
-            return require(cx, info);
+
+            if (file == null) {
+                return UNDEFINED;
+            }
+
+            if (file.getName().endsWith(".json")) {
+                return parseJSON(cx, thisObj, file);
+            } else {
+                ScriptInfo info = new ScriptInfo(file);
+                return require(cx, info);
+            }
         }
-        return null;
+        return UNDEFINED;
     }
 
-    private static File resolve(String dirname, String module) {
-        File file = new File(dirname, module);
+    private static Object parseJSON(Context cx, Scriptable scope, File file) throws IOException {
+        byte[] b = Files.readAllBytes(file.toPath());
+        return parseJSON(cx, scope, new String(b));
+    }
+
+    private static Object parseJSON(Context cx, Scriptable scope, String json) {
+        return NativeJSON.parse(cx, scope, json, (p1, p2, p3, args) -> args[1]);
+    }
+
+    @NativeMethod
+    public static Object JS(Context cx, Scriptable thisObj, Object[] args, Function funObj) {
+        if (args.length == 1) {
+            Object obj = args[0];
+
+            if (obj == null || Undefined.isUndefined(obj)) {
+                return UNDEFINED;
+            }
+
+            if (obj instanceof NativeObject) {
+                return obj;
+            }
+
+            if (obj instanceof Map || obj instanceof Collection || obj.getClass().isArray()) {
+                JsonElement tree = GSON.toJsonTree(obj);
+                String str = GSON.toJson(tree);
+                return parseJSON(cx, thisObj, str);
+            }
+
+            return Context.javaToJS(obj, thisObj);
+        }
+        return UNDEFINED;
+    }
+
+    @NativeMethod
+    public static Object print(Context cx, Scriptable thisObj, Object[] args, Function funObj) {
+        String[] strings = new String[args.length];
+
+        for (int i = 0; i < strings.length; i++) {
+            strings[i] = Context.toString(args[i]);
+        }
+
+        System.out.println(String.join(" ", strings));
+
+        return UNDEFINED;
+    }
+
+    private static List<Method> findMethods(Class<?> clazz) {
+        List<Method> methods = new ArrayList<Method>();
+        for (Method m : clazz.getMethods()) {
+            if (m.isAnnotationPresent(NativeMethod.class)) {
+                methods.add(m);
+            }
+        }
+        return methods;
+    }
+
+    private static File resolve(String dir, String name) {
+        File file = new File(dir, name);
 
         if (file.exists()) {
             if (file.isDirectory()) {
                 file = new File(file, "index.js");
             }
         } else {
-            file = new File(dirname, module + ".js");
+            file = new File(dir, name + ".js");
+            if (!file.exists()) {
+                file = new File(dir, name + ".json");
+            }
         }
 
         return (
                 file.exists() &&
                 file.isFile() &&
-                file.getName().endsWith(".js")
+                (file.getName().endsWith(".js") || file.getName().endsWith(".json"))
             ) ? file : null;
     }
 }

@@ -33,44 +33,50 @@ public abstract class VelocityPlugin {
 
     private final static File pluginsDir = new File("plugins");
 
-    @Getter private final ProxyServer proxyServer;
-    @Getter private final CommandManager commandManager;
-    @Getter private final EventManager eventManager;
-    @Getter private final PluginManager pluginManager;
+    private static ProxyServer proxyServer;
+    private static CommandManager commandManager;
+    private static EventManager eventManager;
+    private static PluginManager pluginManager;
 
     @Getter private File dataFolder;
     @Getter private Logger logger;
 
     private Plugin plugin;
 
+    public VelocityPlugin() {
+        check();
+    }
+
     public VelocityPlugin(@NonNull ProxyServer proxyServer) {
-        this.proxyServer = proxyServer;
-        this.commandManager = proxyServer.getCommandManager();
-        this.eventManager = proxyServer.getEventManager();
-        this.pluginManager = proxyServer.getPluginManager();
+        VelocityPlugin.proxyServer = proxyServer;
+        commandManager = proxyServer.getCommandManager();
+        eventManager = proxyServer.getEventManager();
+        pluginManager = proxyServer.getPluginManager();
 
         new Server.setVelocityHandle(proxyServer);
-
-        this.setup();
-        this.onLoad();
-        this.onEnable(); // TODO
+        check();
     }
 
     public void onLoad() {}
     public void onEnable() {}
 
-    private void setup() {
+    private void check() {
+        final String name = getName();
+
+        this.dataFolder = new File(pluginsDir, name);
+        this.logger = new SLF4JWrapper(name);
+
+        this.onLoad();
+        this.onEnable(); // TODO
+    }
+
+    private String getName() {
         final Class<?> clazz = getClass();
 
         if (clazz.isAnnotationPresent(Plugin.class)) {
             this.plugin = clazz.getAnnotation(Plugin.class);
 
-            final String name = plugin.name().isEmpty() ? plugin.id() : plugin.name();
-
-            this.dataFolder = new File(pluginsDir, name);
-            this.logger = new SLF4JWrapper(name);
-
-            return;
+            return plugin.name().isEmpty() ? plugin.id() : plugin.name();
         }
 
         throw new IllegalStateException(String.format("missing annotation %s for class %s", Plugin.class.getName(), clazz.getName()));
@@ -78,5 +84,21 @@ public abstract class VelocityPlugin {
 
     public final org.slf4j.Logger getSLF4JLogger() {
         return ((SLF4JWrapper) logger).getSLF4JLogger();
+    }
+
+    public ProxyServer getProxyServer() {
+        return proxyServer;
+    }
+
+    public CommandManager getCommandManager() {
+        return commandManager;
+    }
+
+    public EventManager getEventManager() {
+        return eventManager;
+    }
+
+    public PluginManager getPluginManager() {
+        return pluginManager;
     }
 }

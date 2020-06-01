@@ -29,10 +29,11 @@ public abstract class SimpleAddon implements Node {
     private final String name;
     private final String id;
     private final String author;
+    private final String version;
     private final String[] commands;
 
     /**
-     * Create an addon.
+     * Constructor.
      * 
      * @param name   the addon name
      * @param id     the addon id
@@ -43,62 +44,79 @@ public abstract class SimpleAddon implements Node {
     }
 
     /**
-     * Create an addon and pass the command name that the addon will use.
-     * <br><br>
-     * The method {@link #onCommand(DiscordBotCommand, String[])} will be called<br>
-     * when one of the given commands are executed by an user.
-     * <br><br>
-     * You can use this if this addon will only provide one command with some<br>
-     * aliases to it, for example:
-     * <br><br>
-     * <code>new SimpleAddon(_,_,_, new String[] {"hello", "hi"})</code>
-     * <br><br>
-     * If the addon will have different commands with different functions, you<br>
-     * should use {@link DiscordBotCommand#getName()} to know what command is being<br>
-     * executed.<br>
+     * Constructor.
+     * 
+     * @param name    the addon name
+     * @param id      the addon id
+     * @param author  the addon author
+     * @param version the addon version
+     */
+    public SimpleAddon(String name, String id, String author, String version) {
+        this(name, id, author, version, new String[0]);
+    }
+
+    /**
+     * Constructor.
      * 
      * @param name     the addon name
      * @param id       the addon id
      * @param author   the addon author
-     * @param commands the command list or aliases
+     * @param commands the command list
      */
     public SimpleAddon(String name, String id, String author, String[] commands) {
+        this(name, id, author, "unknown", commands);
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param name     the addon name
+     * @param id       the addon id
+     * @param author   the addon author
+     * @param version  the addon version
+     * @param commands the command list
+     */
+    public SimpleAddon(String name, String id, String author, String version, String[] commands) {
         this.name = name;
         this.id = id;
         this.author = author;
+        this.version = version;
         this.commands = commands;
     }
 
     /**
-     * Method called when a bot loads this addon, the bot may not be started yet.
+     * This method will be called when a bot loads this addon.
      * 
-     * @param bot the bot that loaded this addon
+     * @param bot the bot, may not be started yet
      */
     public void onLoad(DiscordBot bot) {
     }
 
     /**
-     * Method called when a bot that loaded this addon is ready.
+     * This method will be called when a bot that loaded this addon is ready.
      * 
-     * @param bot the bot ready to be used
+     * @param bot the bot, ready to be used
      */
     public void onReady(DiscordBot bot) {
     }
 
     /**
-     * Method called only if you used the
-     * {@link #SimpleAddon(String, String, String, String[])} constructor to build
-     * this addon.
+     * This method will only be called if you passed a command list to the
+     * constructor.
+     * <p>
+     * You can use {@link DiscordBotCommand#getName()} to know what alias was
+     * called.
      * 
      * @param command the command instance that contains information about the
-     *                sender and related things
+     *                sender and related to the message
      * @param args    the command arguments
      */
     public void onCommand(DiscordBotCommand command, String[] args) {
     }
 
     /**
-     * Method called when a bot that loaded this addon receives a message.
+     * This method will be called when a bot that loaded this addon receives a
+     * message.
      * 
      * @param bot   the bot that received the message
      * @param event the message event data
@@ -107,23 +125,28 @@ public abstract class SimpleAddon implements Node {
     }
 
     /**
-     * Method called when the bot goes shutdown by Spicord.
-     * You should use this method to stop interacting with JDA and this bot.
+     * This method will be called when a bot that loaded this addon is shutting
+     * down. You should use this method to stop interacting with JDA and this bot.
      * 
-     * @param bot the shutdown bot
+     * @param bot the bot
      */
     public void onShutdown(DiscordBot bot) {
         getLogger().warning(String.format("The addon %s (%s) does not implement the onShutdown() method", name, id));
     }
 
     /**
-     * Method called when Spicord is being disabled (for example when the server shutdowns).
-     * You can use this method to release resources.
+     * This method is called when Spicord is being disabled (for example when the
+     * server shutdowns). You can use this method to release resources.
      */
     public void onDisable() {
     }
 
-    public boolean isJavaScriptAddon() {
-        return false;
+    /**
+     * Check if this addon is a JavaScript addon.
+     * 
+     * @return true if this is a JavaScript addon
+     */
+    public final boolean isJavaScriptAddon() {
+        return this instanceof JavaScriptAddon;
     }
 }

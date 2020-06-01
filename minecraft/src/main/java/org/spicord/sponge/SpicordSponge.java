@@ -10,6 +10,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStoppingEvent;
 import org.spongepowered.api.plugin.Plugin;
 import com.google.inject.Inject;
 import eu.mcdb.spicord.SpicordCommand;
@@ -29,17 +30,24 @@ public class SpicordSponge extends SpongePlugin {
             "net.dv8tion.jda."
         );
 
+    private SpicordLoader loader;
+
     @Inject
     public SpicordSponge(Logger logger, @ConfigDir(sharedRoot = false) File configDir) {
         ClassLoader cl = prepareClassLoader(Sponge.class.getClassLoader());
         SpicordClassLoader classLoader = new SpicordClassLoader(cl);
-        SpicordLoader loader = new SpicordLoader(classLoader, new SLF4JWrapper(logger), configDir);
+        loader = new SpicordLoader(classLoader, new SLF4JWrapper(logger), configDir);
         loader.load();
     }
 
     @Listener
     public void init(GameInitializationEvent event) {
         MCDB.registerCommand(this, new SpicordCommand(() -> {}));
+    }
+
+    @Listener
+    public void stop(GameStoppingEvent event) {
+        loader.close();
     }
 
     private ClassLoader prepareClassLoader(ClassLoader classLoader) {

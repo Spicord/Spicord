@@ -20,13 +20,13 @@ package org.spicord.script;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class ScriptEngine implements IScriptEngine {
+public abstract class ScriptEngine implements IScriptEngine, AutoCloseable {
 
-    private final static Map<String, Class<? extends ScriptEngine>> engines;
+    private final static Map<String, ScriptEngine> engines;
 
     static {
         engines = new HashMap<>();
-        registerEngine("rhino", RhinoScriptEngine.class);
+        registerEngine("rhino", new RhinoScriptEngine());
     }
 
     /**
@@ -39,19 +39,14 @@ public abstract class ScriptEngine implements IScriptEngine {
      */
     public static ScriptEngine getEngine(String name) {
         if (engines.containsKey(name)) {
-            Class<? extends ScriptEngine> c = engines.get(name);
-            try {
-                return c.newInstance();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            return engines.get(name);
         } else {
             throw new IllegalArgumentException("engine '" + name + "' not found");
         }
     }
 
-    public static void registerEngine(String name, Class<? extends ScriptEngine> engineClass) {
-        engines.put(name, engineClass);
+    public static void registerEngine(String name, ScriptEngine instance) {
+        engines.put(name, instance);
     }
 
     public static ScriptEngine getDefaultEngine() {

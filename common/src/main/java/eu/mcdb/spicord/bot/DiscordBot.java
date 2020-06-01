@@ -45,12 +45,13 @@ public class DiscordBot extends SimpleBot implements Node {
     private final boolean enabled;
 
     protected final Collection<SimpleAddon> loadedAddons;
+    protected final Map<String, Consumer<DiscordBotCommand>> commands;
+
+    @Getter private final Collection<String> addons;
+    @Getter private final boolean commandSupportEnabled;
+    @Getter private final String commandPrefix;    
 
     @Getter private JDA jda;
-    @Getter private final Collection<String> addons;
-    @Getter private boolean commandSupportEnabled;
-    @Getter private final String commandPrefix;
-    @Getter protected final Map<String, Consumer<DiscordBotCommand>> commands;
     @Getter protected BotStatus status;
 
     /**
@@ -71,7 +72,6 @@ public class DiscordBot extends SimpleBot implements Node {
         this.enabled = enabled;
         this.addons = Collections.unmodifiableCollection(addons);
         this.loadedAddons = new ArrayList<SimpleAddon>();
-        this.commandSupportEnabled = commandSupportEnabled;
         this.commandPrefix = prefix.trim();
         this.commands = new HashMap<String, Consumer<DiscordBotCommand>>();
         this.status = BotStatus.OFFLINE;
@@ -83,8 +83,11 @@ public class DiscordBot extends SimpleBot implements Node {
                 getLogger().severe(
                         "The command prefix cannot be empty. The command-support feature is now disabled on bot '"
                                 + name + "'.");
+                return;
             }
         }
+
+        this.commandSupportEnabled = commandSupportEnabled;
     }
 
     @Override
@@ -169,7 +172,7 @@ public class DiscordBot extends SimpleBot implements Node {
     }
 
     /**
-     * Register a command for this bot.
+     * Register a command to this bot.
      * 
      * @param command the command to be registered
      */
@@ -178,6 +181,16 @@ public class DiscordBot extends SimpleBot implements Node {
 
         for (final String alias : command.getAliases()) {
             this.onCommand(alias, command);
+        }
+    }
+
+    public void unregisterCommand(String name) {
+        commands.remove(name);
+    }
+
+    public void unregisterCommands(String... names) {
+        for (String name : names) {
+            commands.remove(name);
         }
     }
 
@@ -243,6 +256,9 @@ public class DiscordBot extends SimpleBot implements Node {
 
         jda = null;
         status = BotStatus.OFFLINE;
+
+        commands.clear();
+        loadedAddons.clear();
     }
 
     public enum BotStatus {

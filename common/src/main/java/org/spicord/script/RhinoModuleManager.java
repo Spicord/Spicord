@@ -20,6 +20,7 @@ package org.spicord.script;
 import java.util.HashMap;
 import java.util.Map;
 import org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.Undefined;
 
 class RhinoModuleManager implements ModuleManager {
 
@@ -72,8 +73,24 @@ class RhinoModuleManager implements ModuleManager {
     public void registerNative(Object ins) {
         if (ins instanceof NativeObject) {
             NativeObject obj = (NativeObject) ins;
-            String name = String.valueOf(obj.get("__moduleName"));
-            modules.put(name, obj);
+            NativeObject module = (NativeObject) obj.get("module");
+
+            if (module == null || Undefined.isUndefined(module)) {
+                // warn
+                System.err.println("module obj = null");
+                return;
+            }
+
+            String name = (String) module.get("name");
+            Object exports = module.get("exports");
+
+            if (name == null || exports == null) {
+                // warn
+                System.err.println("name or exports = null");
+                return;
+            }
+
+            modules.put(name, exports);
         }
     }
 }

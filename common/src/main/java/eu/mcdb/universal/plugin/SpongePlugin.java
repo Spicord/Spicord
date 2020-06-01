@@ -51,7 +51,11 @@ public class SpongePlugin {
         this.pluginManager = game.getPluginManager();
         this.eventManager = game.getEventManager();
 
-        this.setup();
+        final String name = getName();
+
+        this.dataFolder = new File(configDir, name);
+        this.logger = new SLF4JWrapper(name);
+
         this.onLoad();
         this.onEnable();
     }
@@ -59,18 +63,13 @@ public class SpongePlugin {
     public void onLoad() {}
     public void onEnable() {}
 
-    private void setup() {
+    private String getName() {
         final Class<?> clazz = getClass();
 
         if (clazz.isAnnotationPresent(Plugin.class)) {
             this.plugin = clazz.getAnnotation(Plugin.class);
 
-            final String name = plugin.name().isEmpty() ? plugin.id() : plugin.name();
-
-            this.dataFolder = new File(configDir, name);
-            this.logger = new SLF4JWrapper(name);
-
-            return;
+            return plugin.name().isEmpty() ? plugin.id() : plugin.name();
         }
 
         throw new IllegalStateException(String.format("missing annotation %s for class %s", Plugin.class.getName(), clazz.getName()));

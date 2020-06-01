@@ -175,7 +175,6 @@ public class AddonManager implements Node {
     }
 
     private static final Gson GSON = new Gson();
-    private static final ScriptEngine ENGINE = ScriptEngine.getDefaultEngine();
 
     private void loadZipAddon(final File file, final File runtimeDir) {
         try (final ZipExtractor ex = new ZipExtractor(file)) {
@@ -185,15 +184,12 @@ public class AddonManager implements Node {
                 final Reader reader = entry.get();
                 final AddonData data = GSON.fromJson(reader, AddonData.class);
 
-                final String id = checkNotNull(data.getId(), "id");
-                final String name = checkNotNull(data.getName(), "name");
-                final String author = checkNotNull(data.getAuthor(), "author");
-                //final String version = checkNotNull(data.getVersion(), "version");
-                final String main = data.getMain();
-                final String[] modules = data.getModules();
-
-                if (main == null && modules.length == 0)
-                    throw new ScriptException("script file not set");
+                final String id      = checkNotNull(data.getId(), "id");
+                final String name    = data.getName()    == null ? id : data.getName();
+                final String author  = data.getAuthor()  == null ? "unknown" : data.getAuthor();
+                final String version = data.getVersion() == null ? "unknown" : data.getVersion();
+                final String main    = checkNotNull(data.getMain(), "main");
+                final String engineName  = "rhino";
 
                 if (!ex.hasEntry(main)) {
                     throw new ScriptException(main + " not found for addon " + name);
@@ -221,10 +217,11 @@ public class AddonManager implements Node {
                 final ScriptEnvironment env = new ScriptEnvironment()
                         .addEnv("__data", dataDir.toString());
 
-                final Object res = ENGINE.loadScript(addonMain, env);
+                final ScriptEngine engine = ScriptEngine.getEngine(engineName);
+                final Object res = engine.loadScript(addonMain, env);
 
                 if (res instanceof JavaScriptBaseAddon) {
-                    final JavaScriptAddon addon = new JavaScriptAddon(name, id, author, (JavaScriptBaseAddon) res, ENGINE);
+                    final JavaScriptAddon addon = new JavaScriptAddon(name, id, author, version, (JavaScriptBaseAddon) res, engine);
                     this.registerAddon(addon);
                 } else {
                     throw new ScriptException("the '" + main + "' file needs to export the addon instance");
@@ -235,8 +232,7 @@ public class AddonManager implements Node {
                         file.getName()));
             }
         } catch (IOException e) {
-            getLogger().warning(String.format("The file '%s' cannot be loaded: %s", file.getName(), e.getCause()));
-            e.printStackTrace();
+            getLogger().warning(String.format("The file '%s' cannot be loaded: %s", file.getName(), e.getMessage()));
         }
     }
 
@@ -248,11 +244,12 @@ public class AddonManager implements Node {
                 final Reader reader = new FileReader(addonJson);
                 final AddonData data = GSON.fromJson(reader, AddonData.class);
 
-                final String id = checkNotNull(data.getId(), "id");
-                final String name = checkNotNull(data.getName(), "name");
-                final String author = checkNotNull(data.getAuthor(), "author");
-                //final String version = checkNotNull(data.getVersion(), "version");
-                final String main = checkNotNull(data.getMain(), "main");
+                final String id      = checkNotNull(data.getId(), "id");
+                final String name    = data.getName()    == null ? id : data.getName();
+                final String author  = data.getAuthor()  == null ? "unknown" : data.getAuthor();
+                final String version = data.getVersion() == null ? "unknown" : data.getVersion();
+                final String main    = checkNotNull(data.getMain(), "main");
+                final String engineName = "rhino";
 
                 final File addonMain = new File(addonDir, main);
 
@@ -265,18 +262,18 @@ public class AddonManager implements Node {
                 final ScriptEnvironment env = new ScriptEnvironment()
                         .addEnv("__data", dataDir.toString());
 
-                final Object res = ENGINE.loadScript(addonMain, env);
+                final ScriptEngine engine = ScriptEngine.getEngine(engineName);
+                final Object res = engine.loadScript(addonMain, env);
 
                 if (res instanceof JavaScriptBaseAddon) {
-                    final JavaScriptAddon addon = new JavaScriptAddon(name, id, author, (JavaScriptBaseAddon) res, ENGINE);
+                    final JavaScriptAddon addon = new JavaScriptAddon(name, id, author, version, (JavaScriptBaseAddon) res, engine);
                     this.registerAddon(addon);
                 } else {
                     throw new ScriptException("the '" + main + "' file needs to export the addon instance");
                 }
             }
         } catch (IOException e) {
-            getLogger().warning(String.format("The addon on folder '%s' cannot be loaded: %s", addonDir.getName(), e.getCause()));
-            e.printStackTrace();
+            getLogger().warning(String.format("The addon on folder '%s' cannot be loaded: %s", addonDir.getName(), e.getMessage()));
         }    
     }
 }
