@@ -65,7 +65,7 @@ public class LibraryLoader {
         }
 
         if (loader == null) {
-            loader = new SpicordClassLoader();
+            this.loader = new SpicordClassLoader();
         }
     }
 
