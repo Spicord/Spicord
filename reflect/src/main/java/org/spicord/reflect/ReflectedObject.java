@@ -26,10 +26,19 @@ public final class ReflectedObject extends ReflectBase<ReflectedObject> {
     private final Object o;
     private final Class<?> c;
 
+    /**
+     * 
+     * @param c
+     */
     public ReflectedObject(Class<?> c) {
         this(c, null);
     }
 
+    /**
+     * 
+     * @param c
+     * @param o
+     */
     public ReflectedObject(Class<?> c, Object o) {
         if (c == null) throw new NullPointerException();
         if (o != null && !c.isInstance(o)) throw new IllegalArgumentException();
@@ -38,6 +47,10 @@ public final class ReflectedObject extends ReflectBase<ReflectedObject> {
         this.o = o;
     }
 
+    /**
+     * 
+     * @param o
+     */
     public ReflectedObject(Object o) {
         if (o == null) throw new NullPointerException();
 
@@ -50,6 +63,11 @@ public final class ReflectedObject extends ReflectBase<ReflectedObject> {
         }
     }
 
+    /**
+     * 
+     * @param name
+     * @return
+     */
     public ReflectedField getField(String name) {
         try {
             return new ReflectedField(o, c.getDeclaredField(name)).setErrorRule(getErrorRule());
@@ -61,6 +79,11 @@ public final class ReflectedObject extends ReflectBase<ReflectedObject> {
         return null;
     }
 
+    /**
+     * 
+     * @param fun
+     * @return
+     */
     public ReflectedField findField(Function<Field, Boolean> fun) {
         for (Field f : c.getDeclaredFields()) {
             if (fun.apply(f)) {
@@ -70,6 +93,12 @@ public final class ReflectedObject extends ReflectBase<ReflectedObject> {
         return null;
     }
 
+    /**
+     * 
+     * @param name
+     * @param parameterTypes
+     * @return
+     */
     public ReflectedMethod getMethod(String name, Class<?>... parameterTypes) {
         try {
             return new ReflectedMethod(o, c.getDeclaredMethod(name, parameterTypes)).setErrorRule(getErrorRule());
@@ -81,6 +110,11 @@ public final class ReflectedObject extends ReflectBase<ReflectedObject> {
         return null;
     }
 
+    /**
+     * 
+     * @param fun
+     * @return
+     */
     public ReflectedMethod findMethod(Function<Method, Boolean> fun) {
         for (Method m : c.getDeclaredMethods()) {
             if (fun.apply(m)) {
@@ -90,6 +124,11 @@ public final class ReflectedObject extends ReflectBase<ReflectedObject> {
         return null;
     }
 
+    /**
+     * 
+     * @param parameterTypes
+     * @return
+     */
     public ReflectedConstructor getConstructor(Class<?>... parameterTypes) {
         try {
             return new ReflectedConstructor(c.getDeclaredConstructor(parameterTypes)).setErrorRule(getErrorRule());

@@ -33,9 +33,24 @@ public final class ReflectedField extends ReflectBase<ReflectedField> implements
         this.f = f;
     }
 
+    /**
+     * 
+     * @param <T>
+     * @return
+     */
     public <T> T getValue() {
+        return getValue(o);
+    }
+
+    /**
+     * 
+     * @param <T>
+     * @param obj
+     * @return
+     */
+    public <T> T getValue(final Object obj) {
         try {
-            return (T) f.get(o);
+            return (T) f.get(obj);
         } catch (IllegalArgumentException e) {
             handleException(e);
         } catch (IllegalAccessException e) {
@@ -44,15 +59,32 @@ public final class ReflectedField extends ReflectBase<ReflectedField> implements
         return null;
     }
 
+    /**
+     * 
+     * @return
+     */
     public ReflectedObject getReflectValue() {
         Object val = getValue();
         if (val == null) return null;
         return new ReflectedObject(val).setErrorRule(getErrorRule());
     }
 
+    /**
+     * 
+     * @param value
+     */
     public void setValue(final Object value) {
+        setValue(o, value);
+    }
+
+    /**
+     * 
+     * @param obj
+     * @param value
+     */
+    public void setValue(final Object obj, final Object value) {
         try {
-            f.set(o, value);
+            f.set(obj, value);
         } catch (IllegalArgumentException e) {
             handleException(e);
         } catch (IllegalAccessException e) {
@@ -66,6 +98,10 @@ public final class ReflectedField extends ReflectBase<ReflectedField> implements
         return this;
     }
 
+    /**
+     * 
+     * @return
+     */
     public ReflectedField setModifiable() {
         try {
             Field mf = Field.class.getDeclaredField("modifiers");

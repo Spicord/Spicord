@@ -17,11 +17,15 @@
 
 package org.spicord.reflect;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Member;
 
 @SuppressWarnings("unchecked")
-public final class ReflectedConstructor extends ReflectBase<ReflectedConstructor> implements AccessibleObject<ReflectedConstructor>, InvokableObject {
+public final class ReflectedConstructor extends ReflectBase<ReflectedConstructor>
+        implements AccessibleObject<ReflectedConstructor>, InvokableObject, LambdaBuilder {
 
     private final Constructor<?> c;
 
@@ -30,6 +34,10 @@ public final class ReflectedConstructor extends ReflectBase<ReflectedConstructor
         this.c = c;
     }
 
+    /**
+     * 
+     * @return
+     */
     public ConstructorAccessor getConstructorAccessor() {
         Object accessor = getAccessor();
         if (accessor == null) return null;
@@ -75,5 +83,20 @@ public final class ReflectedConstructor extends ReflectBase<ReflectedConstructor
     public ReflectedConstructor setAccessible(boolean flag) {
         c.setAccessible(flag);
         return this;
+    }
+
+    @Override
+    public MethodHandle getHandle(Lookup lookup) {
+        try {
+            return lookup.unreflectConstructor(c);
+        } catch (Exception e) {
+            handleException(e);
+        }
+        return null;
+    }
+
+    @Override
+    public Member getMember() {
+        return c;
     }
 }

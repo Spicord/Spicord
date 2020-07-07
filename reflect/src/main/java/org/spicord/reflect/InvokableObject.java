@@ -17,23 +17,21 @@
 
 package org.spicord.reflect;
 
-import java.lang.reflect.Array;
-import java.util.Optional;
+public interface InvokableObject {
 
-public final class ReflectUtils {
+    /**
+     * 
+     * @param <T>
+     * @param args
+     * @return
+     */
+    <T> T invoke(Object... args);
 
-    public static Class<?> getArrayClass(Class<?> clazz) {
-        return Array.newInstance(clazz, 0).getClass();
-    }
+    /**
+     * 
+     * @param args
+     * @return
+     */
+    ReflectedObject invokeReflect(Object... args);
 
-    public static Optional<Class<?>> findClass(String name) {
-        try {
-            return Optional.of(Class.forName(name));
-        } catch (ClassNotFoundException e) {}
-        return Optional.empty();
-    }
-
-    public static <T> T nullOnException(ExceptionConsumer<T> action) {
-        return action.runHandled();
-    }
 }

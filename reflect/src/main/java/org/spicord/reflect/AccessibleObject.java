@@ -17,19 +17,20 @@
 
 package org.spicord.reflect;
 
-public final class ConstructorAccessor extends ReflectBase<ConstructorAccessor> {
+public interface AccessibleObject<T> {
 
-    private final ReflectedMethod method;
-
-    ConstructorAccessor(Object accessor) {
-        if (accessor == null) throw new NullPointerException();
-
-        this.method = new ReflectedObject(accessor)
-                .setErrorRule(getErrorRule())
-                .getMethod("newInstance", Object[].class).setAccessible();
+    /**
+     * 
+     * @return
+     */
+    public default T setAccessible() {
+        return setAccessible(true);
     }
 
-    public Object newInstance(Object[] args) {
-        return method.invoke(new Object[] { args });
-    }
+    /**
+     * 
+     * @param flag
+     * @return
+     */
+    T setAccessible(boolean flag);
 }

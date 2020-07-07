@@ -16,6 +16,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.spicord</groupId>
+            <artifactId>spicord-reflect</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.mozilla</groupId>
             <artifactId>rhino</artifactId>
             <version>1.7.12</version>

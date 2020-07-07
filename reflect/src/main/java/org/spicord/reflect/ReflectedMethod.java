@@ -17,12 +17,15 @@
 
 package org.spicord.reflect;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
 @SuppressWarnings("unchecked")
 public final class ReflectedMethod extends ReflectBase<ReflectedMethod>
-        implements AccessibleObject<ReflectedMethod>, InvokableObject {
+        implements AccessibleObject<ReflectedMethod>, InvokableObject, LambdaBuilder {
 
     private final Object o;
     private final Method m;
@@ -59,5 +62,20 @@ public final class ReflectedMethod extends ReflectBase<ReflectedMethod>
     public ReflectedMethod setAccessible(boolean flag) {
         m.setAccessible(flag);
         return this;
+    }
+
+    @Override
+    public MethodHandle getHandle(Lookup lookup) {
+        try {
+            return lookup.unreflect(m);
+        } catch (IllegalAccessException e) {
+            handleException(e);
+        }
+        return null;
+    }
+
+    @Override
+    public Member getMember() {
+        return m;
     }
 }

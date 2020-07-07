@@ -18,10 +18,10 @@
 package org.spicord.reflect;
 
 @SuppressWarnings("unchecked")
-public class ReflectBase<T> {
+public class ReflectBase<T> implements ExceptionHandler {
 
     private ReflectErrorRule errorRule = ReflectErrorRule.THROW;
-    private ReflectErrorHandler errorHandler;
+    private ReflectExceptionHandler errorHandler;
 
     public T setErrorRule(ReflectErrorRule errorRule) {
         this.errorRule = errorRule;
@@ -32,12 +32,13 @@ public class ReflectBase<T> {
         return errorRule;
     }
 
-    public T setErrorHandler(ReflectErrorHandler handler) {
+    public T setErrorHandler(ReflectExceptionHandler handler) {
         this.errorHandler = handler;
         return (T) this;
     }
 
-    protected void handleException(Exception e) {
+    @Override
+    /*protected*/ public void handleException(Exception e) {
         switch (getErrorRule()) {
         case IGNORE:
             break;
@@ -45,11 +46,10 @@ public class ReflectBase<T> {
             e.printStackTrace(System.err);
             break;
         case THROW:
-            ReflectException ex = new ReflectException(e);
             if (errorHandler == null) {
-                throw ex;
+                throw new ReflectException(e);
             } else {
-                errorHandler.handle(ex);
+                errorHandler.handle(e);
             }
         }
     }

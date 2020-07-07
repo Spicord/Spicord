@@ -17,8 +17,24 @@
 
 package org.spicord.reflect;
 
-@FunctionalInterface
-public interface ReflectErrorHandler {
+public final class ConstructorAccessor extends ReflectBase<ConstructorAccessor> {
 
-    void handle(ReflectException e);
+    private final ReflectedMethod method;
+
+    ConstructorAccessor(Object accessor) {
+        if (accessor == null) throw new NullPointerException();
+
+        this.method = new ReflectedObject(accessor)
+                .setErrorRule(getErrorRule())
+                .getMethod("newInstance", Object[].class).setAccessible();
+    }
+
+    /**
+     * 
+     * @param args
+     * @return
+     */
+    public Object newInstance(Object[] args) {
+        return method.invoke(new Object[] { args });
+    }
 }

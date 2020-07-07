@@ -35,6 +35,12 @@ public final class ReflectedEnum<T> {
         this.types = buildParameters(parameterTypes);
     }
 
+    /**
+     * 
+     * @param name
+     * @param args
+     * @return
+     */
     public T addValue(String name, Object... args) {
         ReflectedObject obj = new ReflectedObject(clazz);
         ConstructorAccessor accessor = obj.getConstructor(types).getConstructorAccessor();

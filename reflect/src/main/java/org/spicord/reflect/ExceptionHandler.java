@@ -17,11 +17,7 @@
 
 package org.spicord.reflect;
 
-public interface AccessibleObject<T> {
+public interface ExceptionHandler {
 
-    public default T setAccessible() {
-        return setAccessible(true);
-    }
-
-    T setAccessible(boolean flag);
+    void handleException(Exception e);
 }

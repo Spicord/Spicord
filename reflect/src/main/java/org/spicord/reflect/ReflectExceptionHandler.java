@@ -17,9 +17,8 @@
 
 package org.spicord.reflect;
 
-public interface InvokableObject {
+@FunctionalInterface
+public interface ReflectExceptionHandler {
 
-    <T> T invoke(Object... args);
-
-    ReflectedObject invokeReflect(Object... args);
+    void handle(Exception e);
 }
