@@ -70,9 +70,9 @@
       "dontloadifclassfound": "com.moandjiezana.toml.Toml"
     },
     {
-      "name": "eu.mcdb:jda:3.8.4",
-      "sha1": "6a07dbb32ae1a4972053c4a41786bdc76e11cc0f",
-      "url": "https://github.com/mcdb/JDA/releases/download/v3/JDA-3.8.4-mcdb.jar",
+      "name": "eu.mcdb:jda:3.8.5",
+      "sha1": "f5ef4757e8dd4db901849e361d1a17bd288db5a2",
+      "url": "https://github.com/mcdb/JDA/releases/download/v3/JDA-3.8.5-mcdb.jar",
       "dontloadifclassfound": "net.dv8tion.jda.core.JDA"
     },
     {
