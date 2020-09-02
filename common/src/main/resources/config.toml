@@ -27,3 +27,8 @@ config_version = 1
 [jda_messages]
   enabled = true
   debug = false
+
+# Leave it empty or delete the line to disable the footer
+# or replace the text with whatever you want!
+integrated_addon_footer: "Powered by Spicord v{version}"
+

@@ -35,8 +35,15 @@ public class InfoAddon extends SimpleAddon {
                 .setTitle("Server information")
                 .setDescription("Online players: " + getServer().getOnlineCount() + "/" + getServer().getPlayerLimit()
                         + "\nServer version: " + getServer().getVersion())
-                .setColor(new Color(5154580))
-                .setFooter("Powered by Spicord v" + Spicord.getVersion(), null);
+                .setColor(new Color(5154580));
+
+        String footer = getSpicord().getConfig().getIntegratedAddonFooter();
+
+        if (footer == null || footer.isEmpty()) {
+            // ignore
+        } else {
+            builder.setFooter(footer.replace("{version}", Spicord.getVersion()), null);
+        }
 
         command.reply(builder.build());
     }

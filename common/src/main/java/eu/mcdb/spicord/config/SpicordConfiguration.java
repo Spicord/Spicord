@@ -42,6 +42,7 @@ public final class SpicordConfiguration implements Node {
     @Getter private final File dataFolder;
     @Getter private boolean debugEnabled;
     @Getter private boolean jdaMessagesEnabled;
+    @Getter private String integratedAddonFooter;
 
     private final File configFile;
     private final TomlWriter writer;
@@ -87,6 +88,7 @@ public final class SpicordConfiguration implements Node {
 
         this.jdaMessagesEnabled = config.jda_messages.enabled;
         this.debugEnabled = config.jda_messages.debug;
+        this.integratedAddonFooter = config.integrated_addon_footer;
 
         long disabledCount = bots.stream().filter(DiscordBot::isDisabled).count();
         getLogger().info("Loaded " + bots.size() + " bots, " + disabledCount + " disabled.");
@@ -216,6 +218,7 @@ public final class SpicordConfiguration implements Node {
         private Bot[] bots;
         private Messages jda_messages;
         //private int config_version;
+        private String integrated_addon_footer;
 
         public SpicordConfig() {
             this.jda_messages = new Messages();

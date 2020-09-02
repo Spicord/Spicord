@@ -69,18 +69,30 @@ public class PlayersAddon extends SimpleAddon {
             final EmbedBuilder builder = new EmbedBuilder()
                     .setTitle("Total players: " + getServer().getOnlineCount())
                     .setDescription(desc)
-                    .setColor(new Color(5154580))
-                    .setFooter("Powered by Spicord v" + Spicord.getVersion(), null);
+                    .setColor(new Color(5154580));
+
+            setFooter(builder);
 
             command.reply(builder.build());
         } else {
             final EmbedBuilder builder = new EmbedBuilder()
                     .setTitle("Players (" + getServer().getOnlineCount() + "): ")
                     .setDescription(String.join(", ", escapeUnderscores(getServer().getOnlinePlayers())))
-                    .setColor(new Color(5154580))
-                    .setFooter("Powered by Spicord v" + Spicord.getVersion(), null);
+                    .setColor(new Color(5154580));
+
+            setFooter(builder);
 
             command.reply(builder.build());
+        }
+    }
+
+    private void setFooter(EmbedBuilder builder) {
+        String footer = getSpicord().getConfig().getIntegratedAddonFooter();
+
+        if (footer == null || footer.isEmpty()) {
+            // ignore
+        } else {
+            builder.setFooter(footer.replace("{version}", Spicord.getVersion()), null);
         }
     }
 

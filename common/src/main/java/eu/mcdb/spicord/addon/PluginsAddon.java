@@ -34,8 +34,15 @@ public class PluginsAddon extends SimpleAddon {
         final EmbedBuilder builder = new EmbedBuilder()
                 .setTitle("Plugins (" + getServer().getPlugins().length + "): ")
                 .setDescription(String.join(", ", getServer().getPlugins()))
-                .setColor(new Color(5154580))
-                .setFooter("Powered by Spicord v" + Spicord.getVersion(), null);
+                .setColor(new Color(5154580));
+
+        String footer = getSpicord().getConfig().getIntegratedAddonFooter();
+
+        if (footer == null || footer.isEmpty()) {
+            // ignore
+        } else {
+            builder.setFooter(footer.replace("{version}", Spicord.getVersion()), null);
+        }
 
         command.reply(builder.build());
     }
