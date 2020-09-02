@@ -35,12 +35,15 @@ public class Embed implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Embed() {
+    public Embed(String description) {
+        this.embed = new EmbedData();
+        this.embed.description = description;
     }
 
-    private Embed(String content) {
+    public Embed(String title, String description) {
         this.embed = new EmbedData();
-        this.embed.description = content;
+        this.embed.title = title;
+        this.embed.description = description;
     }
 
     private Integer __version;
@@ -394,15 +397,19 @@ public class Embed implements Serializable {
         return builder.build();
     }
 
-    @Deprecated
     public Embed setPlaceholders(User user) {
         String json = toString()
-                .replace("{author:name}", user.getName())
-                .replace("{author:id}", user.getId())
-                .replace("{author:avatar_url}", user.getAvatarUrl())
-                .replace("{author:discriminator}", user.getDiscriminator())
-                .replace("{author:mention}", user.getAsMention());
-        return fromJson(json);
+                .replace("{user:name}", user.getName())
+                .replace("{user:id}", user.getId())
+                .replace("{user:avatar}", user.getAvatarUrl())
+                .replace("{user:discriminator}", user.getDiscriminator())
+                .replace("{user:mention}", user.getAsMention());
+
+        Embed temp = fromJson(json);
+        this.content = temp.content;
+        this.embed = temp.embed;
+
+        return this;
     }
 
     /**

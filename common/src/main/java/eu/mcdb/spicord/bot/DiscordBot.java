@@ -232,7 +232,7 @@ public class DiscordBot extends SimpleBot implements Node {
     }
 
     /**
-     * Check if the bot is connected to the Discord endpoint.
+     * Check if this bot is connected to the Discord gateway.
      * 
      * @return true if the bot is connected
      */

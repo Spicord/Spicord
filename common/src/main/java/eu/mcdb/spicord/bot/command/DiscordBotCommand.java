@@ -60,14 +60,44 @@ public class DiscordBotCommand extends SimpleCommand {
         return author.getAsMention();
     }
 
+    /**
+     * Wrap the given message into an embed and send it.
+     * 
+     * @param message the message to send
+     * @see {@link #reply(String, boolean)}
+     */
     public void reply(String message) {
-        reply(Embed.fromString(message));
+        reply(message, true);
     }
 
+    /**
+     * Send the given message and choose if it should be wrapped into an embed or not.
+     * 
+     * @param message the message to send
+     * @param wrap true if the message should be wrapped into an embed
+     */
+    public void reply(String message, boolean wrap) {
+        if (wrap) {
+            Embed.fromString(message).sendToChannel(channel);
+        } else {
+            channel.sendMessage(message).queue();
+        }
+    }
+
+    /**
+     * Send the given embed message to the channel this command was called.
+     * 
+     * @param embed the embed message
+     */
     public void reply(Embed embed) {
         embed.sendToChannel(channel);
     }
 
+    /**
+     * Send the given JDA embed to the channel this command was called.
+     * 
+     * @param embed the JDA embed to send
+     */
     public void reply(MessageEmbed embed) {
         channel.sendMessage(embed).queue();
     }
