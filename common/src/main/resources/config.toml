@@ -30,5 +30,4 @@ config_version = 1
 
 # Leave it empty or delete the line to disable the footer
 # or replace the text with whatever you want!
-integrated_addon_footer: "Powered by Spicord v{version}"
-
+integrated_addon_footer = "Powered by Spicord v{version}"
