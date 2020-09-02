@@ -215,10 +215,11 @@ public final class SpicordConfiguration implements Node {
 
     public static class SpicordConfig {
 
+        private int config_version; // not used yet
+        private String integrated_addon_footer;
+
         private Bot[] bots;
         private Messages jda_messages;
-        //private int config_version;
-        private String integrated_addon_footer;
 
         public SpicordConfig() {
             this.jda_messages = new Messages();

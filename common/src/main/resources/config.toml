@@ -3,7 +3,14 @@
 # | GitHub: https://github.com/OopsieWoopsie/Spicord |
 # +--------------------------------------------------+
 
+# Configuration version, don't change this.
 config_version = 1
+
+
+# Leave it empty or delete the line to disable the footer
+# or replace the text with whatever you want!
+integrated_addon_footer = "Powered by Spicord v{version}"
+
 
 [[bots]]
   name = "default"
@@ -24,10 +31,7 @@ config_version = 1
 #  command_prefix = "!"
 #  addons = []
 
+
 [jda_messages]
   enabled = true
   debug = false
-
-# Leave it empty or delete the line to disable the footer
-# or replace the text with whatever you want!
-integrated_addon_footer = "Powered by Spicord v{version}"
