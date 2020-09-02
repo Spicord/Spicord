@@ -245,6 +245,9 @@ public class DiscordBot extends SimpleBot implements Node {
         loadedAddons.forEach(a -> a.onShutdown(this));
 
         if (jda != null) {
+            jda.cancelRequests();
+            jda.getCallbackPool().shutdown();
+
             if (force) {
                 jda.shutdownNow();
             } else {
