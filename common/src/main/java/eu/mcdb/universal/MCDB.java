@@ -17,9 +17,11 @@
 
 package eu.mcdb.universal;
 
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.spongepowered.api.Sponge;
 import eu.mcdb.universal.command.BukkitCommandExecutor;
 import eu.mcdb.universal.command.BungeeCommandExecutor;
 import eu.mcdb.universal.command.SpongeCommandExecutor;
@@ -46,10 +48,22 @@ public final class MCDB {
             new registerBukkitCommand((JavaPlugin) plugin, command);
         else if (isInstance(plugin, "eu.mcdb.universal.plugin.VelocityPlugin"))
             new registerVelocityCommand((VelocityPlugin) plugin, command);
-        else if (isInstance(plugin, "eu.mcdb.universal.plugin.SpongePlugin"))
+        else if (isSpongePlugin(plugin))
             new registerSpongeCommand((SpongePlugin) plugin, command);
         else
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("plugin");
+    }
+
+    @SuppressWarnings("unchecked")
+    private static boolean isSpongePlugin(Object plugin) {
+        try {
+            Class<?> pluginClass = plugin.getClass();
+            Class<?> pluginAnnotation = Class.forName("org.spongepowered.api.plugin.Plugin");
+            
+            return isInstance(plugin, "eu.mcdb.universal.plugin.SpongePlugin")
+                    || pluginClass.isAnnotationPresent((Class<? extends Annotation>) pluginAnnotation);
+        } catch (ClassNotFoundException e) {}
+        return false;
     }
 
     private static boolean isInstance(Object plugin, String className) {
@@ -82,8 +96,8 @@ public final class MCDB {
     }
 
     private static class registerSpongeCommand {
-        registerSpongeCommand(SpongePlugin plugin, UniversalCommand command) {
-            plugin.getCommandManager().register(plugin, new SpongeCommandExecutor(command).get(), command.getAliases());
+        registerSpongeCommand(Object plugin, UniversalCommand command) {
+            Sponge.getGame().getCommandManager().register(plugin, new SpongeCommandExecutor(command).get(), command.getAliases());
         }
     }
 }

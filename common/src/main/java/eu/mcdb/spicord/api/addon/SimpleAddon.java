@@ -131,7 +131,9 @@ public abstract class SimpleAddon implements Node {
      * @param bot the bot
      */
     public void onShutdown(DiscordBot bot) {
-        getLogger().warning(String.format("The addon %s (%s) does not implement the onShutdown() method", name, id));
+        if (!id.startsWith("spicord::")) {
+            getLogger().warning(String.format("The addon %s (%s) does not implement the onShutdown() method", name, id));
+        }
     }
 
     /**

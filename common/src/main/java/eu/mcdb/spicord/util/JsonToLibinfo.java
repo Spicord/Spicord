@@ -55,10 +55,10 @@ class JsonToLibinfo {
     private void compile(final String in, final String out) throws IOException {
         final FileInputStream fis = new FileInputStream(new File(baseDir, in));
         final String json = new String(ByteStreams.toByteArray(fis));
-        final Libraries libs = gson.fromJson(json, Libraries.class);
+        final Library[] libs = gson.fromJson(json, Library[].class);
         final ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(baseDir, out)));
 
-        oos.writeObject(libs.libraries);
+        oos.writeObject(libs);
         oos.flush();
         oos.close();
 
@@ -86,7 +86,7 @@ class JsonToLibinfo {
      * @return the output instance
      * @throws IOException :angryasf:
      */
-    private Libraries decompile(final String in) throws IOException {
+    private Library[] decompile(final String in) throws IOException {
         final FileInputStream fis = new FileInputStream(new File(baseDir, in));
         final Object obj;
 
@@ -97,15 +97,9 @@ class JsonToLibinfo {
         }
 
         if (obj instanceof Library[]) {
-            final Libraries libs = new Libraries();
-            libs.libraries = (Library[]) obj;
-            return libs;
+            return (Library[]) obj;
         } else {
             throw new RuntimeException("incompatible input file");
         }
-    }
-
-    private class Libraries {
-        Library[] libraries;
     }
 }

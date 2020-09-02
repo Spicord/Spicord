@@ -17,6 +17,8 @@
 
 package eu.mcdb.universal.command;
 
+import eu.mcdb.universal.MCDB;
+
 public abstract class UniversalCommand {
 
     private final String name;
@@ -82,5 +84,9 @@ public abstract class UniversalCommand {
      */
     public String[] getAliases() {
         return aliases;
+    }
+
+    public void register(Object pluginInstance) {
+        MCDB.registerCommand(pluginInstance, this);
     }
 }

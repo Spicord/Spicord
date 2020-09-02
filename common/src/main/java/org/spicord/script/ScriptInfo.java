@@ -46,7 +46,7 @@ public class ScriptInfo {
         this.isFile = f.isFile();
 
         if (exists) {
-            this.reader = ReflectUtils.nullOnException(() -> new FileReader(f));
+            this.reader = ReflectUtils.consumeException(() -> new FileReader(f));
         }
     }
 

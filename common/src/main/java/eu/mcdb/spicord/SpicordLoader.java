@@ -20,7 +20,6 @@ package eu.mcdb.spicord;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
-import org.spicord.reflect.ReflectUtils;
 import com.google.common.base.Preconditions;
 import eu.mcdb.spicord.config.SpicordConfiguration;
 import eu.mcdb.spicord.util.JarClassLoader;
@@ -58,12 +57,6 @@ public final class SpicordLoader implements AutoCloseable {
                 firstRun = false;
                 libraryLoader.downloadLibraries();
                 libraryLoader.loadLibraries();
-
-                if (!ReflectUtils.findClass("net.dv8tion.jda.core.JDA").isPresent()) {
-                    logger.severe("[Loader] JDA library is not loaded, this plugin will not work.");
-                    this.disable();
-                    return;
-                }
             }
 
             this.spicord = new Spicord(logger);

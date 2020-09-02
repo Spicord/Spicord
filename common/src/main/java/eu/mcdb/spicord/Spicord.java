@@ -21,14 +21,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 import org.spicord.api.services.ServiceManager;
-import org.spicord.reflect.ReflectErrorRule;
-import org.spicord.reflect.ReflectUtils;
-import org.spicord.reflect.ReflectedMethod;
-import org.spicord.reflect.ReflectedObject;
 import eu.mcdb.spicord.addon.AddonManager;
 import eu.mcdb.spicord.addon.InfoAddon;
 import eu.mcdb.spicord.addon.PlayersAddon;
@@ -39,7 +34,6 @@ import eu.mcdb.spicord.config.SpicordConfiguration;
 import eu.mcdb.universal.Server;
 import eu.mcdb.universal.ServerType;
 import lombok.Getter;
-import net.dv8tion.jda.core.utils.JDALogger;
 
 public final class Spicord {
 
@@ -77,54 +71,19 @@ public final class Spicord {
         if (!isLoaded())
             return;
 
-        loadListeners.forEach(l -> l.accept(this));
-        loadListeners.clear();
+        this.config = config;
 
         File addonsDir = new File(config.getDataFolder(), "addons");
-
-        this.config = config;
         this.addonManager.loadAddons(addonsDir);
         this.registerIntegratedAddons();
 
         Server.getInstance().setDebugEnabled(config.isDebugEnabled());
 
-        setupLogger();
+        loadListeners.forEach(l -> l.accept(this));
+        loadListeners.clear();
 
         getLogger().info("Starting the bots...");
         config.getBots().forEach(DiscordBotLoader::startBot);
-    }
-
-    private void setupLogger() {
-        Optional<Class<?>> oClass = ReflectUtils.findClass("eu.mcdb.logger.ProvisionalLogger");
-
-        if (oClass.isPresent()) {
-            try {
-                Class<?> loggerClass = oClass.get();
-
-                Object loggerInst = new ReflectedObject(loggerClass)
-                        .getConstructor(boolean.class, boolean.class)
-                        .invoke(config.isDebugEnabled(), config.isJdaMessagesEnabled());
-
-                ReflectedMethod method = new ReflectedObject(JDALogger.class)
-                        .setErrorRule(ReflectErrorRule.IGNORE)
-                        .getMethod("setLog", loggerClass.getInterfaces()[0]);
-
-                if (method != null) {
-                    method.invoke(loggerInst);
-
-                    if (config.isJdaMessagesEnabled()) {
-                        debug("Successfully enabled JDA messages.");
-                    } else {
-                        debug("Successfully disabled JDA messages.");
-                    }
-                } else {
-                    getLogger().warning("setLog method not found, this may cause errors.");
-                }
-            } catch (Exception e) {
-                getLogger().warning("An error ocurred while setting the logger: " + e.getCause());
-                e.printStackTrace();
-            }
-        }
     }
 
     private void registerIntegratedAddons() {

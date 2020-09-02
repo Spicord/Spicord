@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import javax.security.auth.login.LoginException;
 import com.google.common.base.Preconditions;
 import eu.mcdb.spicord.api.Node;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
@@ -33,7 +32,6 @@ import eu.mcdb.spicord.api.bot.command.BotCommand;
 import eu.mcdb.spicord.bot.command.DiscordBotCommand;
 import eu.mcdb.spicord.bot.command.DiscordCommand;
 import lombok.Getter;
-import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.events.ReadyEvent;
@@ -96,7 +94,7 @@ public class DiscordBot extends SimpleBot implements Node {
 
         try {
             this.status = BotStatus.STARTING;
-            this.jda = new JDABuilder(AccountType.BOT).setToken(token).setAutoReconnect(true).build();
+            this.jda = JDABuilder.createDefault(token).setAutoReconnect(true).build();
 
             jda.addEventListener(new BotStatusListener(this));
 
@@ -105,7 +103,7 @@ public class DiscordBot extends SimpleBot implements Node {
 
             getSpicord().getAddonManager().loadAddons(this);
             return true;
-        } catch (LoginException e) {
+        } catch (Exception e) {
             this.status = BotStatus.OFFLINE;
             this.jda = null;
             getLogger().severe("An error ocurred while starting the bot '" + getName() + "'. " + e.getMessage());

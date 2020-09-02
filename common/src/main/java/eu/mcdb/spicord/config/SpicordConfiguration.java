@@ -211,7 +211,7 @@ public final class SpicordConfiguration implements Node {
         }
     }
 
-    public class SpicordConfig {
+    public static class SpicordConfig {
 
         private Bot[] bots;
         private Messages jda_messages;

@@ -17,16 +17,13 @@
 
 package org.spicord.fix;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.spicord.reflect.ReflectErrorRule;
-import org.spicord.reflect.ReflectedField;
 import org.spicord.reflect.ReflectedObject;
 
 @SuppressWarnings("all")
@@ -35,42 +32,52 @@ public class FixClassLoaderPosition {
     public static boolean bukkit() {
         ClassLoader loader = FixClassLoaderPosition.class.getClassLoader();
 
-        ReflectedField loadersField = new ReflectedObject(loader)
+        Object loadersObj = new ReflectedObject(loader)
                 .getField("loader").setAccessible()
                 .getReflectValue()
-                .getField("loaders").setAccessible().setModifiable();
-
-        Object loadersObj = loadersField.getValue();
+                .getField("loaders").setAccessible().setModifiable()
+                .getValue();
 
         if (loadersObj instanceof Map) {
             Map loaders = (Map) loadersObj;
-            Map newMap = new LinkedHashMap(loaders.size()+1);
-            newMap.put("Spicord", loader);
-            newMap.putAll(loaders);
-            loadersField.setValue(newMap);
+            Map copy = new HashMap(loaders);
+            loaders.clear();
+            loaders.put("Spicord", loader);
+            loaders.putAll(copy);
+            copy.clear();
+            copy = null;
+
+            return loaders.get(0) == loader;
         } else if (loadersObj instanceof List) {
             List loaders = (List) loadersObj;
-            List newList = new LinkedList();
-            newList.add(loader);
-            newList.addAll(loaders);
-            loadersField.setValue(newList);
-        } else {
-            return false;
+            List copy = new ArrayList(loaders);
+            loaders.clear();
+            loaders.add(loader);
+            loaders.addAll(copy);
+            copy.clear();
+            copy = null;
+
+            return loaders.get(0) == loader;
         }
-        return true;
+
+        return false;
     }
 
     public static boolean bungee() {
         ClassLoader loader = FixClassLoaderPosition.class.getClassLoader();
 
-        ReflectedField allLoadersField = new ReflectedObject(loader)
-                .getField("allLoaders").setAccessible().setModifiable();
+        Set allLoaders = new ReflectedObject(loader)
+                .getField("allLoaders")
+                .setAccessible()
+                .setModifiable()
+                .getValue();
+        Set copy = new HashSet(allLoaders);
+        allLoaders.clear();
+        allLoaders.add(loader);
+        allLoaders.addAll(copy);
+        copy.clear();
+        copy = null;
 
-        Set<Object> allLoaders = allLoadersField.getValue();
-        Set<Object> newSet = new LinkedHashSet<Object>();
-        newSet.add(loader);
-        newSet.addAll(allLoaders);
-        allLoadersField.setValue(newSet);
-        return true;
+        return allLoaders.iterator().next() == loader;
     }
 }

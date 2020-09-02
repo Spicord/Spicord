@@ -41,7 +41,8 @@ public final class FileUtils {
                 deleteRecursive(f);
             }
         }
-        dir.delete();
+
+        if (!dir.delete()) System.err.println("Unable to delete " + dir.toString());
     }
 
     public static void deleteOnExit(final File file) {
@@ -49,6 +50,6 @@ public final class FileUtils {
     }
 
     public static File getParent(final File file) {
-        return file.toPath().getParent().toFile();
+        return (file.isAbsolute() ? file : file.getAbsoluteFile()).getParentFile();
     }
 }

@@ -26,6 +26,20 @@ public final class ReflectedField extends ReflectBase<ReflectedField> implements
     private final Object o;
     private final Field f;
 
+    public ReflectedField(Object o, String field) {
+        this(o.getClass(), field);
+    }
+
+    public ReflectedField(Class<?> clazz, String field) {
+        this.o = null;
+
+        try {
+            this.f = clazz.getDeclaredField(field);
+        } catch (ReflectiveOperationException e) {
+            throw new NullPointerException();
+        }
+    }
+
     ReflectedField(Object o, Field f) {
         if (f == null) throw new NullPointerException();
 
@@ -106,10 +120,14 @@ public final class ReflectedField extends ReflectBase<ReflectedField> implements
         try {
             Field mf = Field.class.getDeclaredField("modifiers");
             mf.setAccessible(true);
-            mf.set(f, f.getModifiers() & ~Modifier.FINAL);
+            mf.setInt(f, f.getModifiers() & ~Modifier.FINAL);
         } catch (Exception e) {
             handleException(e);
         }
         return this;
+    }
+
+    public boolean isStatic() {
+        return Modifier.isStatic(f.getModifiers());
     }
 }
