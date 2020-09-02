@@ -31,10 +31,29 @@ public class InfoAddon extends SimpleAddon {
 
     @Override
     public void onCommand(DiscordBotCommand command, String[] args) {
+        int onlineCount = getServer().getOnlineCount();
+        int playerLimit = getServer().getPlayerLimit();
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Online players: ");
+        sb.append(onlineCount);
+        sb.append('/');
+
+        if (playerLimit < 0) {
+            sb.append("∞"); // infinity symbol
+        } else {
+            sb.append(playerLimit);
+        }
+
+        sb.append('\n'); // new line
+
+        sb.append("Server version: ");
+        sb.append(getServer().getVersion());
+
         final EmbedBuilder builder = new EmbedBuilder()
                 .setTitle("Server information")
-                .setDescription("Online players: " + getServer().getOnlineCount() + "/" + getServer().getPlayerLimit()
-                        + "\nServer version: " + getServer().getVersion())
+                .setDescription(sb.toString())
                 .setColor(new Color(5154580));
 
         String footer = getSpicord().getConfig().getIntegratedAddonFooter();
