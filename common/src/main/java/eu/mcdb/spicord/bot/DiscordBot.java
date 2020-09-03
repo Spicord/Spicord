@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import com.google.common.base.Preconditions;
 import eu.mcdb.spicord.api.Node;
@@ -245,14 +246,16 @@ public class DiscordBot extends SimpleBot implements Node {
         loadedAddons.forEach(a -> a.onShutdown(this));
 
         if (jda != null) {
-            jda.cancelRequests();
-            jda.getCallbackPool().shutdown();
+            try {
+                jda.cancelRequests();
+                jda.getCallbackPool().awaitTermination(4, TimeUnit.SECONDS);
 
-            if (force) {
-                jda.shutdownNow();
-            } else {
-                jda.shutdown();
-            }
+                if (force) {
+                    jda.shutdownNow();
+                } else {
+                    jda.shutdown();
+                }
+            } catch (InterruptedException e) {}
         }
 
         jda = null;
