@@ -37,13 +37,13 @@
 ```xml
 <repository>
     <id>spicord-repo</id>
-    <url>https://repo.mcdb.eu/</url>
+    <url>https://repo.spicord.org/</url>
 </repository>
 
 <dependency>
-    <groupId>eu.mcdb</groupId>
+    <groupId>org.spicord</groupId>
     <artifactId>spicord-common</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.1.0</version>
     <scope>provided</scope>
 </dependency>
 ```
