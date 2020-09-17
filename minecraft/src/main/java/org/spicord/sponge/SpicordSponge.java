@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
+import org.spicord.Version;
 import org.spicord.reflect.ReflectedObject;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
@@ -20,7 +21,7 @@ import eu.mcdb.universal.MCDB;
 import eu.mcdb.universal.plugin.SpongePlugin;
 import eu.mcdb.util.SLF4JWrapper;
 
-@Plugin(id = "spicord", name = "Spicord", version = "3.0.0", authors = { "Sheidy" })
+@Plugin(id = "spicord", name = "Spicord", version = Version.VERSION, authors = { "Sheidy" })
 public class SpicordSponge extends SpongePlugin {
 
     private static final List<String> EXCEPTIONS = Arrays.asList(
