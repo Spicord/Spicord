@@ -81,8 +81,11 @@ public class Native {
 
     class Loader extends URLClassLoader {
 
+        private final ClassLoader parent;
+
         public Loader() {
             super(new URL[0], null);
+            this.parent = Loader.class.getClassLoader();
         }
 
         @Override
@@ -90,9 +93,18 @@ public class Native {
             super.addURL(url);
         }
 
+        @Override
+        protected Class<?> findClass(String name) throws ClassNotFoundException {
+            try {
+                return super.findClass(name);
+            } catch (ClassNotFoundException e) {
+                return parent.loadClass(name);
+            }
+        }
+
         public Class<?> getClass(String name) {
             try {
-                return super.loadClass(name, true);
+                return loadClass(name, true);
             } catch (ClassNotFoundException e) {
                 System.err.println("Unable to find class " + name);
                 return null;
