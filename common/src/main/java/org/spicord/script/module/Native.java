@@ -53,12 +53,12 @@ public class Native {
         return loader.getClass(name);
     }
 
-    private static URL[] getURLS(File file) {
-        if (file.exists()) {
-            if (file.isDirectory()) {
-                return getURLS(file.listFiles());
+    private static URL[] getURLS(File fileOrDirectory) {
+        if (fileOrDirectory.exists()) {
+            if (fileOrDirectory.isDirectory()) {
+                return getURLS(fileOrDirectory.listFiles());
             } else {
-                return getURLS(new File[] { file });
+                return getURLS(new File[] { fileOrDirectory });
             }
         }
         return new URL[0];
@@ -82,7 +82,7 @@ public class Native {
     class Loader extends URLClassLoader {
 
         public Loader() {
-            super(new URL[0], Loader.class.getClassLoader());
+            super(new URL[0], null);
         }
 
         @Override
@@ -94,6 +94,7 @@ public class Native {
             try {
                 return super.loadClass(name, true);
             } catch (ClassNotFoundException e) {
+                System.err.println("Unable to find class " + name);
                 return null;
             }
         }
