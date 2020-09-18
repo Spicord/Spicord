@@ -18,10 +18,11 @@
 package eu.mcdb.universal.player;
 
 import java.util.UUID;
+
 import org.bukkit.entity.Player;
 import org.spongepowered.api.text.Text;
+
 import eu.mcdb.universal.command.UniversalCommandSender;
-import net.kyori.text.Component;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -83,27 +84,15 @@ public class UniversalPlayer extends UniversalCommandSender {
     @Override
     public void sendMessage(String message) {
         if (isProxiedPlayer()) {
-            getProxiedPlayer().sendMessage(new TextComponent(message));
+            new sendMessageBungee(getProxiedPlayer(), message);
         } else if (isBukkitPlayer()) {
             getBukkitPlayer().sendMessage(message);
         } else if (isVelocityPlayer()) {
-            getVelocityPlayer().sendMessage(new VelocityComponent().get(message));
+            new sendMessageVelocity(getVelocityPlayer(), message);
         } else if (isSpongePlayer()) {
-            getSpongePlayer().sendMessage(new SpongeText().get(message));
+            new sendMessageSponge(getSpongePlayer(), message);
         } else {
             System.out.println("The message was not send because there's no player instance set.");
-        }
-    }
-
-    private class VelocityComponent {
-        public Component get(String message) {
-            return net.kyori.text.TextComponent.of(message);
-        }
-    }
-
-    private class SpongeText {
-        public Text get(String message) {
-            return Text.of(message);
         }
     }
 
@@ -136,5 +125,25 @@ public class UniversalPlayer extends UniversalCommandSender {
             System.out.println("Can't check if the player is online because there's no player instance set.");
         }
         return false;
+    }
+
+    // this is needed to avoid ClassNotFoundException
+
+    private static class sendMessageBungee {
+        sendMessageBungee(ProxiedPlayer player, String message) {
+            player.sendMessage(new TextComponent(message));
+        }
+    }
+
+    private static class sendMessageVelocity {
+        sendMessageVelocity(com.velocitypowered.api.proxy.Player player, String message) {
+            player.sendMessage(net.kyori.text.TextComponent.of(message));
+        }
+    }
+
+    private static class sendMessageSponge {
+        sendMessageSponge(org.spongepowered.api.entity.living.player.Player player, String message) {
+            player.sendMessage(Text.of(message));
+        }
     }
 }

@@ -17,7 +17,6 @@ import com.google.inject.Inject;
 import eu.mcdb.spicord.SpicordCommand;
 import eu.mcdb.spicord.SpicordLoader;
 import eu.mcdb.spicord.util.SpicordClassLoader;
-import eu.mcdb.universal.MCDB;
 import eu.mcdb.universal.plugin.SpongePlugin;
 import eu.mcdb.util.SLF4JWrapper;
 
@@ -38,12 +37,12 @@ public class SpicordSponge extends SpongePlugin {
         ClassLoader cl = prepareClassLoader(Sponge.class.getClassLoader());
         SpicordClassLoader classLoader = new SpicordClassLoader(cl);
         loader = new SpicordLoader(classLoader, new SLF4JWrapper(logger), configDir);
-        loader.load();
     }
 
     @Listener
     public void init(GameInitializationEvent event) {
-        MCDB.registerCommand(this, new SpicordCommand(() -> {}));
+        loader.load();
+        new SpicordCommand(() -> {}).register(this);
     }
 
     @Listener
