@@ -21,8 +21,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
+import org.spicord.player.SpongePlayer;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
@@ -94,18 +96,13 @@ class SpongeServer extends eu.mcdb.universal.Server {
 
     @Override
     public UniversalPlayer getPlayer(UUID uuid) {
-        final Player player = server.getPlayer(uuid).orElse(null);
+        final Optional<Player> player = server.getPlayer(uuid);
 
-        if (player == null)
-            return null;
+        if (player.isPresent()) {
+            return new SpongePlayer(player.get());
+        }
 
-        return new UniversalPlayer(player.getName(), uuid) {
-
-            @Override
-            public Player getSpongePlayer() {
-                return player;
-            }
-        };
+        return null;
     }
 
     @Override

@@ -25,7 +25,7 @@ import lombok.Setter;
  * This class provides methods that can be accessed no matter what server
  * software you are using.
  */
-public abstract class Server implements IServer {
+public abstract class Server implements ServerInterface {
 
     @Getter private static ServerType serverType;
     @Getter private static Server instance;
@@ -45,7 +45,6 @@ public abstract class Server implements IServer {
             return new SpongeServer();
         case VELOCITY:
             return new VelocityServer();
-        case UNKNOWN:
         default:
             return new DummyServer();
         }

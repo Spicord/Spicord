@@ -23,7 +23,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 import eu.mcdb.universal.player.UniversalPlayer;
 
-public interface IServer {
+public interface ServerInterface {
 
     /**
      * Get the amount of online players.

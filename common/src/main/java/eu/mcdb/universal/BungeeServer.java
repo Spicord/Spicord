@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.spicord.player.BungeePlayer;
 import eu.mcdb.universal.player.UniversalPlayer;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -123,13 +124,11 @@ class BungeeServer extends Server {
     public UniversalPlayer getPlayer(UUID uuid) {
         final ProxiedPlayer player = bungee.getPlayer(uuid);
 
-        return new UniversalPlayer(player.getName(), uuid) {
+        if (player == null) {
+            return null;
+        }
 
-            @Override
-            public ProxiedPlayer getProxiedPlayer() {
-                return player;
-            }
-        };
+        return new BungeePlayer(player);
     }
 
     @Override

@@ -30,6 +30,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.spicord.player.BukkitPlayer;
 import eu.mcdb.universal.player.UniversalPlayer;
 
 class BukkitServer extends eu.mcdb.universal.Server {
@@ -95,16 +96,11 @@ class BukkitServer extends eu.mcdb.universal.Server {
     public UniversalPlayer getPlayer(UUID uuid) {
         final OfflinePlayer player = bukkit.getOfflinePlayer(uuid);
 
-        if (player == null)
+        if (!player.isOnline()) {
             return null;
+        }
 
-        return new UniversalPlayer(player.getName(), uuid) {
-
-            @Override
-            public Player getBukkitPlayer() {
-                return player.isOnline() ? player.getPlayer() : null;
-            }
-        };
+        return new BukkitPlayer(player.getPlayer());
     }
 
     @Override

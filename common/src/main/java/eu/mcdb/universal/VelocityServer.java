@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.spicord.player.VelocityPlayer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
@@ -66,6 +67,7 @@ class VelocityServer extends Server {
             List<String> players = server.getPlayersConnected().stream()
                     .map(Player::getUsername)
                     .collect(Collectors.toList());
+
             map.put(server.getServerInfo().getName(), players);
         }
 
@@ -81,7 +83,7 @@ class VelocityServer extends Server {
     @Override
     public String[] getPlugins() {
         return handle.getPluginManager().getPlugins().stream()
-                .map(p -> p.getDescription().getName())
+                .map(plugin -> plugin.getDescription().getName())
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toArray(String[]::new);
@@ -99,18 +101,13 @@ class VelocityServer extends Server {
 
     @Override
     public UniversalPlayer getPlayer(UUID uuid) {
-        final Player player = handle.getPlayer(uuid).orElse(null);
+        final Optional<Player> player = handle.getPlayer(uuid);
 
-        if (player == null)
-            return null;
+        if (player.isPresent()) {
+            return new VelocityPlayer(player.get());
+        }
 
-        return new UniversalPlayer(player.getUsername(), uuid) {
-
-            @Override
-            public Player getVelocityPlayer() {
-                return player;
-            }
-        };
+        return null;
     }
 
     protected static void setHandle(ProxyServer server) {

@@ -31,6 +31,7 @@ import eu.mcdb.universal.plugin.SpongePlugin;
 import eu.mcdb.universal.plugin.VelocityPlugin;
 import net.md_5.bungee.api.plugin.Plugin;
 
+@Deprecated
 public final class MCDB {
 
     private MCDB() {}

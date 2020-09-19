@@ -21,29 +21,36 @@ import org.spicord.reflect.ReflectUtils;
 
 public enum ServerType {
 
-    BUKKIT("org.bukkit.Bukkit"),
-    BUNGEECORD("net.md_5.bungee.api.ProxyServer"),
-    VELOCITY("com.velocitypowered.api.proxy.ProxyServer"),
-    SPONGE("org.spongepowered.api.Game"),
-    UNKNOWN(null);
+    BUKKIT     ("org.bukkit.Bukkit"),
+    BUNGEECORD ("net.md_5.bungee.api.ProxyServer"),
+    VELOCITY   ("com.velocitypowered.api.proxy.ProxyServer"),
+    SPONGE     ("org.spongepowered.api.Game"),
+    UNKNOWN    (null);
 
-    private final String clazz;
+    private final String serverClass;
 
-    private ServerType(String clazz) {
-        this.clazz = clazz;
+    private ServerType(String serverClass) {
+        this.serverClass = serverClass;
     }
 
-    private boolean check() {
-        if (clazz == null) return false;
-        return ReflectUtils.findClass(clazz).isPresent();
+    private boolean isCurrent() {
+        if (serverClass == null) {
+            return false;
+        }
+
+        return ReflectUtils.findClass(serverClass).isPresent();
     }
 
     public static ServerType auto() {
-        if ("1".equals(System.getenv("SPICORD_CONSOLE")))
+        if (System.getProperty("SPICORD_CONSOLE", "false").equals("true")) {
             return UNKNOWN;
+        }
 
-        for (ServerType val : ServerType.values())
-            if (val.check()) return val;
+        for (ServerType serverType : ServerType.values()) {
+            if (serverType.isCurrent()) {
+                return serverType;
+            }
+        }
 
         return UNKNOWN;
     }
