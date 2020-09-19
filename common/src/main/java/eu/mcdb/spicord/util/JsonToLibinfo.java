@@ -23,10 +23,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import org.spicord.Library;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import eu.mcdb.spicord.LibraryLoader.Library;
 
 // Run this class to convert the .json lib data into a .libinfo file
 // or to do the opposite

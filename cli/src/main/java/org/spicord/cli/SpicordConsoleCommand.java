@@ -18,7 +18,7 @@
 package org.spicord.cli;
 
 import java.util.logging.Logger;
-import eu.mcdb.spicord.SpicordCommand;
+import org.spicord.SpicordCommand;
 import eu.mcdb.universal.command.UniversalCommandSender;
 
 class SpicordConsoleCommand {

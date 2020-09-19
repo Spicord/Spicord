@@ -19,12 +19,12 @@ package eu.mcdb.universal.plugin;
 
 import java.io.File;
 import java.util.logging.Logger;
+import org.spicord.server.impl.ServerUtil;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.event.EventManager;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginManager;
 import com.velocitypowered.api.proxy.ProxyServer;
-import eu.mcdb.universal.Server;
 import eu.mcdb.util.SLF4JWrapper;
 import lombok.Getter;
 import lombok.NonNull;
@@ -53,7 +53,7 @@ public abstract class VelocityPlugin {
         eventManager = proxyServer.getEventManager();
         pluginManager = proxyServer.getPluginManager();
 
-        new Server.setVelocityHandle(proxyServer);
+        new ServerUtil.setVelocityHandle(proxyServer);
         check();
     }
 

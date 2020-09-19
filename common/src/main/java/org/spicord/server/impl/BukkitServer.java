@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.universal;
+package org.spicord.server.impl;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,7 +33,7 @@ import org.bukkit.plugin.Plugin;
 import org.spicord.player.BukkitPlayer;
 import eu.mcdb.universal.player.UniversalPlayer;
 
-class BukkitServer extends eu.mcdb.universal.Server {
+final class BukkitServer extends eu.mcdb.universal.Server {
 
     private final Server bukkit = Bukkit.getServer();
 

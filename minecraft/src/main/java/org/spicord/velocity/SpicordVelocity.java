@@ -17,12 +17,12 @@
 
 package org.spicord.velocity;
 
+import org.spicord.SpicordCommand;
 import org.spicord.Version;
 
 import com.google.inject.Inject;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
-import eu.mcdb.spicord.SpicordCommand;
 import eu.mcdb.spicord.SpicordLoader;
 import eu.mcdb.universal.MCDB;
 import eu.mcdb.universal.plugin.VelocityPlugin;

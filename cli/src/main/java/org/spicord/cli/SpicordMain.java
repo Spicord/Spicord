@@ -22,8 +22,8 @@ import java.io.IOException;
 import java.util.logging.Logger;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
+import org.spicord.LibraryLoader;
 import org.spicord.cli.log.FormattedLogger;
-import eu.mcdb.spicord.LibraryLoader;
 import eu.mcdb.spicord.SpicordLoader;
 
 public class SpicordMain {

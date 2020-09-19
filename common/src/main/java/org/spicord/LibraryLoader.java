@@ -15,25 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord;
+package org.spicord;
 
 import static org.spicord.reflect.ReflectUtils.findClass;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.Serializable;
 import java.math.BigInteger;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.logging.Logger;
 import eu.mcdb.spicord.util.JarClassLoader;
 import eu.mcdb.spicord.util.SpicordClassLoader;
-import lombok.Getter;
 import lombok.Setter;
 
 public class LibraryLoader {
@@ -139,7 +134,6 @@ public class LibraryLoader {
 
             File file = new File(libFolder, lib.getFileName());
             if (file.isFile() && file.getName().endsWith(".jar")) {
-
                 if (file.exists()) {
                     try {
                         loader.loadJar(file.toPath());
@@ -151,39 +145,6 @@ public class LibraryLoader {
                 } else {
                     logger.severe("[Loader] Library '" + file.getName() + "' was not found on the library path.");
                 }
-            }
-        }
-    }
-
-    @Getter
-    public class Library implements Serializable {
-
-        private static final long serialVersionUID = 1L;
-
-        private String name;
-        private String sha1;
-        private String url;
-        private String dontloadifclassfound;
-
-        public String getFileName() {
-            return url.substring(url.lastIndexOf('/') + 1, url.length());
-        }
-
-        public byte[] download() throws IOException {
-            final URL url = new URL(this.url);
-            final URLConnection conn = url.openConnection();
-            conn.setRequestProperty("User-Agent", "Mozilla/5.0");
-            conn.connect();
-
-            try (final InputStream in = conn.getInputStream()) {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-                int i;
-                while ((i = in.read()) != -1) baos.write(i);
-
-                return baos.toByteArray();
-            } catch (IOException e) {
-                throw e;
             }
         }
     }

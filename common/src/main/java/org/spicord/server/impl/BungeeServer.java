@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.universal;
+package org.spicord.server.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,6 +26,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.spicord.player.BungeePlayer;
+import eu.mcdb.universal.Server;
 import eu.mcdb.universal.player.UniversalPlayer;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -33,7 +34,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginDescription;
 
-class BungeeServer extends Server {
+final class BungeeServer extends Server {
 
     private final ProxyServer bungee = ProxyServer.getInstance();
 

@@ -20,6 +20,7 @@ package eu.mcdb.spicord;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
+import org.spicord.LibraryLoader;
 import com.google.common.base.Preconditions;
 import eu.mcdb.spicord.config.SpicordConfiguration;
 import eu.mcdb.spicord.util.JarClassLoader;

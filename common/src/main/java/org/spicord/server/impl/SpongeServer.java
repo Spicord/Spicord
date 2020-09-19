@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.universal;
+package org.spicord.server.impl;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,13 +34,13 @@ import org.spongepowered.api.text.Text;
 import eu.mcdb.universal.player.UniversalPlayer;
 import eu.mcdb.util.SLF4JWrapper;
 
-class SpongeServer extends eu.mcdb.universal.Server {
+final class SpongeServer extends eu.mcdb.universal.Server {
 
     private final Game game;
     private final Server server;
     private final Logger logger;
 
-    SpongeServer() {
+    public SpongeServer() {
         this.game = Sponge.getGame();
         this.server = Sponge.getServer();
         this.logger = new SLF4JWrapper();

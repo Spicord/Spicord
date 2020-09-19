@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.universal;
+package org.spicord.server.impl;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,11 +29,12 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.util.ProxyVersion;
+import eu.mcdb.universal.Server;
 import eu.mcdb.universal.player.UniversalPlayer;
 import eu.mcdb.util.SLF4JWrapper;
 import net.kyori.text.TextComponent;
 
-class VelocityServer extends Server {
+final class VelocityServer extends Server {
 
     private static ProxyServer handle;
 

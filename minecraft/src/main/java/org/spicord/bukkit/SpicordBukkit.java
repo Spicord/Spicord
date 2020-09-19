@@ -19,22 +19,17 @@ package org.spicord.bukkit;
 
 import java.io.File;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.spicord.fix.FixClassLoaderPosition;
-import eu.mcdb.spicord.LibraryLoader;
-import eu.mcdb.spicord.SpicordCommand;
+import org.spicord.SpicordCommand;
+import org.spicord.SpicordPlugin;
 import eu.mcdb.spicord.SpicordLoader;
-import eu.mcdb.universal.MCDB;
 
-public class SpicordBukkit extends JavaPlugin {
+public class SpicordBukkit extends JavaPlugin implements SpicordPlugin {
 
     private SpicordLoader loader;
 
     @Override
     public void onEnable() {
-        if (new File(getDataFolder(), "forceload.txt").exists()) {
-            getLogger().info("Libraries will be forced to load");
-            LibraryLoader.setForceLoad(true);
-        }
+        checkForceload();
 
         Runnable reload = () -> {
             onDisable();
@@ -44,22 +39,17 @@ public class SpicordBukkit extends JavaPlugin {
 
         getServer().getScheduler().scheduleSyncDelayedTask(this, () -> loader.load(), 200);
 
-        MCDB.registerCommand(this, new SpicordCommand(() -> {
+        new SpicordCommand(() -> {
             reload.run();
             loader.load();
-        }));
+        }).register(this);
 
-        if (new File(getDataFolder(), "fixloader.txt").exists()) {
-            try {
-                if (FixClassLoaderPosition.bukkit()) {
-                    getLogger().info("Successfully applied the Loader fix");
-                } else {
-                    getLogger().warning("Cannot apply the Loader fix");
-                }
-            } catch (Exception e) {
-                getLogger().warning("An error ocurred while applying the Loader fix: " + e.getMessage());
-            }
-        }
+        checkLoader(true);
+    }
+
+    @Override
+    public File getFile() {
+        return super.getFile();
     }
 
     @Override

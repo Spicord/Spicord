@@ -29,6 +29,14 @@ import org.spicord.reflect.ReflectedObject;
 @SuppressWarnings("all")
 public class FixClassLoaderPosition {
 
+    public static boolean init(boolean isBukkit) {
+        if (isBukkit) {
+            return bukkit();
+        } else {
+            return bungee();
+        }
+    }
+
     public static boolean bukkit() {
         ClassLoader loader = FixClassLoaderPosition.class.getClassLoader();
 

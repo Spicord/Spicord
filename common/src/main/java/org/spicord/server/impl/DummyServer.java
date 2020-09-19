@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.universal;
+package org.spicord.server.impl;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,9 +23,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
+import eu.mcdb.universal.Server;
 import eu.mcdb.universal.player.UniversalPlayer;
 
-class DummyServer extends Server {
+final class DummyServer extends Server {
 
     @Override
     public int getOnlineCount() {

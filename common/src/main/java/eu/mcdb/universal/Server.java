@@ -17,7 +17,7 @@
 
 package eu.mcdb.universal;
 
-import com.velocitypowered.api.proxy.ProxyServer;
+import org.spicord.server.impl.ServerUtil;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,29 +36,11 @@ public abstract class Server implements ServerInterface {
     }
 
     private static Server buildServer(final ServerType serverType) {
-        switch (serverType) {
-        case BUKKIT:
-            return new BukkitServer();
-        case BUNGEECORD:
-            return new BungeeServer();
-        case SPONGE:
-            return new SpongeServer();
-        case VELOCITY:
-            return new VelocityServer();
-        default:
-            return new DummyServer();
-        }
+        return ServerUtil.buildServer(serverType);
     }
 
     public boolean isProxy() {
         return serverType == ServerType.VELOCITY
             || serverType == ServerType.BUNGEECORD;
-    }
-
-    // TODO: look for a better way to do this
-    public static class setVelocityHandle { // prevent java.lang.NoClassDefFoundError: ...ProxyServer
-        public setVelocityHandle(ProxyServer proxy) {
-            VelocityServer.setHandle(proxy);
-        }
     }
 }
