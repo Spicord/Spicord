@@ -18,13 +18,11 @@
 package org.spicord.velocity;
 
 import org.spicord.SpicordCommand;
+import org.spicord.SpicordLoader;
 import org.spicord.Version;
-
 import com.google.inject.Inject;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
-import eu.mcdb.spicord.SpicordLoader;
-import eu.mcdb.universal.MCDB;
 import eu.mcdb.universal.plugin.VelocityPlugin;
 
 @Plugin(id = "spicord", name = "Spicord", version = Version.VERSION, authors = { "Sheidy" })
@@ -37,6 +35,6 @@ public class SpicordVelocity extends VelocityPlugin {
         super(proxyServer);
         this.loader = new SpicordLoader(getLogger(), getDataFolder());
         this.loader.load();
-        MCDB.registerCommand(this, new SpicordCommand(() -> {}));
+        new SpicordCommand(() -> {}).register(this);
     }
 }

@@ -19,8 +19,8 @@ package org.spicord.bungee;
 
 import java.util.concurrent.TimeUnit;
 import org.spicord.SpicordCommand;
+import org.spicord.SpicordLoader;
 import org.spicord.SpicordPlugin;
-import eu.mcdb.spicord.SpicordLoader;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class SpicordBungee extends Plugin implements SpicordPlugin {

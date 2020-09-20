@@ -23,8 +23,8 @@ import java.util.logging.Logger;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.spicord.LibraryLoader;
+import org.spicord.SpicordLoader;
 import org.spicord.cli.log.FormattedLogger;
-import eu.mcdb.spicord.SpicordLoader;
 
 public class SpicordMain {
 

@@ -21,7 +21,7 @@ import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
-import eu.mcdb.spicord.Spicord;
+import org.spicord.Spicord;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.bot.command.DiscordBotCommand;
 import eu.mcdb.universal.Server;

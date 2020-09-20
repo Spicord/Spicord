@@ -18,7 +18,6 @@
 package org.spicord;
 
 import java.util.Set;
-import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.bot.DiscordBot.BotStatus;

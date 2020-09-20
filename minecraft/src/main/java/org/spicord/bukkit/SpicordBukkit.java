@@ -20,8 +20,8 @@ package org.spicord.bukkit;
 import java.io.File;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.spicord.SpicordCommand;
+import org.spicord.SpicordLoader;
 import org.spicord.SpicordPlugin;
-import eu.mcdb.spicord.SpicordLoader;
 
 public class SpicordBukkit extends JavaPlugin implements SpicordPlugin {
 

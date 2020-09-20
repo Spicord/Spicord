@@ -17,8 +17,8 @@
 
 package org.spicord.script;
 
+import org.spicord.Spicord;
 import org.spicord.script.module.*;
-import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.api.addon.JavaScriptBaseAddon;
 import eu.mcdb.universal.Server;
 import eu.mcdb.universal.config.YamlConfiguration;

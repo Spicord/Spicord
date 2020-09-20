@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 import eu.mcdb.spicord.Spicord;
 import eu.mcdb.universal.Server;
 
+@Deprecated
 public interface Node {
 
     /**

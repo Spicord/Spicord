@@ -19,8 +19,8 @@ package eu.mcdb.spicord.bot;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
+import org.spicord.Spicord;
 import com.google.common.base.Preconditions;
-import eu.mcdb.spicord.Spicord;
 import eu.mcdb.spicord.bot.DiscordBot.BotStatus;
 
 public class DiscordBotLoader {
