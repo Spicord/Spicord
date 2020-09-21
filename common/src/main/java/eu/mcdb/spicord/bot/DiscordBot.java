@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import com.google.common.base.Preconditions;
 import eu.mcdb.spicord.api.Node;
@@ -33,6 +32,7 @@ import eu.mcdb.spicord.api.bot.command.BotCommand;
 import eu.mcdb.spicord.bot.command.DiscordBotCommand;
 import eu.mcdb.spicord.bot.command.DiscordCommand;
 import lombok.Getter;
+import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.events.ReadyEvent;
@@ -95,7 +95,7 @@ public class DiscordBot extends SimpleBot implements Node {
 
         try {
             this.status = BotStatus.STARTING;
-            this.jda = JDABuilder.createDefault(token).setAutoReconnect(true).build();
+            this.jda = new JDABuilder(AccountType.BOT).setToken(token).setAutoReconnect(true).build();
 
             jda.addEventListener(new BotStatusListener(this));
 
@@ -247,15 +247,12 @@ public class DiscordBot extends SimpleBot implements Node {
 
         if (jda != null) {
             try {
-                jda.cancelRequests();
-                jda.getCallbackPool().awaitTermination(4, TimeUnit.SECONDS);
-
                 if (force) {
                     jda.shutdownNow();
                 } else {
                     jda.shutdown();
                 }
-            } catch (InterruptedException e) {}
+            } catch (Exception e) {}
         }
 
         jda = null;

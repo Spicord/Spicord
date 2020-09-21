@@ -35,10 +35,6 @@
             <url>https://repo.spongepowered.org/maven/</url>
         </repository>
         <repository>
-            <id>jcenter</id>
-            <url>https://jcenter.bintray.com/</url>
-        </repository>
-        <repository>
             <id>spicord</id>
             <url>https://repo.spicord.org/</url>
         </repository>
@@ -77,8 +73,8 @@
         </dependency>
         <dependency>
             <groupId>org.spicord</groupId>
-            <artifactId>SpicordJDA</artifactId>
-            <version>4.2.0</version>
+            <artifactId>JDA</artifactId>
+            <version>3.8.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -21,6 +21,7 @@ import static java.lang.invoke.MethodHandles.Lookup.PACKAGE;
 import static java.lang.invoke.MethodHandles.Lookup.PRIVATE;
 import static java.lang.invoke.MethodHandles.Lookup.PROTECTED;
 import static java.lang.invoke.MethodHandles.Lookup.PUBLIC;
+import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Array;
@@ -28,6 +29,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URL;
 import java.util.Optional;
 
 public final class ReflectUtils {
@@ -127,5 +129,58 @@ public final class ReflectUtils {
 
     public static <T> T getSingleton(Class<T> clazz) {
         return getSingletonFromMethod(clazz) == null ? getSingletonFromField(clazz) : null;
+    }
+
+    public static String getCaller() {
+        // using "2" to skip this method call and the caller of this method
+        StackTraceElement st = new Exception().getStackTrace()[2];
+        return st.getClassName() + "#" + st.getMethodName();
+    }
+
+    public static File getJarFile(Class<?> clazz) {
+        URL url = getClassLocation(clazz);
+
+        if (url == null) { // shouldn't happen but who knows...
+            return null;
+        }
+
+        if ("jar".equals(url.getProtocol())) {
+            // jar:file:/[...].jar!/[...].class
+
+            String urlString = url.toString();
+
+            try {
+                urlString = urlString.substring(4, urlString.indexOf("!/"));
+                return new File(new URL(urlString).toURI());
+            } catch (Exception e) {} // MalformedURLException, URISyntaxException
+        } else if ("file".equals(url.getProtocol())) {
+            // file:/[...].jar    <- jar file
+            // file:/[...].class  <- running class from command line
+            // file:/[...]/       <- classPath
+
+            String urlString = url.toString();
+
+            if (urlString.endsWith("/") || urlString.endsWith(".jar")) {
+                try {
+                    return new File(url.toURI());
+                } catch (Exception e) {} // URISyntaxException
+            } else if (urlString.endsWith(".class")) {
+                String path = clazz.getCanonicalName().replace('.', '/') + ".class";
+                String newUrl = urlString.substring(0, urlString.length() - path.length());
+                try {
+                    return new File(new URL(newUrl).toURI());
+                } catch (Exception e) {} // MalformedURLException, URISyntaxException
+            }
+        }
+
+        return null;
+    }
+
+    private static URL getClassLocation(Class<?> clazz) {
+        try {
+            return clazz.getProtectionDomain().getCodeSource().getLocation();
+        } catch (Exception e) {} // SecurityException, NPE
+
+        return clazz.getResource(clazz.getName() + ".class");
     }
 }

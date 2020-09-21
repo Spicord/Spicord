@@ -19,6 +19,7 @@ package org.spicord;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,10 +27,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.spicord.api.services.ServiceManager;
 import org.spicord.event.EventHandler;
 import org.spicord.event.SpicordEvent;
+import org.spicord.reflect.ReflectUtils;
 import eu.mcdb.spicord.addon.AddonManager;
 import eu.mcdb.spicord.addon.InfoAddon;
 import eu.mcdb.spicord.addon.PlayersAddon;
@@ -91,6 +94,10 @@ public final class Spicord extends eu.mcdb.spicord.Spicord {
     @Override
     @Deprecated
     public void onLoad(Consumer<eu.mcdb.spicord.Spicord> action) {
+        String caller = ReflectUtils.getCaller();
+        System.err.printf("[%s] Called Spicord#onLoad which is deprecated.\n", caller);
+        System.err.println("Please use Spicord#addEventListener instead.");
+
         loadListeners.add(action);
 
         if (config != null)
@@ -100,6 +107,18 @@ public final class Spicord extends eu.mcdb.spicord.Spicord {
     protected void onLoad(SpicordConfiguration config) throws IOException {
         if (!isLoaded())
             return;
+
+        if (config.isDebugEnabled()) {
+            logger.setLevel(Level.FINER);
+        }
+
+        if (config.isJdaMessagesEnabled()) {
+            try {
+                Class<?> cls = Class.forName("org.spicord.log.LoggerFactory");
+                Method init = cls.getMethod("init", Logger.class);
+                init.invoke(null, logger);
+            } catch (Exception e) {}
+        }
 
         this.config = config;
 

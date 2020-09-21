@@ -6,11 +6,11 @@ import org.spicord.Spicord;
 
 public final class SpicordEvent<T> {
 
-    public static final SpicordEvent<Spicord> SPICORD_LOADED = new SpicordEvent<>();
-
-    /*====================================================*/
-
     private static final Set<SpicordEvent<?>> values = new HashSet<>();
+
+    /*==== add events below this line ====*/
+    public static final SpicordEvent<Spicord> SPICORD_LOADED = new SpicordEvent<>();
+    /*====================================*/
 
     private SpicordEvent() {
         values.add(this);
