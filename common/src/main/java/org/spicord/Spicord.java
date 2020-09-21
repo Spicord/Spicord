@@ -95,8 +95,10 @@ public final class Spicord extends eu.mcdb.spicord.Spicord {
     @Deprecated
     public void onLoad(Consumer<eu.mcdb.spicord.Spicord> action) {
         String caller = ReflectUtils.getCaller();
-        System.err.printf("[%s] Called Spicord#onLoad which is deprecated.\n", caller);
-        System.err.println("Please use Spicord#addEventListener instead.");
+        logger.warning("==============================================");
+        logger.warning(String.format("[%s] Called Spicord#onLoad which is deprecated.", caller));
+        logger.warning("Please use Spicord#addEventListener instead.");
+        logger.warning("==============================================");
 
         loadListeners.add(action);
 
@@ -117,7 +119,9 @@ public final class Spicord extends eu.mcdb.spicord.Spicord {
                 Class<?> cls = Class.forName("org.spicord.log.LoggerFactory");
                 Method init = cls.getMethod("init", Logger.class);
                 init.invoke(null, logger);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+                logger.warning("Failed to enable JDA messages: " + e.getMessage());
+            }
         }
 
         this.config = config;
