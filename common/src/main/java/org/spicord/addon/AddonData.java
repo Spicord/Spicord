@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.addon;
+package org.spicord.addon;
 
 import lombok.Getter;
 

@@ -39,6 +39,7 @@ public final class MCDB {
     /**
      * Register a command to the server.
      * 
+     * @deprecated Use {@link UniversalCommand#register(Object)} instead
      * @param plugin  the plugin instance
      * @param command the command to be registered
      */
