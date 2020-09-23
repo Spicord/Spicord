@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.util;
+package org.spicord.util;
 
 import eu.mcdb.spicord.embed.Embed;
 import net.dv8tion.jda.core.entities.MessageEmbed;

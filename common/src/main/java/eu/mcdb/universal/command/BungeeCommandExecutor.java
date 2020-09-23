@@ -17,7 +17,8 @@
 
 package eu.mcdb.universal.command;
 
-import eu.mcdb.universal.player.UniversalPlayer;
+import org.spicord.player.BungeePlayer;
+import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
@@ -38,30 +39,28 @@ public final class BungeeCommandExecutor extends Command {
     }
 
     @Override
-    public void execute(net.md_5.bungee.api.CommandSender sender, String[] args) {
-        UniversalCommandSender commandSender = new UniversalCommandSender() {
-
-            @Override
-            public boolean hasPermission(String permission) {
-                return sender.hasPermission(permission);
-            }
-
-            @Override
-            public void sendMessage(String message) {
-                sender.sendMessage(new TextComponent(message));
-            }
-        };
+    public void execute(CommandSender sender, String[] args) {
+        UniversalCommandSender commandSender;
 
         if (sender instanceof ProxiedPlayer) {
-            ProxiedPlayer player = (ProxiedPlayer) sender;
-
-            commandSender.setPlayer(new UniversalPlayer(player.getName(), player.getUniqueId()) {
+            commandSender = new BungeePlayer((ProxiedPlayer) sender);
+        } else {
+            commandSender = new UniversalCommandSender() {
 
                 @Override
-                public ProxiedPlayer getProxiedPlayer() {
-                    return player;
+                public boolean hasPermission(String permission) {
+                    return isEmpty(permission) || sender.hasPermission(permission);
                 }
-            });
+
+                @Override
+                public void sendMessage(String message) {
+                    sender.sendMessage(new TextComponent(message));
+                }
+
+                private boolean isEmpty(String string) {
+                    return string == null || string.isEmpty();
+                }
+            };
         }
 
         command.onCommand(commandSender, args);

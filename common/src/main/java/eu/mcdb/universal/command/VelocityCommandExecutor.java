@@ -17,10 +17,10 @@
 
 package eu.mcdb.universal.command;
 
+import org.spicord.player.VelocityPlayer;
 import com.velocitypowered.api.command.Command;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
-import eu.mcdb.universal.player.UniversalPlayer;
 import net.kyori.text.TextComponent;
 
 /**
@@ -39,33 +39,27 @@ public final class VelocityCommandExecutor implements Command {
 
     @Override
     public void execute(CommandSource source, String[] args) {
-        UniversalCommandSender commandSender = new UniversalCommandSender() {
-
-            @Override
-            public boolean hasPermission(String permission) {
-                return isEmpty(permission) || source.hasPermission(permission);
-            }
-
-            @Override
-            public void sendMessage(String message) {
-                source.sendMessage(TextComponent.of(message));
-            }
-
-            private boolean isEmpty(String s) {
-                return s == null || "".equals(s);
-            }
-        };
+        UniversalCommandSender commandSender;
 
         if (source instanceof Player) {
-            Player player = (Player) source;
-
-            commandSender.setPlayer(new UniversalPlayer(player.getUsername(), player.getUniqueId()) {
+            commandSender = new VelocityPlayer((Player) source);
+        } else {
+            commandSender = new UniversalCommandSender() {
 
                 @Override
-                public Player getVelocityPlayer() {
-                    return player;
+                public boolean hasPermission(String permission) {
+                    return isEmpty(permission) || source.hasPermission(permission);
                 }
-            });
+
+                @Override
+                public void sendMessage(String message) {
+                    source.sendMessage(TextComponent.of(message));
+                }
+
+                private boolean isEmpty(String string) {
+                    return string == null || string.isEmpty();
+                }
+            };
         }
 
         command.onCommand(commandSender, args);

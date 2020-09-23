@@ -1,4 +1,4 @@
-package eu.mcdb.spicord.util;
+package org.spicord.util;
 
 import java.nio.file.Path;
 

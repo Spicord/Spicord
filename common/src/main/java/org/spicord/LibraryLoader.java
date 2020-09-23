@@ -27,8 +27,8 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.logging.Logger;
-import eu.mcdb.spicord.util.JarClassLoader;
-import eu.mcdb.spicord.util.SpicordClassLoader;
+import org.spicord.util.JarClassLoader;
+import org.spicord.util.SpicordClassLoader;
 import lombok.Setter;
 
 public class LibraryLoader {

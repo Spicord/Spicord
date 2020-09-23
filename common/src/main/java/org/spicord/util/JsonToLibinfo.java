@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.util;
+package org.spicord.util;
 
 import java.io.File;
 import java.io.FileInputStream;

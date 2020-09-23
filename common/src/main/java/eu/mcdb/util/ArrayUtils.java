@@ -17,6 +17,7 @@
 
 package eu.mcdb.util;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,9 +60,13 @@ public class ArrayUtils {
         if (array.length == 0)
             return array;
 
-        final List<T> l = toList(array);
-        l.remove(array.length - 1);
-        return toArray(l, array);
+        T[] toReturn = create(array.getClass().getComponentType(), array.length - 1);
+
+        for (int i = 0; i < toReturn.length; i++) {
+            toReturn[i] = array[i];
+        }
+
+        return toReturn;
     }
 
     /**
@@ -74,9 +79,13 @@ public class ArrayUtils {
         if (array.length == 0)
             return array;
 
-        final List<T> l = toList(array);
-        l.remove(0);
-        return toArray(l, array);
+        T[] toReturn = create(array.getClass().getComponentType(), array.length - 1);
+
+        for (int i = 0; i < toReturn.length; i++) {
+            toReturn[i] = array[i+1];
+        }
+
+        return toReturn;
     }
 
     @SuppressWarnings("unchecked")
@@ -86,5 +95,10 @@ public class ArrayUtils {
 
     private static <T> LinkedList<T> toList(T[] array) {
         return new LinkedList<T>(Arrays.asList(array));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T[] create(Class<?> componentType, int length) {
+        return (T[]) Array.newInstance(componentType, length);
     }
 }

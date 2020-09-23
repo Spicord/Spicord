@@ -21,7 +21,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import eu.mcdb.universal.player.UniversalPlayer;
+import org.spicord.player.BukkitPlayer;
 
 /**
  * Wrapper for the {@link UniversalCommand} class to
@@ -39,33 +39,27 @@ public final class BukkitCommandExecutor implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command arg1, String arg2, String[] args) {
-        UniversalCommandSender commandSender = new UniversalCommandSender() {
-
-            @Override
-            public boolean hasPermission(String permission) {
-                return isEmpty(permission) || sender.hasPermission(permission);
-            }
-
-            @Override
-            public void sendMessage(String message) {
-                sender.sendMessage(message);
-            }
-
-            private boolean isEmpty(String s) {
-                return s == null || "".equals(s);
-            }
-        };
+        UniversalCommandSender commandSender;
 
         if (sender instanceof Player) {
-            Player player = (Player) sender;
-
-            commandSender.setPlayer(new UniversalPlayer(player.getName(), player.getUniqueId()) {
+            commandSender = new BukkitPlayer((Player) sender);
+        } else {
+            commandSender = new UniversalCommandSender() {
 
                 @Override
-                public Player getBukkitPlayer() {
-                    return player;
+                public boolean hasPermission(String permission) {
+                    return isEmpty(permission) || sender.hasPermission(permission);
                 }
-            });
+
+                @Override
+                public void sendMessage(String message) {
+                    sender.sendMessage(message);
+                }
+
+                private boolean isEmpty(String string) {
+                    return string == null || string.isEmpty();
+                }
+            };
         }
 
         return command.onCommand(commandSender, args);

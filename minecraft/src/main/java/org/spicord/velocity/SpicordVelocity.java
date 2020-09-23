@@ -20,10 +20,10 @@ package org.spicord.velocity;
 import org.spicord.SpicordCommand;
 import org.spicord.SpicordLoader;
 import org.spicord.Version;
+import org.spicord.plugin.VelocityPlugin;
 import com.google.inject.Inject;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
-import eu.mcdb.universal.plugin.VelocityPlugin;
 
 @Plugin(id = "spicord", name = "Spicord", version = Version.VERSION, authors = { "Sheidy" })
 public class SpicordVelocity extends VelocityPlugin {

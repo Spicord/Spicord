@@ -20,9 +20,9 @@ package org.spicord;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
+import org.spicord.util.JarClassLoader;
 import com.google.common.base.Preconditions;
 import eu.mcdb.spicord.config.SpicordConfiguration;
-import eu.mcdb.spicord.util.JarClassLoader;
 
 public final class SpicordLoader implements AutoCloseable {
 

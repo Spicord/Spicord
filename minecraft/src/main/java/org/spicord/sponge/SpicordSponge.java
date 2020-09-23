@@ -8,7 +8,9 @@ import org.slf4j.Logger;
 import org.spicord.SpicordCommand;
 import org.spicord.SpicordLoader;
 import org.spicord.Version;
+import org.spicord.plugin.SpongePlugin;
 import org.spicord.reflect.ReflectedObject;
+import org.spicord.util.SpicordClassLoader;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
@@ -16,8 +18,6 @@ import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStoppingEvent;
 import org.spongepowered.api.plugin.Plugin;
 import com.google.inject.Inject;
-import eu.mcdb.spicord.util.SpicordClassLoader;
-import eu.mcdb.universal.plugin.SpongePlugin;
 import eu.mcdb.util.SLF4JWrapper;
 
 @Plugin(id = "spicord", name = "Spicord", version = Version.VERSION, authors = { "Sheidy" })

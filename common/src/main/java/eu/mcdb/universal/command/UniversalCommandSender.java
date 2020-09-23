@@ -23,6 +23,7 @@ public abstract class UniversalCommandSender {
 
     private UniversalPlayer player;
 
+    @Deprecated
     protected void setPlayer(UniversalPlayer player) {
         this.player = player;
     }
@@ -42,6 +43,7 @@ public abstract class UniversalCommandSender {
      * @return the player, may be null
      * @see {@link #isPlayer()}
      */
+    @Deprecated
     public UniversalPlayer getPlayer() {
         return player;
     }
@@ -92,6 +94,7 @@ public abstract class UniversalCommandSender {
      * 
      * @return true if the sender is a player
      */
+    @Deprecated
     public boolean isPlayer() {
         return player != null;
     }

@@ -17,6 +17,7 @@
 
 package eu.mcdb.universal.command;
 
+import org.spicord.player.SpongePlayer;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -27,7 +28,6 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.command.spec.CommandSpec.Builder;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import eu.mcdb.universal.player.UniversalPlayer;
 
 /**
  * Wrapper for the {@link UniversalCommand} class to
@@ -55,33 +55,27 @@ public class SpongeCommandExecutor implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        UniversalCommandSender commandSender = new UniversalCommandSender() {
-
-            @Override
-            public boolean hasPermission(String permission) {
-                return isEmpty(permission) || src.hasPermission(permission);
-            }
-
-            @Override
-            public void sendMessage(String message) {
-                src.sendMessage(Text.of(message));
-            }
-
-            private boolean isEmpty(String s) {
-                return s == null || "".equals(s);
-            }
-        };
+        UniversalCommandSender commandSender;
 
         if (src instanceof Player) {
-            final Player player = (Player) src;
-
-            commandSender.setPlayer(new UniversalPlayer(player.getName(), player.getUniqueId()) {
+            commandSender = new SpongePlayer((Player) src);
+        } else {
+            commandSender = new UniversalCommandSender() {
 
                 @Override
-                public Player getSpongePlayer() {
-                    return player;
+                public boolean hasPermission(String permission) {
+                    return isEmpty(permission) || src.hasPermission(permission);
                 }
-            });
+
+                @Override
+                public void sendMessage(String message) {
+                    src.sendMessage(Text.of(message));
+                }
+
+                private boolean isEmpty(String string) {
+                    return string == null || string.isEmpty();
+                }
+            };
         }
 
         final String[] _args = args.<String>requireOne("args").split(" ");

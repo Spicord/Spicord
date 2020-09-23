@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.universal.plugin;
+package org.spicord.plugin;
 
 import java.io.File;
 import java.util.logging.Logger;

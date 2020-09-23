@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.util;
+package org.spicord.util;
 
 import java.net.MalformedURLException;
 import java.net.URL;
