@@ -1,11 +1,11 @@
 package org.spicord;
 
 import java.io.File;
-import java.util.logging.Logger;
 import org.spicord.LibraryLoader;
 import org.spicord.fix.FixClassLoaderPosition;
+import org.spicord.plugin.PluginInterface;
 
-public interface SpicordPlugin {
+public interface SpicordPlugin extends PluginInterface {
 
     default void checkLoader(boolean isBukkit) {
         if (new File(getDataFolder(), "fixloader.txt").exists()) {
@@ -27,10 +27,6 @@ public interface SpicordPlugin {
             LibraryLoader.setForceLoad(true);
         }
     }
-
-    File getFile();
-    File getDataFolder();
-    Logger getLogger();
 
     /*====================================================*/
 

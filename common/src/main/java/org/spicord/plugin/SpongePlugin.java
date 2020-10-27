@@ -26,7 +26,6 @@ import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginManager;
 import eu.mcdb.util.SLF4JWrapper;
-import lombok.AccessLevel;
 import lombok.Getter;
 
 @Getter
@@ -42,19 +41,16 @@ public class SpongePlugin {
     private File dataFolder;
     private Logger logger;
 
-    @Getter(value = AccessLevel.NONE)
-    private Plugin plugin;
-
     public SpongePlugin() {
         this.game = Sponge.getGame();
         this.commandManager = game.getCommandManager();
         this.pluginManager = game.getPluginManager();
         this.eventManager = game.getEventManager();
 
-        final String name = getName();
+        final Plugin plugin = getPlugin();
 
-        this.dataFolder = new File(configDir, name);
-        this.logger = new SLF4JWrapper(name);
+        this.dataFolder = new File(configDir, plugin.id());
+        this.logger = new SLF4JWrapper(plugin.name().isEmpty() ? plugin.id() : plugin.name());
 
         this.onLoad();
         this.onEnable();
@@ -63,13 +59,11 @@ public class SpongePlugin {
     public void onLoad() {}
     public void onEnable() {}
 
-    private String getName() {
+    private Plugin getPlugin() {
         final Class<?> clazz = getClass();
 
         if (clazz.isAnnotationPresent(Plugin.class)) {
-            this.plugin = clazz.getAnnotation(Plugin.class);
-
-            return plugin.name().isEmpty() ? plugin.id() : plugin.name();
+            return clazz.getAnnotation(Plugin.class);
         }
 
         throw new IllegalStateException(String.format("missing annotation %s for class %s", Plugin.class.getName(), clazz.getName()));

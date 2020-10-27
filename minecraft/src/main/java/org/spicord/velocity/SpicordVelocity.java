@@ -17,16 +17,19 @@
 
 package org.spicord.velocity;
 
+import java.io.File;
 import org.spicord.SpicordCommand;
 import org.spicord.SpicordLoader;
+import org.spicord.SpicordPlugin;
 import org.spicord.Version;
 import org.spicord.plugin.VelocityPlugin;
+import org.spicord.reflect.ReflectUtils;
 import com.google.inject.Inject;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
 
 @Plugin(id = "spicord", name = "Spicord", version = Version.VERSION, authors = { "Sheidy" })
-public class SpicordVelocity extends VelocityPlugin {
+public class SpicordVelocity extends VelocityPlugin implements SpicordPlugin {
 
     private SpicordLoader loader;
 
@@ -36,5 +39,10 @@ public class SpicordVelocity extends VelocityPlugin {
         this.loader = new SpicordLoader(getLogger(), getDataFolder());
         this.loader.load();
         new SpicordCommand(() -> {}).register(this);
+    }
+
+    @Override
+    public File getFile() {
+        return ReflectUtils.getJarFile(SpicordVelocity.class);
     }
 }

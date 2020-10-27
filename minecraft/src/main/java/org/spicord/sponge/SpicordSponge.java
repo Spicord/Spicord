@@ -7,8 +7,10 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.spicord.SpicordCommand;
 import org.spicord.SpicordLoader;
+import org.spicord.SpicordPlugin;
 import org.spicord.Version;
 import org.spicord.plugin.SpongePlugin;
+import org.spicord.reflect.ReflectUtils;
 import org.spicord.reflect.ReflectedObject;
 import org.spicord.util.SpicordClassLoader;
 import org.spongepowered.api.Sponge;
@@ -18,10 +20,9 @@ import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStoppingEvent;
 import org.spongepowered.api.plugin.Plugin;
 import com.google.inject.Inject;
-import eu.mcdb.util.SLF4JWrapper;
 
 @Plugin(id = "spicord", name = "Spicord", version = Version.VERSION, authors = { "Sheidy" })
-public class SpicordSponge extends SpongePlugin {
+public class SpicordSponge extends SpongePlugin implements SpicordPlugin {
 
     private static final List<String> EXCEPTIONS = Arrays.asList(
             "org.mozilla.javascript.",
@@ -36,7 +37,7 @@ public class SpicordSponge extends SpongePlugin {
     public SpicordSponge(Logger logger, @ConfigDir(sharedRoot = false) File configDir) {
         ClassLoader cl = prepareClassLoader(Sponge.class.getClassLoader());
         SpicordClassLoader classLoader = new SpicordClassLoader(cl);
-        loader = new SpicordLoader(classLoader, new SLF4JWrapper(logger), configDir);
+        loader = new SpicordLoader(classLoader, getLogger(), configDir);
     }
 
     @Listener
@@ -47,7 +48,7 @@ public class SpicordSponge extends SpongePlugin {
 
     @Listener
     public void stop(GameStoppingEvent event) {
-        loader.close();
+        loader.shutdown();
     }
 
     private ClassLoader prepareClassLoader(ClassLoader classLoader) {
@@ -58,5 +59,10 @@ public class SpicordSponge extends SpongePlugin {
 
         classLoaderExceptions.addAll(EXCEPTIONS);
         return parent;
+    }
+
+    @Override
+    public File getFile() {
+        return ReflectUtils.getJarFile(SpicordSponge.class);
     }
 }

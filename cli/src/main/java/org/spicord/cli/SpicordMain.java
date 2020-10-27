@@ -43,7 +43,7 @@ public class SpicordMain {
 
         RESTART = () -> {
             if (loader != null)
-                loader.disable();
+                loader.shutdown();
             this.loader = new SpicordLoader(this.logger, this.dataFolder);
             this.loader.load();
         };
@@ -59,7 +59,7 @@ public class SpicordMain {
                 final String input = lineReader.readLine(prompt);
                 scc.execute(input);
             } catch (Exception e) {
-                this.loader.disable();
+                this.loader.shutdown();
                 System.out.println("Bye!");
                 System.exit(0);
                 break;

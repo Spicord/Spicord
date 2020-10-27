@@ -29,6 +29,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Optional;
 
@@ -152,7 +154,11 @@ public final class ReflectUtils {
             try {
                 urlString = urlString.substring(4, urlString.indexOf("!/"));
                 return new File(new URL(urlString).toURI());
-            } catch (Exception e) {} // MalformedURLException, URISyntaxException
+            } catch (MalformedURLException
+                   | URISyntaxException
+                   | IndexOutOfBoundsException e) {
+                System.err.println("Unable to get File from URL: " + e.getMessage());
+            }
         } else if ("file".equals(url.getProtocol())) {
             // file:/[...].jar    <- jar file
             // file:/[...].class  <- running class from command line
@@ -163,13 +169,20 @@ public final class ReflectUtils {
             if (urlString.endsWith("/") || urlString.endsWith(".jar")) {
                 try {
                     return new File(url.toURI());
-                } catch (Exception e) {} // URISyntaxException
+                } catch (URISyntaxException e) {
+                    System.err.println("Unable to get File from URL: " + e.getMessage());
+                }
             } else if (urlString.endsWith(".class")) {
                 String path = clazz.getCanonicalName().replace('.', '/') + ".class";
                 String newUrl = urlString.substring(0, urlString.length() - path.length());
+
                 try {
                     return new File(new URL(newUrl).toURI());
-                } catch (Exception e) {} // MalformedURLException, URISyntaxException
+                } catch (MalformedURLException
+                        | URISyntaxException
+                        | IndexOutOfBoundsException e) {
+                    System.err.println("Unable to get File from URL: " + e.getMessage());
+                }
             }
         }
 
@@ -179,7 +192,7 @@ public final class ReflectUtils {
     private static URL getClassLocation(Class<?> clazz) {
         try {
             return clazz.getProtectionDomain().getCodeSource().getLocation();
-        } catch (Exception e) {} // SecurityException, NPE
+        } catch (SecurityException | NullPointerException e) {/*ignore*/}
 
         return clazz.getResource(clazz.getName() + ".class");
     }

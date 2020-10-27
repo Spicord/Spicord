@@ -50,7 +50,7 @@ public class SpicordBungee extends Plugin implements SpicordPlugin {
     @Override
     public void onDisable() {
         if (loader != null)
-            loader.disable();
+            loader.shutdown();
 
         this.loader = null;
     }

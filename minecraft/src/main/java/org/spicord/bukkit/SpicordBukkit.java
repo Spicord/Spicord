@@ -55,7 +55,7 @@ public class SpicordBukkit extends JavaPlugin implements SpicordPlugin {
     @Override
     public void onDisable() {
         if (loader != null)
-            loader.disable();
+            loader.shutdown();
 
         this.loader = null;
     }

@@ -24,7 +24,7 @@ import org.spicord.util.JarClassLoader;
 import com.google.common.base.Preconditions;
 import eu.mcdb.spicord.config.SpicordConfiguration;
 
-public final class SpicordLoader implements AutoCloseable {
+public final class SpicordLoader {
 
     private static boolean firstRun = true;
 
@@ -48,10 +48,6 @@ public final class SpicordLoader implements AutoCloseable {
         this.libraryLoader = new LibraryLoader(classLoader, "/libraries.libinfo", logger, dataFolder);
         this.dataFolder = dataFolder;
 
-        this.load0();
-    }
-
-    private void load0() {
         try {
             if (firstRun) {
                 firstRun = false;
@@ -74,23 +70,15 @@ public final class SpicordLoader implements AutoCloseable {
         }
     }
 
-    @Override
-    public void close() {
+    public void shutdown() {
         if (spicord != null)
             spicord.onDisable();
         spicord = null;
     }
 
-    /**
-     * Turns off Spicord.
-     */
-    public void disable() {
-        close();
-    }
-
     private void handleException(Exception e) {
         logger.severe("Spicord could not be loaded, please report this error in \n\t -> https://github.com/OopsieWoopsie/Spicord/issues");
         e.printStackTrace();
-        disable();
+        shutdown();
     }
 }

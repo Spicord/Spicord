@@ -21,9 +21,7 @@ public class ServerUtil {
         }
     }    
 
-    public static class setVelocityHandle {
-        public setVelocityHandle(Object proxy) {
-            VelocityServer.setHandle((ProxyServer) proxy);
-        }
+    public static void setVelocityHandle(Object proxy) {
+        VelocityServer.setHandle((ProxyServer) proxy);
     }
 }

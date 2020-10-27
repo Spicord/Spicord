@@ -131,6 +131,10 @@ public class Command extends UniversalCommand {
         this.commandHandler = commandHandler;
     }
 
+    public void setAsyncCommandHandler(final AsyncCommandHandler commandHandler) {
+        this.setCommandHandler(commandHandler);
+    }
+
     /**
      * Set the command handler for this command.
      * Note: The command handler will not receive any parameter.

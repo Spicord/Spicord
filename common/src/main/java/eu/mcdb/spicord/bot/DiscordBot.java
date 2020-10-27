@@ -95,9 +95,10 @@ public class DiscordBot extends SimpleBot implements Node {
 
         try {
             this.status = BotStatus.STARTING;
-            this.jda = new JDABuilder(AccountType.BOT).setToken(token).setAutoReconnect(true).build();
-
-            jda.addEventListener(new BotStatusListener(this));
+            this.jda = new JDABuilder(token)
+                    .setAutoReconnect(true)
+                    .addEventListener(new BotStatusListener(this))
+                    .build();
 
             if (commandSupportEnabled)
                 jda.addEventListener(new BotCommandListener(this));

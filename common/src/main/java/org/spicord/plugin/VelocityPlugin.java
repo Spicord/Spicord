@@ -33,27 +33,25 @@ public abstract class VelocityPlugin {
 
     private final static File pluginsDir = new File("plugins");
 
-    private static ProxyServer proxyServer;
-    private static CommandManager commandManager;
-    private static EventManager eventManager;
-    private static PluginManager pluginManager;
+    @Getter private static ProxyServer proxyServer;
+    @Getter private static CommandManager commandManager;
+    @Getter private static EventManager eventManager;
+    @Getter private static PluginManager pluginManager;
 
     @Getter private File dataFolder;
     @Getter private Logger logger;
-
-    private Plugin plugin;
 
     public VelocityPlugin() {
         check();
     }
 
-    public VelocityPlugin(@NonNull ProxyServer proxyServer) {
-        VelocityPlugin.proxyServer = proxyServer;
-        commandManager = proxyServer.getCommandManager();
-        eventManager = proxyServer.getEventManager();
-        pluginManager = proxyServer.getPluginManager();
+    public VelocityPlugin(@NonNull ProxyServer server) {
+        proxyServer    = server;
+        commandManager = server.getCommandManager();
+        eventManager   = server.getEventManager();
+        pluginManager  = server.getPluginManager();
+        ServerUtil.setVelocityHandle(server);
 
-        new ServerUtil.setVelocityHandle(proxyServer);
         check();
     }
 
@@ -61,22 +59,20 @@ public abstract class VelocityPlugin {
     public void onEnable() {}
 
     private void check() {
-        final String name = getName();
+        final Plugin name = getPlugin();
 
-        this.dataFolder = new File(pluginsDir, name);
-        this.logger = new SLF4JWrapper(name);
+        this.dataFolder = new File(pluginsDir, name.id());
+        this.logger = new SLF4JWrapper(name.name().isEmpty() ? name.id() : name.name());
 
         this.onLoad();
         this.onEnable(); // TODO
     }
 
-    private String getName() {
+    private Plugin getPlugin() {
         final Class<?> clazz = getClass();
 
         if (clazz.isAnnotationPresent(Plugin.class)) {
-            this.plugin = clazz.getAnnotation(Plugin.class);
-
-            return plugin.name().isEmpty() ? plugin.id() : plugin.name();
+            return clazz.getAnnotation(Plugin.class);
         }
 
         throw new IllegalStateException(String.format("missing annotation %s for class %s", Plugin.class.getName(), clazz.getName()));
@@ -84,21 +80,5 @@ public abstract class VelocityPlugin {
 
     public final org.slf4j.Logger getSLF4JLogger() {
         return ((SLF4JWrapper) logger).getSLF4JLogger();
-    }
-
-    public ProxyServer getProxyServer() {
-        return proxyServer;
-    }
-
-    public CommandManager getCommandManager() {
-        return commandManager;
-    }
-
-    public EventManager getEventManager() {
-        return eventManager;
-    }
-
-    public PluginManager getPluginManager() {
-        return pluginManager;
     }
 }
