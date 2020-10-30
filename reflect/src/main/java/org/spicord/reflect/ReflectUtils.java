@@ -42,6 +42,7 @@ public final class ReflectUtils {
 
     static {
         lookup_c = new ReflectedObject(Lookup.class)
+                .setErrorRule(ReflectErrorRule.IGNORE)
                 .getConstructor(Class.class, int.class)
                 .setAccessible();
     }
@@ -85,6 +86,9 @@ public final class ReflectUtils {
      * @return
      */
     public static Lookup getLookup(Member m) {
+        if (lookup_c == null) {
+            return fullLookup;
+        }
         return MemberUtils.isPublic(m) ? fullLookup : lookup_c.invoke(m.getDeclaringClass(), ALL_MODES);
     }
 
