@@ -43,8 +43,10 @@ public final class ReflectUtils {
     static {
         lookup_c = new ReflectedObject(Lookup.class)
                 .setErrorRule(ReflectErrorRule.IGNORE)
-                .getConstructor(Class.class, int.class)
-                .setAccessible();
+                .getConstructor(Class.class, int.class);
+        if (lookup_c != null) {
+            lookup_c.setAccessible();
+        }
     }
 
     private ReflectUtils() {}
