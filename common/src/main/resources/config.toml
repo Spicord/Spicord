@@ -7,6 +7,12 @@
 config_version = 1
 
 
+# Time in seconds that Spicord will wait for
+# all external addons to register.
+# Don't change this if you don't need this.
+loadDelay = 10
+
+
 # Leave it empty or delete the line to disable the footer
 # or replace the text with whatever you want!
 integrated_addon_footer = "Powered by Spicord v{version}"

@@ -37,7 +37,9 @@ public class SpicordBungee extends Plugin implements SpicordPlugin {
         };
         reload.run();
 
-        getProxy().getScheduler().schedule(this, () -> loader.load(), 10, TimeUnit.SECONDS);
+        int delay = loader.getConfig().getLoadDelay();
+        getLogger().info("Spicord will load in " + delay + " seconds");
+        getProxy().getScheduler().schedule(this, () -> loader.load(), delay, TimeUnit.SECONDS);
 
         new SpicordCommand(() -> {
             reload.run();

@@ -29,8 +29,8 @@ public final class SpicordLoader {
     private static boolean firstRun = true;
 
     private Spicord spicord;
+    private SpicordConfiguration config;
 
-    private final File dataFolder;
     private final LibraryLoader libraryLoader;
     private final Logger logger;
 
@@ -46,7 +46,6 @@ public final class SpicordLoader {
 
         this.logger = logger;
         this.libraryLoader = new LibraryLoader(classLoader, "/libraries.libinfo", logger, dataFolder);
-        this.dataFolder = dataFolder;
 
         try {
             if (firstRun) {
@@ -55,6 +54,7 @@ public final class SpicordLoader {
                 libraryLoader.loadLibraries();
             }
 
+            this.config  = new SpicordConfiguration(logger, dataFolder);
             this.spicord = new Spicord(logger);
         } catch (IOException e) {
             handleException(e);
@@ -63,7 +63,6 @@ public final class SpicordLoader {
 
     public void load() {
         try {
-            final SpicordConfiguration config = new SpicordConfiguration(dataFolder);
             spicord.onLoad(config);
         } catch (IOException e) {
             handleException(e);
@@ -80,5 +79,9 @@ public final class SpicordLoader {
         logger.severe("Spicord could not be loaded, please report this error in \n\t -> https://github.com/OopsieWoopsie/Spicord/issues");
         e.printStackTrace();
         shutdown();
+    }
+
+    public SpicordConfiguration getConfig() {
+        return config;
     }
 }

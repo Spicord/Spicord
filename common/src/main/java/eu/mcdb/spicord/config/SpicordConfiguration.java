@@ -29,33 +29,37 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 import com.moandjiezana.toml.Toml;
 import com.moandjiezana.toml.TomlWriter;
-import eu.mcdb.spicord.api.Node;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.config.SpicordConfiguration.SpicordConfig.Bot;
 import lombok.Getter;
 
-public final class SpicordConfiguration implements Node {
+// this is a mess, i know, will be re-made in the future :)
+public final class SpicordConfiguration {
 
     @Getter private final Set<DiscordBot> bots;
     @Getter private final File dataFolder;
     @Getter private boolean debugEnabled;
     @Getter private boolean jdaMessagesEnabled;
     @Getter private String integratedAddonFooter;
+    @Getter private int loadDelay;
 
     private final File configFile;
     private final TomlWriter writer;
+    private final Logger logger;
     private SpicordConfig config;
 
     @Getter private final ConfigurationManager manager;
 
-    public SpicordConfiguration(final File dataFolder) {
+    public SpicordConfiguration(Logger logger, final File dataFolder) {
         this.bots = Collections.synchronizedSet(new HashSet<DiscordBot>());
 
         this.dataFolder = dataFolder;
         this.dataFolder.mkdir();
         this.configFile = new File(dataFolder, "config.toml");
+        this.logger = logger;
 
         this.writer = new TomlWriter.Builder()
                 .indentValuesBy(2)
@@ -86,12 +90,13 @@ public final class SpicordConfiguration implements Node {
             bots.add(bot);
         }
 
+        this.loadDelay = config.loadDelay >= 10 ? config.loadDelay : 10;
         this.jdaMessagesEnabled = config.jda_messages.enabled;
         this.debugEnabled = config.jda_messages.debug;
         this.integratedAddonFooter = config.integrated_addon_footer;
 
         long disabledCount = bots.stream().filter(DiscordBot::isDisabled).count();
-        getLogger().info("Loaded " + bots.size() + " bots, " + disabledCount + " disabled.");
+        logger.info("Loaded " + bots.size() + " bots, " + disabledCount + " disabled.");
     }
 
     public void save() {
@@ -215,6 +220,7 @@ public final class SpicordConfiguration implements Node {
 
     public static class SpicordConfig {
 
+        private int loadDelay;
         private int config_version; // not used yet
         private String integrated_addon_footer;
 
