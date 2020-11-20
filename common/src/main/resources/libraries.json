@@ -5,9 +5,9 @@
     "url": "https://repo1.maven.org/maven2/com/moandjiezana/toml/toml4j/0.7.2/toml4j-0.7.2.jar"
   },
   {
-    "name": "org.spicord:JDA:3.8.4",
-    "sha1": "47c60c9e305e7e9345d9cce9569fc17e1a51c788",
-    "url": "https://repo.spicord.org/org/spicord/JDA/3.8.4/JDA-3.8.4.jar"
+    "name": "org.spicord:JDA:3.8.5",
+    "sha1": "65e3c3f652a58fa46e0d5bd03185244b306d2dc2",
+    "url": "https://repo.spicord.org/org/spicord/JDA/3.8.5/JDA-3.8.5.jar"
   },
   {
     "name": "org.mozilla:rhino:1.7.12",

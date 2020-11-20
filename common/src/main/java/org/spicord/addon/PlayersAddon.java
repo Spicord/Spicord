@@ -20,6 +20,7 @@ package org.spicord.addon;
 import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import org.spicord.Spicord;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
@@ -44,9 +45,13 @@ public class PlayersAddon extends SimpleAddon {
                 return;
             }
 
+            Map<String, List<String>> playerList = getServer().getServersAndPlayers();
+
+            int playerCount = 0;
+
             if (args.length > 0) {
                 String server = args[0].replace("`", "'");
-                List<String> players = getServer().getServersAndPlayers().get(server);
+                List<String> players = playerList.get(server);
 
                 if (players == null) {
                     String usage = "Usage: `" + command.getPrefix() + "players [server]`";
@@ -54,11 +59,13 @@ public class PlayersAddon extends SimpleAddon {
                     return;
                 } else {
                     desc = buildServerLine(server, players);
+                    playerCount = players.size();
                 }
             } else {
-                for (Entry<String, List<String>> entry : getServer().getServersAndPlayers().entrySet()) {
+                for (Entry<String, List<String>> entry : playerList.entrySet()) {
                     String server = entry.getKey();
                     List<String> players = entry.getValue();
+                    playerCount += players.size();
 
                     String line = buildServerLine(server, players);
 
@@ -67,7 +74,7 @@ public class PlayersAddon extends SimpleAddon {
             }
 
             final EmbedBuilder builder = new EmbedBuilder()
-                    .setTitle("Total players: " + getServer().getOnlineCount())
+                    .setTitle("Total players: " + playerCount)
                     .setDescription(desc)
                     .setColor(new Color(5154580));
 
@@ -75,9 +82,11 @@ public class PlayersAddon extends SimpleAddon {
 
             command.reply(builder.build());
         } else {
+            final String[] online = getServer().getOnlinePlayers();
+
             final EmbedBuilder builder = new EmbedBuilder()
-                    .setTitle("Players (" + getServer().getOnlineCount() + "): ")
-                    .setDescription(String.join(", ", escapeUnderscores(getServer().getOnlinePlayers())))
+                    .setTitle("Players (" + online.length + "): ")
+                    .setDescription(String.join(", ", escapeUnderscores(online)))
                     .setColor(new Color(5154580));
 
             setFooter(builder);

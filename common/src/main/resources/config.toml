@@ -7,6 +7,17 @@
 config_version = 1
 
 
+# === Discord Gateway Intents ===
+# - Use "default" if your bot doesn't uses
+# tracks members statuses and join/leave
+# events.
+# - Otherwise use "privileged" but
+# don't forget to enable the privileged
+# intents in your Bot configuration
+# on the Discord Developer Portal.
+gateway: "default"
+
+
 # Time in seconds that Spicord will wait for
 # all external addons to register.
 # Don't change this if you don't need this.
