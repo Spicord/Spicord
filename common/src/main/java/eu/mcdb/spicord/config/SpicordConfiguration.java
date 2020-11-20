@@ -90,13 +90,6 @@ public final class SpicordConfiguration {
             bots.add(bot);
         }
 
-        if ("privileged".equals(config.gateway)) {
-            System.setProperty("spicord.jda.intents", "privileged");
-            logger.warning("USING PRIVILEGED GATEWAY INTENTS");
-            logger.warning("DONT FORGET TO ENABLE IT IN YOUR BOT");
-            logger.warning("OTHERWISE YOUR BOT WONT BOOT");
-        }
-
         this.loadDelay = config.loadDelay >= 10 ? config.loadDelay : 10;
         this.jdaMessagesEnabled = config.jda_messages.enabled;
         this.debugEnabled = config.jda_messages.debug;
@@ -227,7 +220,6 @@ public final class SpicordConfiguration {
 
     public static class SpicordConfig {
 
-        private String gateway;
         private int loadDelay;
         private int config_version; // not used yet
         private String integrated_addon_footer;
