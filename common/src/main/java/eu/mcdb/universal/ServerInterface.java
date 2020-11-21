@@ -41,6 +41,7 @@ public interface ServerInterface {
 
     /**
      * Get the names of the connected players.
+     * Vanished players will not be shown in Bukkit and BungeeCord.
      * 
      * @return the names of the online players
      */
@@ -60,6 +61,7 @@ public interface ServerInterface {
      * When using bukkit the only map key will be "default"
      * and it will contain all the online players, the
      * result is the same as {@link #getOnlinePlayers()}.
+     * Vanished players will not be shown in Bukkit and BungeeCord.
      * 
      * @return the list of online players on each server
      */

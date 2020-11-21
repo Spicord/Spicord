@@ -26,6 +26,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.spicord.player.BungeePlayer;
+import org.spicord.util.VanishAPI;
 import eu.mcdb.universal.Server;
 import eu.mcdb.universal.player.UniversalPlayer;
 import net.md_5.bungee.api.ProxyServer;
@@ -51,7 +52,9 @@ final class BungeeServer extends Server {
 
     @Override
     public String[] getOnlinePlayers() {
+        final VanishAPI vanish = VanishAPI.get();
         return bungee.getPlayers().stream()
+                .filter(vanish::isVisible)
                 .map(ProxiedPlayer::getName)
                 .toArray(String[]::new);
     }
@@ -60,8 +63,9 @@ final class BungeeServer extends Server {
     public Map<String, List<String>> getServersAndPlayers() {
         final Map<String, List<String>> map = new HashMap<String, List<String>>();
 
+        final VanishAPI vanish = VanishAPI.get();
         final Collection<ProxiedPlayer> players = bungee.getPlayers().stream()
-                .filter(ProxiedPlayer::isConnected)
+                .filter(vanish::isVisible)
                 .collect(Collectors.toList());
 
         for (final ProxiedPlayer player : players) {

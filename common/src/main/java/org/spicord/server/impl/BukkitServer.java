@@ -31,6 +31,7 @@ import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.spicord.player.BukkitPlayer;
+import org.spicord.util.VanishAPI;
 import eu.mcdb.universal.player.UniversalPlayer;
 
 final class BukkitServer extends eu.mcdb.universal.Server {
@@ -49,7 +50,9 @@ final class BukkitServer extends eu.mcdb.universal.Server {
 
     @Override
     public String[] getOnlinePlayers() {
+        final VanishAPI vanish = VanishAPI.get();
         return bukkit.getOnlinePlayers().stream()
+                .filter(vanish::isVisible)
                 .map(Player::getName)
                 .toArray(String[]::new);
     }
