@@ -48,7 +48,7 @@ public final class MCDB {
             new registerBungeeCommand((Plugin) plugin, command);
         else if (isInstance(plugin, "org.bukkit.plugin.java.JavaPlugin"))
             new registerBukkitCommand((JavaPlugin) plugin, command);
-        else if (isInstance(plugin, "eu.mcdb.universal.plugin.VelocityPlugin"))
+        else if (isInstance(plugin, "org.spicord.plugin.VelocityPlugin"))
             new registerVelocityCommand((VelocityPlugin) plugin, command);
         else if (isSpongePlugin(plugin))
             new registerSpongeCommand((SpongePlugin) plugin, command);
@@ -61,8 +61,8 @@ public final class MCDB {
         try {
             Class<?> pluginClass = plugin.getClass();
             Class<?> pluginAnnotation = Class.forName("org.spongepowered.api.plugin.Plugin");
-            
-            return isInstance(plugin, "eu.mcdb.universal.plugin.SpongePlugin")
+
+            return isInstance(plugin, "org.spicord.plugin.SpongePlugin")
                     || pluginClass.isAnnotationPresent((Class<? extends Annotation>) pluginAnnotation);
         } catch (ClassNotFoundException e) {}
         return false;
