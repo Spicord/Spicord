@@ -37,37 +37,39 @@ public class PlayersAddon extends SimpleAddon {
 
     @Override
     public void onCommand(DiscordBotCommand command, String[] args) {
+        Server server = Server.getInstance();
+
         if (Server.getServerType() == ServerType.BUNGEECORD) {
             String desc = "";
 
-            if (getServer().getOnlineCount() == 0) {
+            if (server.getOnlineCount() == 0) {
                 command.reply(command.getAuthorAsMention() + ", there are no players online!");
                 return;
             }
 
-            Map<String, List<String>> playerList = getServer().getServersAndPlayers();
+            Map<String, List<String>> playerList = server.getServersAndPlayers();
 
             int playerCount = 0;
 
             if (args.length > 0) {
-                String server = args[0].replace("`", "'");
-                List<String> players = playerList.get(server);
+                String serverName = args[0].replace("`", "'");
+                List<String> players = playerList.get(serverName);
 
                 if (players == null) {
                     String usage = "Usage: `" + command.getPrefix() + "players [server]`";
-                    command.reply(command.getAuthorAsMention() + ", the server `" + server + "` was not found!\n" + usage);
+                    command.reply(command.getAuthorAsMention() + ", the server `" + serverName + "` was not found!\n" + usage);
                     return;
                 } else {
-                    desc = buildServerLine(server, players);
+                    desc = buildServerLine(serverName, players);
                     playerCount = players.size();
                 }
             } else {
                 for (Entry<String, List<String>> entry : playerList.entrySet()) {
-                    String server = entry.getKey();
+                    String serverName = entry.getKey();
                     List<String> players = entry.getValue();
                     playerCount += players.size();
 
-                    String line = buildServerLine(server, players);
+                    String line = buildServerLine(serverName, players);
 
                     desc += line + "\n";
                 }
@@ -82,7 +84,7 @@ public class PlayersAddon extends SimpleAddon {
 
             command.reply(builder.build());
         } else {
-            final String[] online = getServer().getOnlinePlayers();
+            final String[] online = server.getOnlinePlayers();
 
             final EmbedBuilder builder = new EmbedBuilder()
                     .setTitle("Players (" + online.length + "): ")

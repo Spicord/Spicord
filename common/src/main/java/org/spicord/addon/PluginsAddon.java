@@ -21,6 +21,7 @@ import java.awt.Color;
 import org.spicord.Spicord;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.bot.command.DiscordBotCommand;
+import eu.mcdb.universal.Server;
 import net.dv8tion.jda.core.EmbedBuilder;
 
 public class PluginsAddon extends SimpleAddon {
@@ -31,9 +32,11 @@ public class PluginsAddon extends SimpleAddon {
 
     @Override
     public void onCommand(DiscordBotCommand command, String[] args) {
+        final Server server = Server.getInstance();
+
         final EmbedBuilder builder = new EmbedBuilder()
-                .setTitle("Plugins (" + getServer().getPlugins().length + "): ")
-                .setDescription(String.join(", ", getServer().getPlugins()))
+                .setTitle("Plugins (" + server.getPlugins().length + "): ")
+                .setDescription(String.join(", ", server.getPlugins()))
                 .setColor(new Color(5154580));
 
         String footer = getSpicord().getConfig().getIntegratedAddonFooter();

@@ -93,7 +93,7 @@ public final class MCDB {
             final List<String> aliases = Arrays.asList(command.getAliases());
             aliases.add(command.getName());
 
-            plugin.getCommandManager().register(new VelocityCommandExecutor(command), aliases.toArray(new String[aliases.size()]));
+            VelocityPlugin.getCommandManager().register(new VelocityCommandExecutor(command), aliases.toArray(new String[aliases.size()]));
         }
     }
 

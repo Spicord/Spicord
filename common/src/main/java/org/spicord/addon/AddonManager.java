@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Logger;
 import org.spicord.script.ScriptEngine;
 import org.spicord.script.ScriptEnvironment;
 import org.spicord.script.ScriptException;
@@ -48,6 +49,12 @@ public class AddonManager extends eu.mcdb.spicord.addon.AddonManager {
 
     static {
         addons = Collections.synchronizedSet(new HashSet<SimpleAddon>());
+    }
+
+    private final Logger logger;
+
+    public AddonManager(Logger logger) {
+        this.logger = logger;
     }
 
     /**
@@ -83,7 +90,7 @@ public class AddonManager extends eu.mcdb.spicord.addon.AddonManager {
         if (!isRegistered(addon)) {
             final Object[] args = new Object[] { addon.getName(), addon.getId(), addon.getAuthor() };
 
-            getLogger().info(String.format("Registered addon '%s' (%s) by %s", args));
+            logger.info(String.format("Registered addon '%s' (%s) by %s", args));
 
             return addons.add(addon);
         }
@@ -124,7 +131,7 @@ public class AddonManager extends eu.mcdb.spicord.addon.AddonManager {
             if (addon.getId().equals(id))
                 return addon;
 
-        getLogger().warning("The addon with the id '" + id + "' was not found.");
+        logger.warning("The addon with the id '" + id + "' was not found.");
         return null;
     }
 
@@ -226,12 +233,12 @@ public class AddonManager extends eu.mcdb.spicord.addon.AddonManager {
                     throw new ScriptException("the '" + main + "' file needs to export the addon instance");
                 }
             } else {
-                getLogger().warning(String.format(
+                logger.warning(String.format(
                         "The file '%s' doesn't contains the 'addon.json' file on its root directory, ignoring it",
                         file.getName()));
             }
         } catch (IOException e) {
-            getLogger().warning(String.format("The file '%s' cannot be loaded: %s", file.getName(), e.getMessage()));
+            logger.warning(String.format("The file '%s' cannot be loaded: %s", file.getName(), e.getMessage()));
         }
     }
 
@@ -272,7 +279,7 @@ public class AddonManager extends eu.mcdb.spicord.addon.AddonManager {
                 }
             }
         } catch (IOException e) {
-            getLogger().warning(String.format("The addon on folder '%s' cannot be loaded: %s", addonDir.getName(), e.getMessage()));
+            logger.warning(String.format("The addon on folder '%s' cannot be loaded: %s", addonDir.getName(), e.getMessage()));
         }    
     }
 }

@@ -21,6 +21,7 @@ import java.awt.Color;
 import org.spicord.Spicord;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.bot.command.DiscordBotCommand;
+import eu.mcdb.universal.Server;
 import net.dv8tion.jda.core.EmbedBuilder;
 
 public class InfoAddon extends SimpleAddon {
@@ -31,8 +32,9 @@ public class InfoAddon extends SimpleAddon {
 
     @Override
     public void onCommand(DiscordBotCommand command, String[] args) {
-        int onlineCount = getServer().getOnlineCount();
-        int playerLimit = getServer().getPlayerLimit();
+        Server server = Server.getInstance();
+        int onlineCount = server.getOnlineCount();
+        int playerLimit = server.getPlayerLimit();
 
         StringBuilder sb = new StringBuilder();
 
@@ -49,7 +51,7 @@ public class InfoAddon extends SimpleAddon {
         sb.append('\n'); // new line
 
         sb.append("Server version: ");
-        sb.append(getServer().getVersion());
+        sb.append(server.getVersion());
 
         final EmbedBuilder builder = new EmbedBuilder()
                 .setTitle("Server information")

@@ -24,22 +24,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
+import org.spicord.Spicord;
 import com.google.common.base.Preconditions;
-import eu.mcdb.spicord.api.Node;
 import eu.mcdb.spicord.api.addon.SimpleAddon;
 import eu.mcdb.spicord.api.bot.SimpleBot;
 import eu.mcdb.spicord.api.bot.command.BotCommand;
 import eu.mcdb.spicord.bot.command.DiscordBotCommand;
 import eu.mcdb.spicord.bot.command.DiscordCommand;
 import lombok.Getter;
-import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-public class DiscordBot extends SimpleBot implements Node {
+public class DiscordBot extends SimpleBot {
 
     private final boolean enabled;
 
@@ -52,6 +52,9 @@ public class DiscordBot extends SimpleBot implements Node {
 
     @Getter private JDA jda;
     @Getter protected BotStatus status;
+
+    private final Spicord spicord;
+    private final Logger logger;
 
     /**
      * Create a new Discord bot instance.<br>
@@ -68,6 +71,11 @@ public class DiscordBot extends SimpleBot implements Node {
             String prefix) {
         super(name, token);
 
+        //----------------
+        this.spicord = Spicord.getInstance();
+        this.logger = spicord.getLogger();
+        //----------------
+
         this.enabled = enabled;
         this.addons = Collections.unmodifiableCollection(addons);
         this.loadedAddons = new ArrayList<SimpleAddon>();
@@ -79,7 +87,7 @@ public class DiscordBot extends SimpleBot implements Node {
             if (prefix.isEmpty()) {
                 this.commandSupportEnabled = false;
 
-                getLogger().severe(
+                logger.severe(
                         "The command prefix cannot be empty. The command-support feature is now disabled on bot '"
                                 + name + "'.");
                 return;
@@ -103,12 +111,12 @@ public class DiscordBot extends SimpleBot implements Node {
             if (commandSupportEnabled)
                 jda.addEventListener(new BotCommandListener(this));
 
-            getSpicord().getAddonManager().loadAddons(this);
+            spicord.getAddonManager().loadAddons(this);
             return true;
         } catch (Exception e) {
             this.status = BotStatus.OFFLINE;
             this.jda = null;
-            getLogger().severe("An error ocurred while starting the bot '" + getName() + "'. " + e.getMessage());
+            logger.severe("An error ocurred while starting the bot '" + getName() + "'. " + e.getMessage());
         }
 
         return false;
@@ -148,12 +156,12 @@ public class DiscordBot extends SimpleBot implements Node {
 
         if (commandSupportEnabled) {
             if (commands.containsKey(name)) {
-                getLogger().warning("The command '" + name + "' is already registered on bot '" + getName() + "'.");
+                logger.warning("The command '" + name + "' is already registered on bot '" + getName() + "'.");
             } else {
                 commands.put(name, command);
             }
         } else {
-            getLogger().warning("Cannot register command '" + name + "' on bot '" + getName()
+            logger.warning("Cannot register command '" + name + "' on bot '" + getName()
                     + "' because the 'command-support' option is disabled.");
         }
     }

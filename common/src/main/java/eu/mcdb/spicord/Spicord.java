@@ -61,4 +61,8 @@ public class Spicord {
     public static boolean isLoaded() {
         return instance != null;
     }
+
+    protected void removeInstance() {
+        instance = null;
+    }
 }

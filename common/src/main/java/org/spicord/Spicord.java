@@ -69,7 +69,7 @@ public final class Spicord extends eu.mcdb.spicord.Spicord {
 
         instance = this;
         this.logger = logger;
-        this.addonManager = new AddonManager();
+        this.addonManager = new AddonManager(logger);
         this.serviceManager = new SpicordServiceManager();
         this.listeners = new HashMap<>();
 
@@ -100,10 +100,13 @@ public final class Spicord extends eu.mcdb.spicord.Spicord {
         logger.warning("Please use Spicord#addEventListener instead.");
         logger.warning("==============================================");
 
-        loadListeners.add(action);
-
-        if (config != null)
+        if (config == null) {
+            // didn't loaded yet, wait.
+            loadListeners.add(action);
+        } else {
+            // already loaded, just run it.
             action.accept(this);
+        }
     }
 
     protected void onLoad(SpicordConfiguration config) throws IOException {
@@ -161,6 +164,8 @@ public final class Spicord extends eu.mcdb.spicord.Spicord {
         this.logger = null;
         this.config = null;
         instance = null;
+
+        super.removeInstance();
     }
 
     /**

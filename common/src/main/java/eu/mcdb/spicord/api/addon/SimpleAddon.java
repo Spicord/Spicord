@@ -17,20 +17,25 @@
 
 package eu.mcdb.spicord.api.addon;
 
-import eu.mcdb.spicord.api.Node;
+import java.util.logging.Logger;
+import org.spicord.Spicord;
 import eu.mcdb.spicord.bot.DiscordBot;
 import eu.mcdb.spicord.bot.command.DiscordBotCommand;
 import lombok.Getter;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 @Getter
-public abstract class SimpleAddon implements Node {
+public abstract class SimpleAddon {
 
     private final String name;
     private final String id;
     private final String author;
     private final String version;
     private final String[] commands;
+
+    //--------------
+    private final Spicord spicord;
+    //--------------
 
     /**
      * Constructor.
@@ -82,6 +87,10 @@ public abstract class SimpleAddon implements Node {
         this.author = author;
         this.version = version;
         this.commands = commands;
+
+        //--------------
+        this.spicord = Spicord.getInstance();
+        //--------------
     }
 
     /**
@@ -150,5 +159,9 @@ public abstract class SimpleAddon implements Node {
      */
     public final boolean isJavaScriptAddon() {
         return this instanceof JavaScriptAddon;
+    }
+
+    public Logger getLogger() {
+        return spicord.getLogger();
     }
 }
