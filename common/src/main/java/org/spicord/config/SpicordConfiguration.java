@@ -224,7 +224,7 @@ public final class SpicordConfiguration {
     public static class SpicordConfig {
 
         private int loadDelay;
-        private int config_version; // not used yet
+        //private int config_version; // not used yet
         private String integrated_addon_footer;
 
         private Bot[] bots;

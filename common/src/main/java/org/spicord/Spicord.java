@@ -20,13 +20,10 @@ package org.spicord;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.spicord.addon.AddonManager;
@@ -39,14 +36,11 @@ import org.spicord.bot.DiscordBotLoader;
 import org.spicord.config.SpicordConfiguration;
 import org.spicord.event.EventHandler;
 import org.spicord.event.SpicordEvent;
-import org.spicord.reflect.ReflectUtils;
-
 import eu.mcdb.universal.Server;
 import eu.mcdb.universal.ServerType;
 import lombok.Getter;
 
-@SuppressWarnings("deprecation")
-public final class Spicord extends eu.mcdb.spicord.Spicord {
+public final class Spicord {
 
     private static Spicord instance;
 
@@ -57,8 +51,6 @@ public final class Spicord extends eu.mcdb.spicord.Spicord {
     @Getter private AddonManager addonManager;
 
     private Map<SpicordEvent<?>, Set<EventHandler<?>>> listeners;
-
-    private List<Consumer<eu.mcdb.spicord.Spicord>> loadListeners;
 
     /**
      * The Spicord constructor.
@@ -74,8 +66,6 @@ public final class Spicord extends eu.mcdb.spicord.Spicord {
         this.serviceManager = new SpicordServiceManager();
         this.listeners = new HashMap<>();
 
-        this.loadListeners = new ArrayList<>();
-
         for (SpicordEvent<?> e : SpicordEvent.values()) {
             this.listeners.put(e, new HashSet<>());
         }
@@ -89,24 +79,6 @@ public final class Spicord extends eu.mcdb.spicord.Spicord {
     public <T> void callEvent(SpicordEvent<T> eventType, T object) {
         for (EventHandler<?> listener : listeners.get(eventType)) {
             ((EventHandler<T>) listener).handleSafe(object);
-        }
-    }
-
-    @Override
-    @Deprecated
-    public void onLoad(Consumer<eu.mcdb.spicord.Spicord> action) {
-        String caller = ReflectUtils.getCaller();
-        logger.warning("==============================================");
-        logger.warning(String.format("[%s] Called Spicord#onLoad which is deprecated.", caller));
-        logger.warning("Please use Spicord#addEventListener instead.");
-        logger.warning("==============================================");
-
-        if (config == null) {
-            // didn't loaded yet, wait.
-            loadListeners.add(action);
-        } else {
-            // already loaded, just run it.
-            action.accept(this);
         }
     }
 
@@ -138,9 +110,6 @@ public final class Spicord extends eu.mcdb.spicord.Spicord {
 
         callEvent(SpicordEvent.SPICORD_LOADED, this);
 
-        loadListeners.forEach(l -> l.accept(this));
-        loadListeners.clear();
-
         getLogger().info("Starting the bots...");
         config.getBots().forEach(DiscordBotLoader::startBot);
     }
@@ -165,8 +134,6 @@ public final class Spicord extends eu.mcdb.spicord.Spicord {
         this.logger = null;
         this.config = null;
         instance = null;
-
-        super.removeInstance();
     }
 
     /**

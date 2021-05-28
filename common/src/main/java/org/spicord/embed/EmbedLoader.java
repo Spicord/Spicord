@@ -23,11 +23,13 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.spicord.Spicord;
+
 import com.google.common.base.Preconditions;
-import eu.mcdb.spicord.api.Node;
 import eu.mcdb.util.ZipExtractor;
 
-public class EmbedLoader implements Node {
+public class EmbedLoader {
 
     private static final Charset charset = Charset.forName("UTF-8");
     private final Map<String, Embed> embeds;
@@ -53,7 +55,7 @@ public class EmbedLoader implements Node {
                     final String content = new String(Files.readAllBytes(file.toPath()), charset);
                     embeds.put(name, Embed.fromJson(content));
                 } catch (IOException e) {
-                    getLogger().warning("Cannot load the embed '" + file.getName() + "': " + e.getMessage());
+                    Spicord.getInstance().getLogger().warning("Cannot load the embed '" + file.getName() + "': " + e.getMessage());
                 }
             }
         }

@@ -45,7 +45,7 @@ import eu.mcdb.util.ZipExtractor;
 /**
  * This class is used for manage and register addons.
  */
-public class AddonManager extends eu.mcdb.spicord.addon.AddonManager {
+public class AddonManager {
 
     private static final Set<SimpleAddon> addons;
 
