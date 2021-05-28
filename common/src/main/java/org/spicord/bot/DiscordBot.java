@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 import org.spicord.Spicord;
 import org.spicord.api.addon.SimpleAddon;
@@ -31,13 +32,16 @@ import org.spicord.api.bot.SimpleBot;
 import org.spicord.api.bot.command.BotCommand;
 import org.spicord.bot.command.DiscordBotCommand;
 import org.spicord.bot.command.DiscordCommand;
-
 import com.google.common.base.Preconditions;
-
 import lombok.Getter;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.JDA.Status;
+import net.dv8tion.jda.core.events.DisconnectEvent;
 import net.dv8tion.jda.core.events.ReadyEvent;
+import net.dv8tion.jda.core.events.ReconnectedEvent;
+import net.dv8tion.jda.core.events.ResumedEvent;
+import net.dv8tion.jda.core.events.StatusChangeEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
@@ -107,11 +111,11 @@ public class DiscordBot extends SimpleBot {
             this.status = BotStatus.STARTING;
             this.jda = new JDABuilder(token)
                     .setAutoReconnect(true)
-                    .addEventListener(new BotStatusListener(this))
+                    .addEventListener(new BotStatusListener())
                     .build();
 
             if (commandSupportEnabled)
-                jda.addEventListener(new BotCommandListener(this));
+                jda.addEventListener(new BotCommandListener());
 
             spicord.getAddonManager().loadAddons(this);
             return true;
@@ -289,6 +293,78 @@ public class DiscordBot extends SimpleBot {
         @Override
         public String toString() {
             return value;
+        }
+    }
+
+    private class BotStatusListener extends ListenerAdapter {
+
+        private final DiscordBot bot = DiscordBot.this;
+
+        @Override
+        public void onReady(ReadyEvent event) {
+            bot.status = BotStatus.READY;
+            bot.onReady(event);
+        }
+
+        @Override
+        public void onStatusChange(StatusChangeEvent event) {
+            if (event.getNewStatus() == Status.SHUTDOWN) {
+                bot.status = BotStatus.OFFLINE;
+            }
+        }
+
+        @Override
+        public void onReconnect(ReconnectedEvent event) {
+            bot.status = BotStatus.READY;
+        }
+
+        @Override
+        public void onResume(ResumedEvent event) {
+            bot.status = BotStatus.READY;
+        }
+
+        @Override
+        public void onDisconnect(DisconnectEvent event) {
+            bot.status = BotStatus.OFFLINE;
+        }
+    }
+
+    private class BotCommandListener extends ListenerAdapter {
+
+        private final DiscordBot bot = DiscordBot.this;
+
+        @Override
+        public void onMessageReceived(MessageReceivedEvent event) {
+            bot.onMessageReceived(event);
+
+            String commandPrefix = bot.getCommandPrefix();
+            String messageContent = event.getMessage().getContentRaw();
+
+            if (messageContent.startsWith(commandPrefix)) {
+                messageContent = messageContent.substring(commandPrefix.length());
+
+                if (!messageContent.isEmpty()) {
+                    String commandName = messageContent.split(" ")[0];
+                    String[] args = messageContent.contains(" ")
+                            ? messageContent.substring(commandName.length() + 1).split(" ")
+                            : new String[0];
+
+                    // the command instance will only be created if the get() method is called
+                    Supplier<DiscordBotCommand> commandSupplier = () -> new DiscordBotCommand(commandName, args, event.getMessage());
+
+                    if (bot.commands.containsKey(commandName)) {
+                        bot.commands.get(commandName).accept(commandSupplier.get());
+                    } else {
+                        for (SimpleAddon addon : bot.loadedAddons) {
+                            for (String cmd : addon.getCommands()) {
+                                if (cmd.equals(commandName)) {
+                                    addon.onCommand(commandSupplier.get(), args);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
