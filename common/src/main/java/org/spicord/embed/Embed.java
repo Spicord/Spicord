@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.embed;
+package org.spicord.embed;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

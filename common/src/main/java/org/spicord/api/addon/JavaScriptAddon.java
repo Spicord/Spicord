@@ -15,13 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.api.addon;
+package org.spicord.api.addon;
 
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.spicord.api.bot.command.BotCommand;
+import org.spicord.bot.DiscordBot;
 import org.spicord.script.ScriptEngine;
-import eu.mcdb.spicord.api.bot.command.BotCommand;
-import eu.mcdb.spicord.bot.DiscordBot;
 
 public final class JavaScriptAddon extends SimpleAddon {
 

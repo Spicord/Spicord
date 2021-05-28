@@ -19,8 +19,9 @@ package org.spicord.addon;
 
 import java.awt.Color;
 import org.spicord.Spicord;
-import eu.mcdb.spicord.api.addon.SimpleAddon;
-import eu.mcdb.spicord.bot.command.DiscordBotCommand;
+import org.spicord.api.addon.SimpleAddon;
+import org.spicord.bot.command.DiscordBotCommand;
+
 import eu.mcdb.universal.Server;
 import net.dv8tion.jda.core.EmbedBuilder;
 

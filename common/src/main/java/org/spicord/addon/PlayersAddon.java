@@ -23,8 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.spicord.Spicord;
-import eu.mcdb.spicord.api.addon.SimpleAddon;
-import eu.mcdb.spicord.bot.command.DiscordBotCommand;
+import org.spicord.api.addon.SimpleAddon;
+import org.spicord.bot.command.DiscordBotCommand;
+
 import eu.mcdb.universal.Server;
 import eu.mcdb.universal.ServerType;
 import net.dv8tion.jda.core.EmbedBuilder;

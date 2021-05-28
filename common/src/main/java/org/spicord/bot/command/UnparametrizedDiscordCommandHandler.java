@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.bot.command;
+package org.spicord.bot.command;
 
 import eu.mcdb.universal.command.api.CommandParameters;
 import net.dv8tion.jda.core.entities.MessageChannel;

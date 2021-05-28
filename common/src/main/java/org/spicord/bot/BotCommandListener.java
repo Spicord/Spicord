@@ -15,11 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.bot;
+package org.spicord.bot;
 
 import java.util.function.Supplier;
-import eu.mcdb.spicord.api.addon.SimpleAddon;
-import eu.mcdb.spicord.bot.command.DiscordBotCommand;
+
+import org.spicord.api.addon.SimpleAddon;
+import org.spicord.bot.command.DiscordBotCommand;
+
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;

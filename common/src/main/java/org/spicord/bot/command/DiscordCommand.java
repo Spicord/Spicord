@@ -15,9 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.bot.command;
+package org.spicord.bot.command;
 
-import eu.mcdb.spicord.api.bot.command.BotCommand;
+import org.spicord.api.bot.command.BotCommand;
+
 import eu.mcdb.universal.command.api.Command;
 import net.dv8tion.jda.core.Permission;
 

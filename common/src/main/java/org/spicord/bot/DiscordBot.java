@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.bot;
+package org.spicord.bot;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,12 +26,14 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 import org.spicord.Spicord;
+import org.spicord.api.addon.SimpleAddon;
+import org.spicord.api.bot.SimpleBot;
+import org.spicord.api.bot.command.BotCommand;
+import org.spicord.bot.command.DiscordBotCommand;
+import org.spicord.bot.command.DiscordCommand;
+
 import com.google.common.base.Preconditions;
-import eu.mcdb.spicord.api.addon.SimpleAddon;
-import eu.mcdb.spicord.api.bot.SimpleBot;
-import eu.mcdb.spicord.api.bot.command.BotCommand;
-import eu.mcdb.spicord.bot.command.DiscordBotCommand;
-import eu.mcdb.spicord.bot.command.DiscordCommand;
+
 import lombok.Getter;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;

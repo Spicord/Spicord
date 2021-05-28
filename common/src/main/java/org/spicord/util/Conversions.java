@@ -17,7 +17,8 @@
 
 package org.spicord.util;
 
-import eu.mcdb.spicord.embed.Embed;
+import org.spicord.embed.Embed;
+
 import net.dv8tion.jda.core.entities.MessageEmbed;
 
 public class Conversions {

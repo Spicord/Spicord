@@ -15,9 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.bot;
+package org.spicord.bot;
 
-import eu.mcdb.spicord.bot.DiscordBot.BotStatus;
+import org.spicord.bot.DiscordBot.BotStatus;
+
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.core.JDA.Status;
 import net.dv8tion.jda.core.events.DisconnectEvent;

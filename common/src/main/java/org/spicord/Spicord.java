@@ -34,12 +34,13 @@ import org.spicord.addon.InfoAddon;
 import org.spicord.addon.PlayersAddon;
 import org.spicord.addon.PluginsAddon;
 import org.spicord.api.services.ServiceManager;
+import org.spicord.bot.DiscordBot;
+import org.spicord.bot.DiscordBotLoader;
+import org.spicord.config.SpicordConfiguration;
 import org.spicord.event.EventHandler;
 import org.spicord.event.SpicordEvent;
 import org.spicord.reflect.ReflectUtils;
-import eu.mcdb.spicord.bot.DiscordBot;
-import eu.mcdb.spicord.bot.DiscordBotLoader;
-import eu.mcdb.spicord.config.SpicordConfiguration;
+
 import eu.mcdb.universal.Server;
 import eu.mcdb.universal.ServerType;
 import lombok.Getter;

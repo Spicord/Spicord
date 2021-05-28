@@ -15,10 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.bot.command;
+package org.spicord.bot.command;
 
-import eu.mcdb.spicord.api.bot.command.SimpleCommand;
-import eu.mcdb.spicord.embed.Embed;
+import org.spicord.api.bot.command.SimpleCommand;
+import org.spicord.embed.Embed;
+
 import lombok.Getter;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;

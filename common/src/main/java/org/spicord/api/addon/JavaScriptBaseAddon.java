@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.api.addon;
+package org.spicord.api.addon;
 
 import java.util.HashMap;
 import java.util.Map;

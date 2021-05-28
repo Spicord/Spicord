@@ -18,10 +18,12 @@
 package org.spicord;
 
 import java.util.Set;
-import eu.mcdb.spicord.api.addon.SimpleAddon;
-import eu.mcdb.spicord.bot.DiscordBot;
-import eu.mcdb.spicord.bot.DiscordBot.BotStatus;
-import eu.mcdb.spicord.bot.DiscordBotLoader;
+
+import org.spicord.api.addon.SimpleAddon;
+import org.spicord.bot.DiscordBot;
+import org.spicord.bot.DiscordBotLoader;
+import org.spicord.bot.DiscordBot.BotStatus;
+
 import eu.mcdb.universal.command.UniversalCommandSender;
 import eu.mcdb.universal.command.api.Command;
 import eu.mcdb.universal.command.api.CommandParameter;

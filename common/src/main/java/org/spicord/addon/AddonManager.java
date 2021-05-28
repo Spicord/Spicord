@@ -29,14 +29,16 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import org.spicord.api.addon.JavaScriptAddon;
+import org.spicord.api.addon.JavaScriptBaseAddon;
+import org.spicord.api.addon.SimpleAddon;
+import org.spicord.bot.DiscordBot;
 import org.spicord.script.ScriptEngine;
 import org.spicord.script.ScriptEnvironment;
 import org.spicord.script.ScriptException;
 import com.google.gson.Gson;
-import eu.mcdb.spicord.api.addon.JavaScriptAddon;
-import eu.mcdb.spicord.api.addon.JavaScriptBaseAddon;
-import eu.mcdb.spicord.api.addon.SimpleAddon;
-import eu.mcdb.spicord.bot.DiscordBot;
+
 import eu.mcdb.util.FileUtils;
 import eu.mcdb.util.ZipExtractor;
 

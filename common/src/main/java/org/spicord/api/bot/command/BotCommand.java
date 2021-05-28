@@ -15,28 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.embed;
+package org.spicord.api.bot.command;
 
-import com.google.common.base.Preconditions;
-import com.google.gson.Gson;
+import org.spicord.bot.command.DiscordBotCommand;
 
-public class EmbedParser {
+@FunctionalInterface
+public interface BotCommand {
 
-    protected static final Gson GSON;
-
-    static {
-        GSON = new Gson();
-    }
-
-    /**
-     * Converts a json string to a {@link Embed} object.
-     * 
-     * @param json the json to be parsed.
-     * @return the {@link Embed} object.
-     */
-    public static Embed parse(String json) {
-        Preconditions.checkNotNull(json, "json");
-
-        return GSON.fromJson(json, Embed.class);
-    }
+    void onCommand(DiscordBotCommand command, String[] args);
 }

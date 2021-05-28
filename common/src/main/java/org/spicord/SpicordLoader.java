@@ -20,9 +20,10 @@ package org.spicord;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
+
+import org.spicord.config.SpicordConfiguration;
 import org.spicord.util.JarClassLoader;
 import com.google.common.base.Preconditions;
-import eu.mcdb.spicord.config.SpicordConfiguration;
 
 public final class SpicordLoader {
 

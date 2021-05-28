@@ -15,27 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.api.bot.command;
+package org.spicord.api.bot;
 
-public abstract class SimpleCommand {
+import lombok.Getter;
 
-    private final String[] arguments;
+public abstract class SimpleBot {
 
-    /**
-     * Constructor.
-     * 
-     * @param args the command arguments
-     */
-    public SimpleCommand(String[] args) {
-        this.arguments = args;
+    @Getter
+    protected String name;
+
+    protected String token;
+
+    public SimpleBot(String name, String token) {
+        this.name = name;
+        this.token = token;
     }
 
-    /**
-     * Get the command arguments.
-     * 
-     * @return the command arguments
-     */
-    public String[] getArguments() {
-        return arguments;
-    }
+    protected abstract boolean start();
 }

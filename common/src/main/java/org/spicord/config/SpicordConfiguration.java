@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.config;
+package org.spicord.config;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -30,10 +30,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import org.spicord.bot.DiscordBot;
+import org.spicord.config.SpicordConfiguration.SpicordConfig.Bot;
+
 import com.moandjiezana.toml.Toml;
 import com.moandjiezana.toml.TomlWriter;
-import eu.mcdb.spicord.bot.DiscordBot;
-import eu.mcdb.spicord.config.SpicordConfiguration.SpicordConfig.Bot;
+
 import lombok.Getter;
 
 // this is a mess, i know, will be re-made in the future :)

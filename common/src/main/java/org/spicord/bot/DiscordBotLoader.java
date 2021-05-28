@@ -15,13 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package eu.mcdb.spicord.bot;
+package org.spicord.bot;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 import org.spicord.Spicord;
+import org.spicord.bot.DiscordBot.BotStatus;
+
 import com.google.common.base.Preconditions;
-import eu.mcdb.spicord.bot.DiscordBot.BotStatus;
 
 public class DiscordBotLoader {
 
