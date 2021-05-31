@@ -41,12 +41,19 @@ public final class ReflectUtils {
     private static final int ALL_MODES = (PUBLIC | PRIVATE | PROTECTED | PACKAGE);
 
     static {
-        lookup_c = new ReflectedObject(Lookup.class)
+        ReflectedConstructor lookup = new ReflectedObject(Lookup.class)
                 .setErrorRule(ReflectErrorRule.IGNORE)
                 .getConstructor(Class.class, int.class);
-        if (lookup_c != null) {
-            lookup_c.setAccessible();
+
+        if (lookup != null) {
+            try {
+                lookup.setAccessible();
+            } catch (Exception e) {
+                lookup = null;
+            }
         }
+
+        lookup_c = lookup;
     }
 
     private ReflectUtils() {}
