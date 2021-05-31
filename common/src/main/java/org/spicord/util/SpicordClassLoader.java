@@ -17,24 +17,29 @@
 
 package org.spicord.util;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import org.spicord.reflect.ReflectedMethod;
-import org.spicord.reflect.ReflectedObject;
 
 public class SpicordClassLoader implements JarClassLoader {
 
-    private final ReflectedMethod addURL;
+    private final MethodHandle addURL;
 
     public SpicordClassLoader() {
         this(SpicordClassLoader.class.getClassLoader());
     }
 
     public SpicordClassLoader(ClassLoader loader) {
-        addURL = new ReflectedObject(URLClassLoader.class, loader)
-                .getMethod("addURL", URL.class).setAccessible();
+        try {
+            addURL = getAddUrlMethod(loader);
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -47,6 +52,28 @@ public class SpicordClassLoader implements JarClassLoader {
             addURL.invoke(file.toUri().toURL());
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException(e);
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
         }
+    }
+
+    public MethodHandle getAddUrlMethod(ClassLoader loader) throws ReflectiveOperationException {
+        boolean methodNotFound = false;
+        Lookup lookup = MethodHandles.lookup();
+
+        try {
+            Method m = MethodHandles.class.getMethod("privateLookupIn", Class.class, Lookup.class);
+            lookup = (Lookup) m.invoke(null, loader.getClass(), lookup);
+        } catch (ReflectiveOperationException e) {
+            methodNotFound = true;
+        }
+
+        Method addURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+
+        if (methodNotFound) {
+            addURL.setAccessible(true);
+        }
+
+        return lookup.unreflect(addURL).bindTo(loader);
     }
 }
