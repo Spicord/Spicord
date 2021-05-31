@@ -54,8 +54,8 @@ public final class SpicordLoader {
                 libraryLoader.loadLibraries();
             }
 
-            this.config  = new SpicordConfiguration(logger, dataFolder);
             this.spicord = new Spicord(logger);
+            this.config  = new SpicordConfiguration(logger, dataFolder);
         } catch (IOException e) {
             handleException(e);
         }
