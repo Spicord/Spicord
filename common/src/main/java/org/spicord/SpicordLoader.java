@@ -19,9 +19,13 @@ package org.spicord;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.spicord.config.SpicordConfiguration;
+import org.spicord.event.EventHandler;
+import org.spicord.event.SpicordEvent;
 import org.spicord.util.JarClassLoader;
 import com.google.common.base.Preconditions;
 
@@ -57,6 +61,11 @@ public final class SpicordLoader {
 
             this.config  = new SpicordConfiguration(logger, dataFolder);
             this.spicord = new Spicord(logger);
+
+            for (EventHandler<Spicord> listener : startupListeners) {
+                this.spicord.addEventListener(SpicordEvent.SPICORD_LOADED, listener);
+            }
+
         } catch (IOException e) {
             handleException(e);
         }
@@ -74,6 +83,7 @@ public final class SpicordLoader {
         if (spicord != null)
             spicord.onDisable();
         spicord = null;
+        self = null;
     }
 
     private void handleException(Exception e) {
@@ -84,5 +94,25 @@ public final class SpicordLoader {
 
     public SpicordConfiguration getConfig() {
         return config;
+    }
+
+    // -------------------
+
+    private static final List<EventHandler<Spicord>> startupListeners = new ArrayList<>();
+    private static SpicordLoader self; { self = this; }
+
+    public static void addStartupListener(EventHandler<Spicord> listener) {
+        if (self == null) {
+            throw new IllegalStateException("Called too early");
+        }
+
+        if (
+            self.spicord != null &&
+            self.spicord.getConfig() != null
+        ) {
+            listener.handle(self.spicord);
+        }
+
+        startupListeners.add(listener);
     }
 }

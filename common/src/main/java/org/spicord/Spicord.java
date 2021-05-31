@@ -57,10 +57,9 @@ public final class Spicord {
      * 
      * @param logger the logger instance
      */
-    public Spicord(Logger logger) {
-        super(); // register this instance in the old class
-
+    protected Spicord(Logger logger) {
         instance = this;
+
         this.logger = logger;
         this.addonManager = new AddonManager(logger);
         this.serviceManager = new SpicordServiceManager();
