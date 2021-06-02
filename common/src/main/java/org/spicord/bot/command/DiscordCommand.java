@@ -20,7 +20,7 @@ package org.spicord.bot.command;
 import org.spicord.api.bot.command.BotCommand;
 
 import eu.mcdb.universal.command.api.Command;
-import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.api.Permission;
 
 public class DiscordCommand extends Command implements BotCommand {
 

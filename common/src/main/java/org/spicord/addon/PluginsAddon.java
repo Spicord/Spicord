@@ -23,7 +23,7 @@ import org.spicord.api.addon.SimpleAddon;
 import org.spicord.bot.command.DiscordBotCommand;
 
 import eu.mcdb.universal.Server;
-import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class PluginsAddon extends SimpleAddon {
 

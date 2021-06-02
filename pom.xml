@@ -72,9 +72,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.spicord</groupId>
+            <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>3.8.4</version>
+            <version>4.2.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

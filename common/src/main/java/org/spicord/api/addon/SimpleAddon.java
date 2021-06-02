@@ -23,7 +23,7 @@ import org.spicord.bot.DiscordBot;
 import org.spicord.bot.command.DiscordBotCommand;
 
 import lombok.Getter;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 @Getter
 public abstract class SimpleAddon {

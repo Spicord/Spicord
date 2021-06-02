@@ -59,8 +59,8 @@ public final class SpicordLoader {
                 libraryLoader.loadLibraries();
             }
 
-            this.config  = new SpicordConfiguration(logger, dataFolder);
             this.spicord = new Spicord(logger);
+            this.config  = new SpicordConfiguration(logger, dataFolder);
 
             for (EventHandler<Spicord> listener : startupListeners) {
                 this.spicord.addEventListener(SpicordEvent.SPICORD_LOADED, listener);

@@ -20,7 +20,7 @@ package org.spicord.bot.command;
 import eu.mcdb.universal.command.UniversalCommandSender;
 import eu.mcdb.universal.command.api.CommandHandler;
 import eu.mcdb.universal.command.api.CommandParameters;
-import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageChannel;
 
 @FunctionalInterface
 public interface DiscordCommandHandler extends CommandHandler {

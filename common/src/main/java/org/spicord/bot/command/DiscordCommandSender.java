@@ -18,10 +18,10 @@
 package org.spicord.bot.command;
 
 import eu.mcdb.universal.command.UniversalCommandSender;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.MessageChannel;
-import net.dv8tion.jda.core.entities.PrivateChannel;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.PrivateChannel;
 
 public class DiscordCommandSender extends UniversalCommandSender {
 

@@ -28,7 +28,7 @@ import org.spicord.bot.command.DiscordBotCommand;
 
 import eu.mcdb.universal.Server;
 import eu.mcdb.universal.ServerType;
-import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class PlayersAddon extends SimpleAddon {
 
