@@ -61,11 +61,6 @@ public final class SpicordLoader {
 
             this.spicord = new Spicord(logger);
             this.config  = new SpicordConfiguration(logger, dataFolder);
-
-            for (EventHandler<Spicord> listener : startupListeners) {
-                this.spicord.addEventListener(SpicordEvent.SPICORD_LOADED, listener);
-            }
-
         } catch (IOException e) {
             handleException(e);
         }
@@ -73,6 +68,9 @@ public final class SpicordLoader {
 
     public void load() {
         try {
+            for (EventHandler<Spicord> listener : startupListeners) {
+                this.spicord.addEventListener(SpicordEvent.SPICORD_LOADED, listener);
+            }
             spicord.onLoad(config);
         } catch (IOException e) {
             handleException(e);
