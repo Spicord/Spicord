@@ -60,6 +60,8 @@ public final class Spicord {
     protected Spicord(Logger logger) {
         instance = this;
 
+        logger.setLevel(Level.INFO);
+
         this.logger = logger;
         this.addonManager = new AddonManager(logger);
         this.serviceManager = new SpicordServiceManager();
