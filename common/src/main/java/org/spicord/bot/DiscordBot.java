@@ -36,12 +36,13 @@ import com.google.common.base.Preconditions;
 import lombok.Getter;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.JDA.Status;
+//import net.dv8tion.jda.api.JDA.Status;
 import net.dv8tion.jda.api.events.DisconnectEvent;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.ReconnectedEvent;
 import net.dv8tion.jda.api.events.ResumedEvent;
-import net.dv8tion.jda.api.events.StatusChangeEvent;
+import net.dv8tion.jda.api.events.ShutdownEvent;
+//import net.dv8tion.jda.api.events.StatusChangeEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -258,7 +259,7 @@ public class DiscordBot extends SimpleBot {
 
     protected void shutdown(boolean force) {
         status = BotStatus.STOPPING;
-        loadedAddons.forEach(a -> a.onShutdown(this));
+        loadedAddons.forEach(addon -> addon.onShutdown(this));
 
         if (jda != null) {
             try {
@@ -306,12 +307,12 @@ public class DiscordBot extends SimpleBot {
             bot.onReady(event);
         }
 
-        @Override
-        public void onStatusChange(StatusChangeEvent event) {
-            if (event.getNewStatus() == Status.SHUTDOWN) {
-                bot.status = BotStatus.OFFLINE;
-            }
-        }
+//        @Override
+//        public void onStatusChange(StatusChangeEvent event) {
+//            if (event.getNewStatus() == Status.SHUTDOWN) {
+//                bot.status = BotStatus.OFFLINE;
+//            }
+//        }
 
         @Override
         public void onReconnect(ReconnectedEvent event) {
@@ -326,6 +327,13 @@ public class DiscordBot extends SimpleBot {
         @Override
         public void onDisconnect(DisconnectEvent event) {
             bot.status = BotStatus.OFFLINE;
+        }
+
+        @Override
+        public void onShutdown(ShutdownEvent event) {
+            if (bot.status != BotStatus.STOPPING) {
+                bot.shutdown(false);
+            }
         }
     }
 
