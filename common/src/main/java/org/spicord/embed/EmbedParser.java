@@ -17,8 +17,11 @@
 
 package org.spicord.embed;
 
+import java.io.StringReader;
+
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 
 public class EmbedParser {
 
@@ -37,6 +40,9 @@ public class EmbedParser {
     public static Embed parse(String json) {
         Preconditions.checkNotNull(json, "json");
 
-        return GSON.fromJson(json, Embed.class);
+        JsonReader jsonReader = new JsonReader(new StringReader(json.trim()));
+        jsonReader.setLenient(true);
+
+        return GSON.fromJson(jsonReader, Embed.class);
     }
 }
