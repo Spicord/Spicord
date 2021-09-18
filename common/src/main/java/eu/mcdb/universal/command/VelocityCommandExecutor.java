@@ -18,10 +18,10 @@
 package eu.mcdb.universal.command;
 
 import org.spicord.player.VelocityPlayer;
-import com.velocitypowered.api.command.Command;
 import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
-import net.kyori.text.TextComponent;
+import net.kyori.adventure.text.Component;
 
 /**
  * Wrapper for the {@link UniversalCommand} class to
@@ -29,7 +29,7 @@ import net.kyori.text.TextComponent;
  * 
  * @author sheidy
  */
-public final class VelocityCommandExecutor implements Command {
+public final class VelocityCommandExecutor implements SimpleCommand {
 
     private final UniversalCommand command;
 
@@ -38,7 +38,10 @@ public final class VelocityCommandExecutor implements Command {
     }
 
     @Override
-    public void execute(CommandSource source, String[] args) {
+    public void execute(Invocation invocation) {
+        final CommandSource source = invocation.source();
+        final String[] args = invocation.arguments();
+
         UniversalCommandSender commandSender;
 
         if (source instanceof Player) {
@@ -53,7 +56,7 @@ public final class VelocityCommandExecutor implements Command {
 
                 @Override
                 public void sendMessage(String message) {
-                    source.sendMessage(TextComponent.of(message));
+                    source.sendMessage(Component.text(message));
                 }
 
                 private boolean isEmpty(String string) {

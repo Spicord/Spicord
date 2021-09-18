@@ -18,8 +18,6 @@
 package eu.mcdb.universal;
 
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.List;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.spicord.plugin.SpongePlugin;
 import org.spicord.plugin.VelocityPlugin;
@@ -90,10 +88,7 @@ public final class MCDB {
 
     private static class registerVelocityCommand {
         registerVelocityCommand(VelocityPlugin plugin, UniversalCommand command) {
-            final List<String> aliases = Arrays.asList(command.getAliases());
-            aliases.add(command.getName());
-
-            VelocityPlugin.getCommandManager().register(new VelocityCommandExecutor(command), aliases.toArray(new String[aliases.size()]));
+            VelocityPlugin.getCommandManager().register(command.getName(), new VelocityCommandExecutor(command), command.getAliases());
         }
     }
 

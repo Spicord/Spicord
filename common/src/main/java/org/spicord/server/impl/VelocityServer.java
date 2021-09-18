@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.spicord.player.VelocityPlayer;
@@ -32,7 +34,8 @@ import com.velocitypowered.api.util.ProxyVersion;
 import eu.mcdb.universal.Server;
 import eu.mcdb.universal.player.UniversalPlayer;
 import eu.mcdb.util.SLF4JWrapper;
-import net.kyori.text.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 
 final class VelocityServer extends Server {
 
@@ -92,7 +95,13 @@ final class VelocityServer extends Server {
 
     @Override
     public boolean dispatchCommand(String command) {
-        return handle.getCommandManager().execute(handle.getConsoleCommandSource(), command);
+        CompletableFuture<Boolean> future = handle.getCommandManager().executeAsync(handle.getConsoleCommandSource(), command);
+        try {
+            return future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
@@ -120,6 +129,9 @@ final class VelocityServer extends Server {
 
     @Override
     public void broadcast(String message) {
-        handle.broadcast(TextComponent.of(message));
+        TextComponent text = Component.text(message);
+        for (Player player : handle.getAllPlayers()) {
+            player.sendMessage(text);
+        }
     }
 }

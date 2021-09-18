@@ -149,7 +149,7 @@ public class UniversalPlayer extends UniversalCommandSender {
 
     private static class sendMessageVelocity {
         sendMessageVelocity(com.velocitypowered.api.proxy.Player player, String message) {
-            player.sendMessage(net.kyori.text.TextComponent.of(message));
+            player.sendMessage(net.kyori.adventure.text.Component.text(message));
         }
     }
 
