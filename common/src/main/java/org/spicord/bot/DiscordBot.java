@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
@@ -263,6 +264,9 @@ public class DiscordBot extends SimpleBot {
 
         if (jda != null) {
             try {
+                jda.cancelRequests();
+                jda.getCallbackPool().awaitTermination(4, TimeUnit.SECONDS);
+
                 if (force) {
                     jda.shutdownNow();
                 } else {
@@ -270,7 +274,7 @@ public class DiscordBot extends SimpleBot {
                 }
             } catch (Exception e) {}
         }
-
+ 
         jda = null;
         status = BotStatus.OFFLINE;
 
