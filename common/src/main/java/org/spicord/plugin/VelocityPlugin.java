@@ -19,6 +19,8 @@ package org.spicord.plugin;
 
 import java.io.File;
 import java.util.logging.Logger;
+
+import org.spicord.reflect.ReflectUtils;
 import org.spicord.server.impl.ServerUtil;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.event.EventManager;
@@ -80,5 +82,9 @@ public abstract class VelocityPlugin {
 
     public final org.slf4j.Logger getSLF4JLogger() {
         return ((SLF4JWrapper) logger).getSLF4JLogger();
+    }
+
+    public File getFile() {
+        return ReflectUtils.getJarFile(getClass());
     }
 }
