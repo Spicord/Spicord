@@ -58,17 +58,7 @@ public class DiscordBotLoader {
      * @param bot the bot instance
      */
     public static void shutdownBot(DiscordBot bot) {
-        shutdownBot(bot, false);
-    }
-
-    /**
-     * Shutdown the given bot.
-     * 
-     * @param bot the bot instance
-     * @param force true if you want to force the shutdown
-     */
-    public static void shutdownBot(DiscordBot bot, boolean force) {
         Preconditions.checkNotNull(bot, "bot");
-        bot.shutdown(force);
+        bot.shutdown();
     }
 }

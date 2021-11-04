@@ -23,20 +23,28 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+
 import org.spicord.Spicord;
 import org.spicord.api.addon.SimpleAddon;
 import org.spicord.api.bot.SimpleBot;
 import org.spicord.api.bot.command.BotCommand;
 import org.spicord.bot.command.DiscordBotCommand;
 import org.spicord.bot.command.DiscordCommand;
+
 import com.google.common.base.Preconditions;
+
 import lombok.Getter;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.ApplicationInfo;
+import net.dv8tion.jda.api.entities.ApplicationTeam;
+import net.dv8tion.jda.api.entities.TeamMember;
+import net.dv8tion.jda.api.entities.TeamMember.MembershipState;
+import net.dv8tion.jda.api.entities.User;
 //import net.dv8tion.jda.api.JDA.Status;
 import net.dv8tion.jda.api.events.DisconnectEvent;
 import net.dv8tion.jda.api.events.ReadyEvent;
@@ -63,6 +71,8 @@ public class DiscordBot extends SimpleBot {
 
     private final Spicord spicord;
     private final Logger logger;
+
+    @Getter private long botId;
 
     /**
      * Create a new Discord bot instance.<br>
@@ -116,8 +126,12 @@ public class DiscordBot extends SimpleBot {
                     .addEventListeners(new BotStatusListener())
                     .build();
 
+            jda.awaitReady();
+
             if (commandSupportEnabled)
                 jda.addEventListener(new BotCommandListener());
+
+            this.botId = jda.getSelfUser().getIdLong();
 
             spicord.getAddonManager().loadAddons(this);
             return true;
@@ -127,6 +141,25 @@ public class DiscordBot extends SimpleBot {
             logger.severe("An error ocurred while starting the bot '" + getName() + "'. " + e.getMessage());
         }
 
+        return false;
+    }
+
+    public boolean isPrivilegedUser(User user) {
+        ApplicationInfo appInfo = jda.retrieveApplicationInfo().complete();
+        User owner = appInfo.getOwner();
+        if (owner.getIdLong() == user.getIdLong()) {
+            return true;
+        }
+        ApplicationTeam team = appInfo.getTeam();
+        if (team != null) {
+            for (TeamMember m : team.getMembers()) {
+                if (m.getMembershipState() == MembershipState.ACCEPTED) {
+                    if (m.getUser().getIdLong() == user.getIdLong()) {
+                        return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 
@@ -258,21 +291,21 @@ public class DiscordBot extends SimpleBot {
         return isReady();
     }
 
-    protected void shutdown(boolean force) {
+    protected void shutdown() {
         status = BotStatus.STOPPING;
         loadedAddons.forEach(addon -> addon.onShutdown(this));
 
         if (jda != null) {
-            try {
-                jda.cancelRequests();
-                jda.getCallbackPool().awaitTermination(4, TimeUnit.SECONDS);
+            for (Object listener : jda.getRegisteredListeners()) {
+                jda.removeEventListener(listener);
+            }
 
-                if (force) {
-                    jda.shutdownNow();
-                } else {
-                    jda.shutdown();
-                }
-            } catch (Exception e) {}
+            ThreadPoolExecutor pool = (ThreadPoolExecutor) jda.getGatewayPool();
+            pool.setRejectedExecutionHandler((r, executor) -> {
+                // NOP
+            });
+
+            jda.shutdownNow();
         }
  
         jda = null;
@@ -336,7 +369,7 @@ public class DiscordBot extends SimpleBot {
         @Override
         public void onShutdown(ShutdownEvent event) {
             if (bot.status != BotStatus.STOPPING) {
-                bot.shutdown(false);
+                bot.shutdown();
             }
         }
     }
