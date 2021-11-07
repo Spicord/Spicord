@@ -28,6 +28,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
+import javax.security.auth.login.LoginException;
+
 import org.spicord.Spicord;
 import org.spicord.api.addon.SimpleAddon;
 import org.spicord.api.bot.SimpleBot;
@@ -124,9 +126,8 @@ public class DiscordBot extends SimpleBot {
             this.jda = JDABuilder.createDefault(token)
                     .setAutoReconnect(true)
                     .addEventListeners(new BotStatusListener())
-                    .build();
-
-            jda.awaitReady();
+                    .build()
+                    .awaitReady();
 
             if (commandSupportEnabled)
                 jda.addEventListener(new BotCommandListener());
@@ -135,10 +136,11 @@ public class DiscordBot extends SimpleBot {
 
             spicord.getAddonManager().loadAddons(this);
             return true;
-        } catch (Exception e) {
+        } catch (LoginException | InterruptedException e) {
             this.status = BotStatus.OFFLINE;
             this.jda = null;
             logger.severe("An error ocurred while starting the bot '" + getName() + "'. " + e.getMessage());
+            e.printStackTrace();
         }
 
         return false;
