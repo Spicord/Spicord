@@ -28,43 +28,37 @@ public final class JavaScriptAddon extends SimpleAddon {
 
     private final ScriptEngine engine;
 
-    private final Object load;
-    private final Object ready;
-    private final Object shutdown;
-    private final Object disable;
-
     private final Map<String[], Object> _commands;
+
+    private JavaScriptBaseAddon baseAddon;
 
     public JavaScriptAddon(String name, String id, String author, String version, JavaScriptBaseAddon addon, ScriptEngine engine) {
         super(name, id, author, version);
 
         this.engine = engine;
         this._commands = addon.buildCommands();
-        this.load = addon.get("load");
-        this.ready = addon.get("ready");
-        this.shutdown = addon.get("shutdown");
-        this.disable = addon.get("disable");
+        this.baseAddon = addon;
     }
 
     @Override
     public void onLoad(DiscordBot bot) {
-        call(load, bot);
+        call(baseAddon.get("load"), bot);
         setupCommands(bot);
     }
 
     @Override
     public void onReady(DiscordBot bot) {
-        call(ready, bot);
+        call(baseAddon.get("ready"), bot);
     }
 
     @Override
     public void onShutdown(DiscordBot bot) {
-        call(shutdown, bot);
+        call(baseAddon.get("shutdown"), bot);
     }
 
     @Override
     public void onDisable() {
-        call(disable);
+        call(baseAddon.get("disable"));
     }
 
     private void setupCommands(DiscordBot bot) {
