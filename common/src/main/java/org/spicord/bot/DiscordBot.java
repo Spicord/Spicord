@@ -126,17 +126,14 @@ public class DiscordBot extends SimpleBot {
             this.jda = JDABuilder.createDefault(token)
                     .setAutoReconnect(true)
                     .addEventListeners(new BotStatusListener())
-                    .build()
-                    .awaitReady();
+                    .build();
 
             if (commandSupportEnabled)
                 jda.addEventListener(new BotCommandListener());
 
-            this.botId = jda.getSelfUser().getIdLong();
-
             spicord.getAddonManager().loadAddons(this);
             return true;
-        } catch (LoginException | InterruptedException e) {
+        } catch (LoginException e) {
             this.status = BotStatus.OFFLINE;
             this.jda = null;
             logger.severe("An error ocurred while starting the bot '" + getName() + "'. " + e.getMessage());
@@ -166,6 +163,7 @@ public class DiscordBot extends SimpleBot {
     }
 
     protected void onReady(ReadyEvent event) {
+        this.botId = jda.getSelfUser().getIdLong();
         loadedAddons.forEach(addon -> addon.onReady(this));
     }
 
