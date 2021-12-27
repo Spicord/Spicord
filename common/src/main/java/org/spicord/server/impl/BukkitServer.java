@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -86,9 +87,20 @@ final class BukkitServer extends eu.mcdb.universal.Server {
 
     private <T> T callSyncMethod(Callable<T> task) {
         try {
-            Plugin plugin = Bukkit.getPluginManager().getPlugin("Spicord");
-            return Bukkit.getScheduler().callSyncMethod(plugin, task).get(1000, TimeUnit.SECONDS);
-        } catch (Exception e) {}
+            if (Bukkit.isPrimaryThread()) {
+                return task.call();
+            } else {
+                Plugin plugin = Bukkit.getPluginManager().getPlugin("Spicord");
+                return Bukkit.getScheduler().callSyncMethod(plugin, task).get(1000, TimeUnit.SECONDS);
+            }
+        } catch (Throwable e) {
+            if (e instanceof ExecutionException) {
+                e = e.getCause();
+            }
+            if (e instanceof RuntimeException) {
+                throw (RuntimeException)e;
+            }
+        }
         return null;
     }
 
