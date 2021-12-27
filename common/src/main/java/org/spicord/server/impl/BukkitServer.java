@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 import org.bukkit.Bukkit;
@@ -79,13 +80,14 @@ final class BukkitServer extends eu.mcdb.universal.Server {
 
     @Override
     public boolean dispatchCommand(String command) {
-        return callSyncMethod(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
+        Boolean result = callSyncMethod(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
+        return result == null ? false : result;
     }
 
     private <T> T callSyncMethod(Callable<T> task) {
         try {
-            Plugin p = Bukkit.getPluginManager().getPlugins()[0];
-            return Bukkit.getScheduler().callSyncMethod(p, task).get();
+            Plugin plugin = Bukkit.getPluginManager().getPlugin("Spicord");
+            return Bukkit.getScheduler().callSyncMethod(plugin, task).get(1000, TimeUnit.SECONDS);
         } catch (Exception e) {}
         return null;
     }
