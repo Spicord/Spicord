@@ -91,7 +91,7 @@ final class BukkitServer extends eu.mcdb.universal.Server {
                 return task.call();
             } else {
                 Plugin plugin = Bukkit.getPluginManager().getPlugin("Spicord");
-                return Bukkit.getScheduler().callSyncMethod(plugin, task).get(1000, TimeUnit.SECONDS);
+                return Bukkit.getScheduler().callSyncMethod(plugin, task).get(3, TimeUnit.SECONDS);
             }
         } catch (Throwable e) {
             if (e instanceof ExecutionException) {
