@@ -47,13 +47,12 @@ import net.dv8tion.jda.api.entities.ApplicationTeam;
 import net.dv8tion.jda.api.entities.TeamMember;
 import net.dv8tion.jda.api.entities.TeamMember.MembershipState;
 import net.dv8tion.jda.api.entities.User;
-//import net.dv8tion.jda.api.JDA.Status;
 import net.dv8tion.jda.api.events.DisconnectEvent;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.ReconnectedEvent;
 import net.dv8tion.jda.api.events.ResumedEvent;
 import net.dv8tion.jda.api.events.ShutdownEvent;
-//import net.dv8tion.jda.api.events.StatusChangeEvent;
+import net.dv8tion.jda.api.events.StatusChangeEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -334,9 +333,23 @@ public class DiscordBot extends SimpleBot {
         }
     }
 
+    public String getJdaStatus() {
+        if (jda != null) {
+            return jda.getStatus().name();
+        }
+        return "-";
+    }
+
     private class BotStatusListener extends ListenerAdapter {
 
         private final DiscordBot bot = DiscordBot.this;
+
+        @Override
+        public void onStatusChange(StatusChangeEvent event) {
+            if (spicord.getConfig().isDebugEnabled()) {
+                spicord.getLogger().info("[DEBUG] Changed JDA Status [" + event.getOldStatus().name() + " -> " + event.getNewStatus().name() + "]");
+            }
+        }
 
         @Override
         public void onReady(ReadyEvent event) {
