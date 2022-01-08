@@ -76,8 +76,9 @@ public class DiscordBot extends SimpleBot {
     @Getter private long botId;
 
     /**
-     * Create a new Discord bot instance.<br>
+     * Create a new DiscordBot.<br>
      * 
+     * @param spicord               the Spicord instance
      * @param name                  the bot name
      * @param token                 the bot token
      * @param enabled               true if the bot should start
@@ -86,14 +87,11 @@ public class DiscordBot extends SimpleBot {
      * @param prefix                the command prefix for this bot
      * @see {@link DiscordBotLoader#startBot(DiscordBot)}
      */
-    public DiscordBot(String name, String token, boolean enabled, List<String> addons, boolean commandSupportEnabled,
-            String prefix) {
+    public DiscordBot(Spicord spicord, String name, String token, boolean enabled, List<String> addons, boolean commandSupportEnabled, String prefix) {
         super(name, token);
 
-        //----------------
-        this.spicord = Spicord.getInstance();
+        this.spicord = spicord;
         this.logger = spicord.getLogger();
-        //----------------
 
         this.enabled = enabled;
         this.addons = Collections.unmodifiableCollection(addons);
@@ -142,6 +140,12 @@ public class DiscordBot extends SimpleBot {
         return false;
     }
 
+    /**
+     * Check if the given user is the bot owner or member of the bot application team.
+     * 
+     * @param user the user
+     * @return true if the user is privileged
+     */
     public boolean isPrivilegedUser(User user) {
         ApplicationInfo appInfo = jda.retrieveApplicationInfo().complete();
         User owner = appInfo.getOwner();
@@ -161,12 +165,12 @@ public class DiscordBot extends SimpleBot {
         return false;
     }
 
-    protected void onReady(ReadyEvent event) {
+    private void onReady(ReadyEvent event) {
         this.botId = jda.getSelfUser().getIdLong();
         loadedAddons.forEach(addon -> addon.onReady(this));
     }
 
-    protected void onMessageReceived(MessageReceivedEvent event) {
+    private void onMessageReceived(MessageReceivedEvent event) {
         loadedAddons.forEach(addon -> addon.onMessageReceived(this, event));
     }
 
@@ -232,10 +236,20 @@ public class DiscordBot extends SimpleBot {
         }
     }
 
+    /**
+     * Unregister a single command.
+     * 
+     * @param name the command name
+     */
     public void unregisterCommand(String name) {
         commands.remove(name);
     }
 
+    /**
+     * Unregister various commands.
+     * 
+     * @param names the names of the commands
+     */
     public void unregisterCommands(String... names) {
         for (String name : names) {
             commands.remove(name);

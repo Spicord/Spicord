@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
-import org.spicord.SpicordCommand;
+import org.spicord.Spicord;
 import org.spicord.SpicordLoader;
 import org.spicord.SpicordPlugin;
 import org.spicord.Version;
@@ -33,22 +33,40 @@ public class SpicordSponge extends SpongePlugin implements SpicordPlugin {
 
     private SpicordLoader loader;
 
+    @Override
+    public void reloadSpicord() {
+        if (this.loader != null) {
+            this.loader.shutdown();
+        }
+        this.loader = new SpicordLoader(this);
+        this.loader.load();
+    }
+
+    @Override
+    public Spicord getSpicord() {
+        return this.loader.getSpicord();
+    }
+
     @Inject
     public SpicordSponge(Logger logger, @ConfigDir(sharedRoot = false) File configDir) {
         ClassLoader cl = prepareClassLoader(Sponge.class.getClassLoader());
         SpicordClassLoader classLoader = new SpicordClassLoader(cl);
-        loader = new SpicordLoader(classLoader, getLogger(), configDir);
+
+        this.loader = new SpicordLoader(classLoader, this);
     }
 
     @Listener
     public void init(GameInitializationEvent event) {
-        loader.load();
-        new SpicordCommand(() -> {}).register(this);
+        if (this.loader != null) {
+            this.loader.load();
+        }
     }
 
     @Listener
     public void stop(GameStoppingEvent event) {
-        loader.shutdown();
+        if (this.loader != null) {
+            this.loader.shutdown();
+        }
     }
 
     private ClassLoader prepareClassLoader(ClassLoader classLoader) {

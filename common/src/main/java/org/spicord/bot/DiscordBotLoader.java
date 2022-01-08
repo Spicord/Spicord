@@ -26,6 +26,7 @@ import com.google.common.base.Preconditions;
 
 public class DiscordBotLoader {
 
+    // FIXME: Do not use Spicord.getInstance()
     private static final Logger logger = Spicord.getInstance().getLogger();
 
     /**

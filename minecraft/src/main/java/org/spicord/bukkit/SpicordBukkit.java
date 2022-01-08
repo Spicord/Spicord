@@ -19,37 +19,44 @@ package org.spicord.bukkit;
 
 import java.io.File;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.spicord.SpicordCommand;
+import org.spicord.Spicord;
 import org.spicord.SpicordLoader;
 import org.spicord.SpicordPlugin;
+import org.spicord.fix.Fixes;
 
 public class SpicordBukkit extends JavaPlugin implements SpicordPlugin {
 
     private SpicordLoader loader;
 
     @Override
+    public void reloadSpicord() {
+        if (this.loader != null) {
+            this.loader.shutdown();
+        }
+        this.loader = new SpicordLoader(this);
+        this.loader.load();
+    }
+
+    @Override
+    public Spicord getSpicord() {
+        return this.loader.getSpicord();
+    }
+
+    @Override
     public void onEnable() {
-        checkForceload();
+        Fixes.checkForceload(this);
 
-        Runnable reload = () -> {
-            onDisable();
-            this.loader = new SpicordLoader(getLogger(), getDataFolder());
-        };
-        reload.run();
+        this.loader = new SpicordLoader(this);
 
-        int delay = loader.getConfig().getLoadDelay();
-        getLogger().info("Spicord will load in " + delay + " seconds");
+        final int loadDelay = loader.getConfig().getLoadDelay();
+        getLogger().info("Spicord will load in " + loadDelay + " seconds");
+
         getServer().getScheduler().scheduleSyncDelayedTask(this, () -> {
             BukkitJDADetector.checkOtherJDA(this);
             loader.load();
-        }, delay * 20);
+        }, loadDelay * 20);
 
-        new SpicordCommand(() -> {
-            reload.run();
-            loader.load();
-        }).register(this);
-
-        checkLoader(true);
+        Fixes.checkLoader(this, true);
     }
 
     @Override
@@ -59,9 +66,9 @@ public class SpicordBukkit extends JavaPlugin implements SpicordPlugin {
 
     @Override
     public void onDisable() {
-        if (loader != null)
-            loader.shutdown();
-
+        if (this.loader != null) {
+            this.loader.shutdown();
+        }
         this.loader = null;
     }
 }

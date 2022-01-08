@@ -18,9 +18,11 @@
 package org.spicord.bungee;
 
 import java.util.concurrent.TimeUnit;
-import org.spicord.SpicordCommand;
+
+import org.spicord.Spicord;
 import org.spicord.SpicordLoader;
 import org.spicord.SpicordPlugin;
+import org.spicord.fix.Fixes;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class SpicordBungee extends Plugin implements SpicordPlugin {
@@ -28,32 +30,38 @@ public class SpicordBungee extends Plugin implements SpicordPlugin {
     private SpicordLoader loader;
 
     @Override
+    public void reloadSpicord() {
+        if (this.loader != null) {
+            this.loader.shutdown();
+        }
+        this.loader = new SpicordLoader(this);
+        this.loader.load();
+    }
+
+    @Override
+    public Spicord getSpicord() {
+        return this.loader.getSpicord();
+    }
+
+    @Override
     public void onEnable() {
-        checkForceload();
+        Fixes.checkForceload(this);
 
-        Runnable reload = () -> {
-            onDisable();
-            this.loader = new SpicordLoader(getLogger(), getDataFolder());
-        };
-        reload.run();
+        this.loader = new SpicordLoader(this);
 
-        int delay = loader.getConfig().getLoadDelay();
-        getLogger().info("Spicord will load in " + delay + " seconds");
-        getProxy().getScheduler().schedule(this, () -> loader.load(), delay, TimeUnit.SECONDS);
+        final int loadDelay = loader.getConfig().getLoadDelay();
 
-        new SpicordCommand(() -> {
-            reload.run();
-            loader.load();
-        }).register(this);
+        getLogger().info("Spicord will load in " + loadDelay + " seconds");
+        getProxy().getScheduler().schedule(this, () -> loader.load(), loadDelay, TimeUnit.SECONDS);
 
-        checkLoader(false);
+        Fixes.checkLoader(this, false);
     }
 
     @Override
     public void onDisable() {
-        if (loader != null)
-            loader.shutdown();
-
+        if (this.loader != null) {
+            this.loader.shutdown();
+        }
         this.loader = null;
     }
 }

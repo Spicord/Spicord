@@ -18,7 +18,8 @@
 package org.spicord.velocity;
 
 import java.io.File;
-import org.spicord.SpicordCommand;
+
+import org.spicord.Spicord;
 import org.spicord.SpicordLoader;
 import org.spicord.SpicordPlugin;
 import org.spicord.Version;
@@ -33,12 +34,24 @@ public class SpicordVelocity extends VelocityPlugin implements SpicordPlugin {
 
     private SpicordLoader loader;
 
+    @Override
+    public void reloadSpicord() {
+        if (this.loader != null) {
+            this.loader.shutdown();
+        }
+        this.loader = new SpicordLoader(this);
+        this.loader.load();
+    }
+
+    @Override
+    public Spicord getSpicord() {
+        return this.loader.getSpicord();
+    }
+
     @Inject
     public SpicordVelocity(ProxyServer proxyServer) {
         super(proxyServer);
-        this.loader = new SpicordLoader(getLogger(), getDataFolder());
-        this.loader.load();
-        new SpicordCommand(() -> {}).register(this);
+        reloadSpicord();
     }
 
     @Override

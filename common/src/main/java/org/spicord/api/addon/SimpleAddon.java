@@ -90,6 +90,7 @@ public abstract class SimpleAddon {
         this.commands = commands;
 
         //--------------
+        // FIXME: Do not use Spicord.getInstance()
         this.spicord = Spicord.getInstance();
         //--------------
     }

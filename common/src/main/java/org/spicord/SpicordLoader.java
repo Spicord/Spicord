@@ -42,12 +42,15 @@ public final class SpicordLoader {
     /**
      * The {@link SpicordLoader} constructor.
      */
-    public SpicordLoader(Logger logger, File dataFolder) {
-        this(null, logger, dataFolder);
+    public SpicordLoader(SpicordPlugin plugin) {
+        this(null, plugin);
     }
 
-    public SpicordLoader(JarClassLoader classLoader, Logger logger, File dataFolder) {
-        Preconditions.checkNotNull(logger);
+    public SpicordLoader(JarClassLoader classLoader, SpicordPlugin plugin) {
+        Preconditions.checkNotNull(plugin);
+
+        final Logger logger = plugin.getLogger();
+        final File dataFolder = plugin.getDataFolder();
 
         this.logger = logger;
         this.libraryLoader = new LibraryLoader(classLoader, "/libraries.libinfo", logger, dataFolder);
@@ -57,10 +60,12 @@ public final class SpicordLoader {
                 firstRun = false;
                 libraryLoader.downloadLibraries();
                 libraryLoader.loadLibraries();
+
+                new SpicordCommand(plugin).register(plugin);
             }
 
             this.spicord = new Spicord(logger);
-            this.config  = new SpicordConfiguration(logger, dataFolder);
+            this.config  = new SpicordConfiguration(spicord, dataFolder);
         } catch (IOException e) {
             handleException(e);
         }
@@ -75,6 +80,10 @@ public final class SpicordLoader {
         } catch (IOException e) {
             handleException(e);
         }
+    }
+
+    public Spicord getSpicord() {
+        return spicord;
     }
 
     public void shutdown() {

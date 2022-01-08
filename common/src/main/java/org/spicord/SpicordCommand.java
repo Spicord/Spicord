@@ -31,13 +31,11 @@ import eu.mcdb.universal.command.api.CommandParameters;
 
 public final class SpicordCommand extends Command {
 
-    private Spicord spicord;
-    private final Runnable reloadAction;
+    private final SpicordPlugin plugin;
 
-    public SpicordCommand(Runnable reload) {
+    public SpicordCommand(SpicordPlugin plugin) {
         super("spicord", null, new String[] { "sp" });
-        this.spicord = Spicord.getInstance();
-        this.reloadAction = reload;
+        this.plugin = plugin;
 
         setCommandHandler(sender -> {
             sender.sendFormattedMessage("&7&l[&a&lSpicord&7&l] &fRunning Spicord %s by OopsieWoopsie", Spicord.getVersion());
@@ -82,18 +80,18 @@ public final class SpicordCommand extends Command {
         String id = params.getValue("id");
 
         if (action.equals("add") || action.equals("remove")) {
-            DiscordBot bot = spicord.getBotByName(botname);
+            DiscordBot bot = plugin.getSpicord().getBotByName(botname);
 
             if (bot != null) {
-                SimpleAddon addon = spicord.getAddonManager().getAddonById(id);
+                SimpleAddon addon = plugin.getSpicord().getAddonManager().getAddonById(id);
 
                 if (addon != null) {
                     if (action.equals("add")) {
                         sender.sendFormattedMessage("&eAdded the addon '%s' to bot '%s'", addon.getName(), bot.getName());
-                        spicord.getConfig().getManager().addAddonToBot(addon.getId(), bot.getName());
+                        plugin.getSpicord().getConfig().getManager().addAddonToBot(addon.getId(), bot.getName());
                     } else {
                         sender.sendFormattedMessage("&eRemoved the addon '%s' from the bot '%s'", addon.getName(), bot.getName());
-                        spicord.getConfig().getManager().removeAddonFromBot(addon.getId(), bot.getName());
+                        plugin.getSpicord().getConfig().getManager().removeAddonFromBot(addon.getId(), bot.getName());
                     }
                     sender.sendFormattedMessage("&aDo &6/spicord restart &ato apply the changes");
                     return true;
@@ -110,9 +108,9 @@ public final class SpicordCommand extends Command {
     private boolean handleStop(UniversalCommandSender sender, CommandParameters params) {
         String botname = params.getOptionalValue("botname").orElse("default");
 
-        DiscordBot bot = spicord.getBotByName(botname);
+        DiscordBot bot = plugin.getSpicord().getBotByName(botname);
         if (bot == null) {
-            Set<DiscordBot> bots = spicord.getConfig().getBots();
+            Set<DiscordBot> bots = plugin.getSpicord().getConfig().getBots();
             if (bots.size() == 1) {
                 bot = bots.iterator().next();
                 sender.sendFormattedMessage("&cCannot find the bot '%s', using: %s", botname, bot.getName());
@@ -132,7 +130,7 @@ public final class SpicordCommand extends Command {
 
     private boolean handleStart(UniversalCommandSender sender, CommandParameters params) {
         String botname = params.getOptionalValue("botname").orElse("default");
-        DiscordBot bot = spicord.getBotByName(botname);
+        DiscordBot bot = plugin.getSpicord().getBotByName(botname);
 
         if (bot == null) {
             sender.sendFormattedMessage("&cCannot find the bot '%s'", botname);
@@ -151,15 +149,14 @@ public final class SpicordCommand extends Command {
 
     private boolean handleRestart(UniversalCommandSender sender) {
         sender.sendFormattedMessage("&cSpicord is being restarted, please wait...");
-        reloadAction.run();
-        this.spicord = Spicord.getInstance();
+        plugin.reloadSpicord();
         sender.sendFormattedMessage("&aSpicord has been restarted!");
         return true;
     }
 
     private boolean handleStatus(UniversalCommandSender sender) {
         sender.sendFormattedMessage("&7&l[&a&lSpicord&7&l] &f> Status");
-        for (DiscordBot bot : spicord.getConfig().getBots()) {
+        for (DiscordBot bot : plugin.getSpicord().getConfig().getBots()) {
             sender.sendFormattedMessage(" &7- %s [&e%s (JDA:%s)&7]", bot.getName(), bot.getStatus().toString(), bot.getJdaStatus());
         }
         sender.sendFormattedMessage("&7&l[&a&lSpicord&7&l] &f--------");

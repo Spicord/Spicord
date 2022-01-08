@@ -97,7 +97,7 @@ public interface ModuleManager {
         // instances
         this.register("path", new Path(getEngine()));
         this.register("server", Server.getInstance());
-        this.register("spicord", Spicord.getInstance());
+        this.register("spicord", Spicord.getInstance()); // FIXME: Do not use Spicord.getInstance()
         this.register("worker", new Worker(getEngine()));
         this.register("native", new Native(getEngine()));
     }

@@ -55,6 +55,7 @@ public class EmbedLoader {
                     final String content = new String(Files.readAllBytes(file.toPath()), charset);
                     embeds.put(name, Embed.fromJson(content));
                 } catch (IOException e) {
+                    // FIXME: Do not use Spicord.getInstance()
                     Spicord.getInstance().getLogger().warning("Cannot load the embed '" + file.getName() + "': " + e.getMessage());
                 }
             }

@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.spicord.Spicord;
 import org.spicord.bot.DiscordBot;
 import org.spicord.config.SpicordConfiguration.SpicordConfig.Bot;
 
@@ -41,6 +42,8 @@ import lombok.Getter;
 
 // this is a mess, i know, will be re-made in the future :)
 public final class SpicordConfiguration {
+
+    private final Spicord spicord;
 
     @Getter private final Set<DiscordBot> bots;
     @Getter private final File dataFolder;
@@ -56,13 +59,15 @@ public final class SpicordConfiguration {
 
     @Getter private final ConfigurationManager manager;
 
-    public SpicordConfiguration(Logger logger, final File dataFolder) {
+    public SpicordConfiguration(Spicord spicord, final File dataFolder) {
+        this.spicord = spicord;
+
         this.bots = Collections.synchronizedSet(new HashSet<DiscordBot>());
 
         this.dataFolder = dataFolder;
         this.dataFolder.mkdir();
         this.configFile = new File(dataFolder, "config.toml");
-        this.logger = logger;
+        this.logger = spicord.getLogger();
 
         this.writer = new TomlWriter.Builder()
                 .indentValuesBy(2)
@@ -82,6 +87,7 @@ public final class SpicordConfiguration {
 
         for (final SpicordConfig.Bot botData : config.bots) {
             final DiscordBot bot = new DiscordBot(
+                    spicord,
                     botData.name,
                     botData.token,
                     botData.enabled,
