@@ -23,35 +23,55 @@ import java.util.logging.Logger;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.spicord.LibraryLoader;
+import org.spicord.Spicord;
 import org.spicord.SpicordLoader;
+import org.spicord.SpicordPlugin;
 import org.spicord.cli.log.FormattedLogger;
+import org.spicord.reflect.ReflectUtils;
 
-public class SpicordMain {
+public class SpicordMain implements SpicordPlugin {
+
+    public static void main(String[] args) throws IOException { new SpicordMain(args); }
 
     private final Logger logger = FormattedLogger.getLogger("Spicord");
     private final File dataFolder = this.getLocation();
     private SpicordLoader loader;
 
-    public static Runnable RESTART;
+    @Override
+    public void reloadSpicord() {
+        if (this.loader != null) {
+            this.loader.shutdown();
+        }
+        this.loader = new SpicordLoader(this);
+        this.loader.load();
+    }
 
-    public static void main(String[] args) throws IOException {
-        new SpicordMain(args);
+    @Override
+    public Logger getLogger() {
+        return logger;
+    }
+
+    @Override
+    public File getDataFolder() {
+        return dataFolder;
+    }
+
+    @Override
+    public File getFile() {
+        return ReflectUtils.getJarFile(SpicordMain.class);
+    }
+
+    @Override
+    public Spicord getSpicord() {
+        return loader.getSpicord();
     }
 
     public SpicordMain(String[] args) throws IOException {
         this.preload();
-
-        RESTART = () -> {
-            if (loader != null)
-                loader.shutdown();
-            this.loader = new SpicordLoader(this.logger, this.dataFolder);
-            this.loader.load();
-        };
-
-        RESTART.run();
+        this.reloadSpicord();
 
         final LineReader lineReader = LineReaderBuilder.builder().build();
-        final SpicordConsoleCommand scc = new SpicordConsoleCommand(this.logger);
+        final SpicordConsoleCommand scc = new SpicordConsoleCommand(this);
         final String prompt = "spicord > ";
 
         do {

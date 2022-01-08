@@ -17,16 +17,17 @@
 
 package org.spicord.cli;
 
-import java.util.logging.Logger;
 import org.spicord.SpicordCommand;
+
 import eu.mcdb.universal.command.UniversalCommandSender;
 
 class SpicordConsoleCommand {
 
     private final UniversalCommandSender commandSender;
-    private final SpicordCommand command = new SpicordCommand(SpicordMain.RESTART);
+    private final SpicordCommand command;
 
-    public SpicordConsoleCommand(final Logger logger) {
+    public SpicordConsoleCommand(final SpicordMain spicordMain) {
+        this.command = new SpicordCommand(spicordMain);
         this.command.detachChilds();
         this.command.setUsagePrefix("");
         this.command.setUsageEnabled(false);
@@ -44,7 +45,7 @@ class SpicordConsoleCommand {
 
             @Override
             public void sendMessage(String message) {
-                logger.info(message);
+                spicordMain.getLogger().info(message);
             }
         };
     }
