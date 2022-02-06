@@ -165,6 +165,12 @@ public class DiscordBot extends SimpleBot {
         return false;
     }
 
+    public <T extends SimpleAddon> void unloadAddon(T addonInstance) {
+        unregisterCommands(addonInstance.getCommands());
+        loadedAddons.remove(addonInstance);
+        addonInstance.onDisable();
+    }
+
     private void onReady(ReadyEvent event) {
         this.botId = jda.getSelfUser().getIdLong();
         loadedAddons.forEach(addon -> addon.onReady(this));

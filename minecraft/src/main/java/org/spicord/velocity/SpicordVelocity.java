@@ -26,6 +26,8 @@ import org.spicord.Version;
 import org.spicord.plugin.VelocityPlugin;
 import org.spicord.reflect.ReflectUtils;
 import com.google.inject.Inject;
+import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
 
@@ -51,7 +53,15 @@ public class SpicordVelocity extends VelocityPlugin implements SpicordPlugin {
     @Inject
     public SpicordVelocity(ProxyServer proxyServer) {
         super(proxyServer);
-        reloadSpicord();
+        if (this.loader != null) {
+            this.loader.shutdown();
+        }
+        this.loader = new SpicordLoader(this);
+    }
+
+    @Subscribe
+    public void onProxyInitialize(ProxyInitializeEvent event) {
+        this.loader.load();
     }
 
     @Override
