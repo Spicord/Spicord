@@ -34,7 +34,7 @@ public abstract class VanishAPI {
         try {
             Class.forName("de.myzelyam.api.vanish.VanishAPI");
             return true;
-        } catch (ClassNotFoundException e) {}
+        } catch (Throwable e) {}
         return false;
     }
 
