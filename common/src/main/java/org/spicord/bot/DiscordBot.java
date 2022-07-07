@@ -17,10 +17,11 @@
 
 package org.spicord.bot;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -55,6 +56,7 @@ import net.dv8tion.jda.api.events.ShutdownEvent;
 import net.dv8tion.jda.api.events.StatusChangeEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 
 public class DiscordBot extends SimpleBot {
 
@@ -94,8 +96,8 @@ public class DiscordBot extends SimpleBot {
         this.logger = spicord.getLogger();
 
         this.enabled = enabled;
-        this.addons = Collections.unmodifiableCollection(addons);
-        this.loadedAddons = new ArrayList<SimpleAddon>();
+        this.addons = Collections.unmodifiableSet(new HashSet<>(addons));
+        this.loadedAddons = new HashSet<SimpleAddon>();
         this.commandPrefix = prefix.trim();
         this.commands = new HashMap<String, Consumer<DiscordBotCommand>>();
         this.status = BotStatus.OFFLINE;
@@ -120,7 +122,7 @@ public class DiscordBot extends SimpleBot {
 
         try {
             this.status = BotStatus.STARTING;
-            this.jda = JDABuilder.createDefault(token)
+            this.jda = JDABuilder.createDefault(token, EnumSet.allOf(GatewayIntent.class))
                     .setAutoReconnect(true)
                     .addEventListeners(new BotStatusListener())
                     .build();

@@ -5,7 +5,7 @@
 
     <groupId>org.spicord</groupId>
     <artifactId>spicord</artifactId>
-    <version>4.2.0</version>
+    <version>4.2.2</version>
     <packaging>pom</packaging>
 
     <name>Spicord-Parent</name>
@@ -37,6 +37,11 @@
         <repository>
             <id>spicord</id>
             <url>https://repo.spicord.org/</url>
+        </repository>
+        <repository>
+            <id>dv8tion</id>
+            <name>m2-dv8tion</name>
+            <url>https://m2.dv8tion.net/releases</url>
         </repository>
     </repositories>
 
@@ -74,7 +79,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>4.2.1</version>
+            <version>4.4.0_350</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

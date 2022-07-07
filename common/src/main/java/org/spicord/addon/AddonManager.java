@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.spicord.Spicord;
 import org.spicord.api.addon.JavaScriptAddon;
 import org.spicord.api.addon.JavaScriptBaseAddon;
 import org.spicord.api.addon.SimpleAddon;
@@ -93,6 +94,21 @@ public class AddonManager {
             final Object[] args = new Object[] { addon.getName(), addon.getId(), addon.getAuthor() };
 
             logger.info(String.format("Registered addon '%s' (%s) by %s", args));
+
+            final Spicord spicord = Spicord.getInstance();
+            if (spicord != null) {
+                final boolean spicordLoaded = spicord.getConfig() != null;
+                if (spicordLoaded) { // too late
+                    for (DiscordBot bot : spicord.getConfig().getBots()) {
+                        if (bot.isEnabled() && bot.getAddons().contains(addon.getId())) {
+                            bot.loadAddon(addon);
+                            if (bot.isReady()) {
+                                addon.onReady(bot);
+                            }
+                        }
+                    }
+                }
+            }
 
             return addons.add(addon);
         }
