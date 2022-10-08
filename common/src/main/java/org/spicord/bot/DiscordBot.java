@@ -122,7 +122,7 @@ public class DiscordBot extends SimpleBot {
 
         try {
             this.status = BotStatus.STARTING;
-            this.jda = JDABuilder.createDefault(token, EnumSet.allOf(GatewayIntent.class))
+            this.jda = JDABuilder.create(token, EnumSet.allOf(GatewayIntent.class))
                     .setAutoReconnect(true)
                     .addEventListeners(new BotStatusListener())
                     .build();
