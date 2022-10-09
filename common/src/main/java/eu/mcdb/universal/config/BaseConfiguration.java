@@ -18,6 +18,7 @@
 package eu.mcdb.universal.config;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +58,7 @@ public interface BaseConfiguration {
 
     List<String> getStringList(String path);
 
+    Collection<String> getKeys();
     Map<String, Object> getValues();
 
     void save() throws IOException;

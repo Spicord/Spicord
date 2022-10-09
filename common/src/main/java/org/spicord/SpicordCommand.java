@@ -148,10 +148,18 @@ public final class SpicordCommand extends Command {
     }
 
     private boolean handleRestart(UniversalCommandSender sender) {
-        sender.sendFormattedMessage("&cSpicord is being restarted, please wait...");
-        plugin.reloadSpicord();
-        sender.sendFormattedMessage("&aSpicord has been restarted!");
-        return true;
+    	if ("yes".equalsIgnoreCase(System.getProperty("enableSpicordRestartCmd", "no"))) {
+    		
+            sender.sendFormattedMessage("&cSpicord is being restarted, please wait...");
+            plugin.reloadSpicord();
+            sender.sendFormattedMessage("&aSpicord has been restarted!");
+    		
+    		return true;
+    	}
+
+    	sender.sendFormattedMessage("&cThis command is not available anymore, sorry. Restart the server instead.");
+
+    	return true;
     }
 
     private boolean handleStatus(UniversalCommandSender sender) {

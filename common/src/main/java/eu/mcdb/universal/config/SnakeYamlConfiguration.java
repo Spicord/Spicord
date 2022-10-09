@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.yaml.snakeyaml.DumperOptions;
@@ -110,6 +111,11 @@ class SnakeYamlConfiguration extends YamlConfiguration implements GetBasedConfig
         }
 
         return v;
+    }
+
+    @Override
+    public Collection<String> getKeys() {
+    	return map.keySet();
     }
 
     @Override

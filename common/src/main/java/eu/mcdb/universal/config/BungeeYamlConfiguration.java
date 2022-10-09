@@ -19,6 +19,7 @@ package eu.mcdb.universal.config;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,12 @@ class BungeeYamlConfiguration extends YamlConfiguration {
         }
     }
 
+    private BungeeYamlConfiguration(final Configuration config) {
+        this.file = null;
+        this.provider = null;
+        this.config = config;
+    }
+
     @Override
     public void set(String path, Object value) {
         config.set(path, value);
@@ -48,12 +55,24 @@ class BungeeYamlConfiguration extends YamlConfiguration {
 
     @Override
     public Object get(String path) {
-        return config.get(path);
+        Object o = config.get(path);
+
+        if (o instanceof Configuration) {
+        	o = new BungeeYamlConfiguration((Configuration) o);
+        }
+
+        return o;
     }
 
     @Override
     public Object get(String path, Object def) {
-        return config.get(path, def);
+        Object o = config.get(path, def);
+
+        if (o instanceof Configuration) {
+        	o = new BungeeYamlConfiguration((Configuration) o);
+        }
+
+        return o;
     }
 
     @Override
@@ -147,6 +166,11 @@ class BungeeYamlConfiguration extends YamlConfiguration {
     }
 
     @Override
+    public Collection<String> getKeys() {
+    	return config.getKeys();
+    }
+
+    @Override
     public Map<String, Object> getValues() {
         return dig(config);
     }
@@ -169,6 +193,8 @@ class BungeeYamlConfiguration extends YamlConfiguration {
 
     @Override
     public void save() throws IOException {
-        provider.save(config, file);
+    	if (provider != null) {
+            provider.save(config, file);
+    	}
     }
 }
