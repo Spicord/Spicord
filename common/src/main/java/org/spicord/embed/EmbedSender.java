@@ -17,22 +17,16 @@
 
 package org.spicord.embed;
 
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 
 public class EmbedSender {
 
-    @Deprecated
-    public static MessageAction prepare(TextChannel channel, Embed embed) {
-        return prepare((MessageChannel)channel, embed);
-    }
-
-    public static MessageAction prepare(MessageChannel channel, Embed embed) {
+    public static MessageCreateAction prepare(GuildMessageChannel channel, Embed embed) {
         if (embed.hasEmbedData() && embed.hasContent())
-            return channel.sendMessage(embed.toJdaEmbed()).append(embed.getContent());
+            return channel.sendMessageEmbeds(embed.toJdaEmbed()).addContent(embed.getContent());
         else if (embed.hasEmbedData())
-            return channel.sendMessage(embed.toJdaEmbed());
+            return channel.sendMessageEmbeds(embed.toJdaEmbed());
         else if (embed.hasContent())
             return channel.sendMessage(embed.getContent());
         else

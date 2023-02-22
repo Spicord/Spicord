@@ -26,10 +26,9 @@ import java.io.Serializable;
 import java.time.OffsetDateTime;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 
 public class Embed implements Serializable {
 
@@ -455,8 +454,8 @@ public class Embed implements Serializable {
      * @param channel the channel
      * @return the response value
      */
-    public Message sendToChannel(TextChannel channel) {
-        return EmbedSender.prepare((MessageChannel)channel, this).complete();
+    public Message sendToChannel(GuildMessageChannel channel) {
+        return EmbedSender.prepare(channel, this).complete();
     }
 
     /**

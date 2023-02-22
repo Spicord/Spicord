@@ -25,8 +25,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 
 public class DiscordBotCommand extends SimpleCommand {
 
@@ -34,7 +34,7 @@ public class DiscordBotCommand extends SimpleCommand {
     @Getter private final User author;
     private final Member member;
     @Getter private final Guild guild;
-    @Getter private final TextChannel channel;
+    @Getter private final GuildMessageChannel channel;
     @Getter private final String name;
     @Getter private final String prefix;
 
@@ -52,7 +52,7 @@ public class DiscordBotCommand extends SimpleCommand {
         this.author = message.getAuthor();
         this.member = message.getMember();
         this.guild = message.getGuild();
-        this.channel = message.getTextChannel();
+        this.channel = message.getChannel().asGuildMessageChannel();
         String raw = message.getContentRaw();
         this.prefix = raw.split(" ")[0].substring(0, raw.indexOf(name));
     }
@@ -100,7 +100,7 @@ public class DiscordBotCommand extends SimpleCommand {
      * @param embed the JDA embed to send
      */
     public void reply(MessageEmbed embed) {
-        channel.sendMessage(embed).queue();
+        channel.sendMessageEmbeds(embed).queue();
     }
 
     /**

@@ -20,13 +20,13 @@ package org.spicord.bot.command;
 import eu.mcdb.universal.command.UniversalCommandSender;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 
 public class DiscordCommandSender extends UniversalCommandSender {
 
     protected final Member member;
-    protected final MessageChannel channel;
+    protected final GuildMessageChannel channel;
     private PrivateChannel _channel;
 
     public DiscordCommandSender(final DiscordBotCommand command) {

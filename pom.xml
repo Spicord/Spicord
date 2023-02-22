@@ -5,7 +5,7 @@
 
     <groupId>org.spicord</groupId>
     <artifactId>spicord</artifactId>
-    <version>4.2.4</version>
+    <version>5.0.0</version>
     <packaging>pom</packaging>
 
     <name>Spicord-Parent</name>
@@ -79,7 +79,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>4.4.0_350</version>
+            <version>5.0.0-beta.4</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

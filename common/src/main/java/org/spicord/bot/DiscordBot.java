@@ -29,8 +29,6 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-import javax.security.auth.login.LoginException;
-
 import org.spicord.Spicord;
 import org.spicord.api.addon.SimpleAddon;
 import org.spicord.api.bot.SimpleBot;
@@ -48,13 +46,14 @@ import net.dv8tion.jda.api.entities.ApplicationTeam;
 import net.dv8tion.jda.api.entities.TeamMember;
 import net.dv8tion.jda.api.entities.TeamMember.MembershipState;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.DisconnectEvent;
-import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.events.ReconnectedEvent;
-import net.dv8tion.jda.api.events.ResumedEvent;
-import net.dv8tion.jda.api.events.ShutdownEvent;
 import net.dv8tion.jda.api.events.StatusChangeEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
+import net.dv8tion.jda.api.events.session.SessionDisconnectEvent;
+import net.dv8tion.jda.api.events.session.SessionRecreateEvent;
+import net.dv8tion.jda.api.events.session.SessionResumeEvent;
+import net.dv8tion.jda.api.events.session.ShutdownEvent;
+import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
@@ -132,7 +131,7 @@ public class DiscordBot extends SimpleBot {
 
             spicord.getAddonManager().loadAddons(this);
             return true;
-        } catch (LoginException e) {
+        } catch (InvalidTokenException e) {
             this.status = BotStatus.OFFLINE;
             this.jda = null;
             logger.severe("An error ocurred while starting the bot '" + getName() + "'. " + e.getMessage());
@@ -387,17 +386,17 @@ public class DiscordBot extends SimpleBot {
 //        }
 
         @Override
-        public void onReconnect(ReconnectedEvent event) {
+        public void onSessionResume(SessionResumeEvent event) {
             bot.status = BotStatus.READY;
         }
 
         @Override
-        public void onResume(ResumedEvent event) {
+        public void onSessionRecreate(SessionRecreateEvent event) {
             bot.status = BotStatus.READY;
         }
 
         @Override
-        public void onDisconnect(DisconnectEvent event) {
+        public void onSessionDisconnect(SessionDisconnectEvent event) {
             bot.status = BotStatus.OFFLINE;
         }
 
