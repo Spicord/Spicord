@@ -14,6 +14,13 @@
 
     <name>Spicord-Common</name>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
@@ -39,7 +46,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>de.myzelyam</groupId>
+            <groupId>com.github.LeonMangler</groupId>
             <artifactId>PremiumVanishAPI</artifactId>
             <version>2.6.3</version>
             <scope>provided</scope>
