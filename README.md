@@ -35,15 +35,26 @@
 
 ## Maven repository
 ```xml
+<!-- for Spicord -->
 <repository>
-    <id>spicord-repo</id>
-    <url>https://repo.spicord.org/</url>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
 </repository>
 
 <dependency>
-    <groupId>org.spicord</groupId>
+    <groupId>com.github.Spicord.Spicord</groupId>
     <artifactId>spicord-common</artifactId>
-    <version>3.1.0</version>
+    <version>v5-SNAPSHOT</version>
+    <scope>provided</scope>
+</dependency>
+```
+
+```xml
+<!-- JDA -->
+<dependency>
+    <groupId>net.dv8tion</groupId>
+    <artifactId>JDA</artifactId>
+    <version>5.0.0-beta.4</version>
     <scope>provided</scope>
 </dependency>
 ```
