@@ -35,10 +35,6 @@
             <url>https://repo.spongepowered.org/maven/</url>
         </repository>
         <repository>
-            <id>spicord</id>
-            <url>https://repo.spicord.org/</url>
-        </repository>
-        <repository>
             <id>dv8tion</id>
             <name>m2-dv8tion</name>
             <url>https://m2.dv8tion.net/releases</url>
@@ -55,7 +51,7 @@
         <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
-            <version>1.16-R0.4-SNAPSHOT</version>
+            <version>1.19-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
