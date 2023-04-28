@@ -22,8 +22,8 @@ import org.spicord.reflect.ReflectUtils;
 public enum ServerType {
 
     BUKKIT     ("org.bukkit.Bukkit"),
-    BUNGEECORD ("net.md_5.bungee.api.ProxyServer"),
     VELOCITY   ("com.velocitypowered.api.proxy.ProxyServer"),
+    BUNGEECORD ("net.md_5.bungee.api.ProxyServer"),
     SPONGE     ("org.spongepowered.api.Game"),
     UNKNOWN    (null);
 

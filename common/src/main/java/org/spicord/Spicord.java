@@ -91,7 +91,7 @@ public final class Spicord {
             logger.setLevel(Level.FINER);
         }
 
-        if (config.isJdaMessagesEnabled()) {
+        if (config.isJdaMessagesEnabled() && false) {
             try {
                 Class<?> cls = Class.forName("org.spicord.log.LoggerFactory");
                 Method init = cls.getMethod("init", Logger.class);
