@@ -55,6 +55,7 @@ import net.dv8tion.jda.api.events.session.SessionResumeEvent;
 import net.dv8tion.jda.api.events.session.ShutdownEvent;
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.CloseCode;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
 public class DiscordBot extends SimpleBot {
@@ -119,9 +120,12 @@ public class DiscordBot extends SimpleBot {
     protected boolean start() {
         if (!enabled) return false;
 
+        EnumSet<GatewayIntent> intents = EnumSet.allOf(GatewayIntent.class);
+        intents.remove(GatewayIntent.GUILD_PRESENCES);
+
         try {
             this.status = BotStatus.STARTING;
-            this.jda = JDABuilder.create(token, EnumSet.allOf(GatewayIntent.class))
+            this.jda = JDABuilder.create(token, intents)
                     .setAutoReconnect(true)
                     .addEventListeners(new BotStatusListener())
                     .build();
@@ -139,6 +143,15 @@ public class DiscordBot extends SimpleBot {
         }
 
         return false;
+    }
+
+    private void warnMissingIntents() {
+        logger.severe("=============================================");
+        logger.severe("      OPEN THE DISCORD DEVELOPER PORTAL      ");
+        logger.severe("       AND ENABLE THE GATEWAY INTENTS        ");
+        logger.severe("                FOR YOUR BOT                 ");
+        logger.severe(" https://discord.com/developers/applications ");
+        logger.severe("=============================================");
     }
 
     /**
@@ -398,6 +411,10 @@ public class DiscordBot extends SimpleBot {
         @Override
         public void onSessionDisconnect(SessionDisconnectEvent event) {
             bot.status = BotStatus.OFFLINE;
+
+            if (event.getCloseCode() == CloseCode.DISALLOWED_INTENTS) {
+                warnMissingIntents();
+            }
         }
 
         @Override
