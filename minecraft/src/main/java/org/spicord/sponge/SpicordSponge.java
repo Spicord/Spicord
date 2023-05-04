@@ -8,7 +8,6 @@ import org.spicord.Spicord;
 import org.spicord.SpicordLoader;
 import org.spicord.SpicordPlugin;
 import org.spicord.reflect.ReflectUtils;
-import org.spicord.util.SpicordClassLoader;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.LoadedGameEvent;
@@ -26,10 +25,8 @@ public class SpicordSponge implements SpicordPlugin {
 
     @Inject
     public SpicordSponge(@ConfigDir(sharedRoot = false) Path dataFolder) {
-        ClassLoader classLoader = SpicordSponge.class.getClassLoader();
-
-        this.loader = new SpicordLoader(new SpicordClassLoader(classLoader), this);
         this.dataFolder = dataFolder.toFile();
+        this.loader = new SpicordLoader(new MostInefficientClassLoader(), this);
     }
 
     @Listener

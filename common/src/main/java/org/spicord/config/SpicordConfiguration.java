@@ -65,7 +65,7 @@ public final class SpicordConfiguration {
         this.bots = Collections.synchronizedSet(new HashSet<DiscordBot>());
 
         this.dataFolder = dataFolder;
-        this.dataFolder.mkdir();
+        this.dataFolder.mkdirs();
         this.configFile = new File(dataFolder, "config.toml");
         this.logger = spicord.getLogger();
 
