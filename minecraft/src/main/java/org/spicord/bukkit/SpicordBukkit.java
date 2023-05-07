@@ -43,14 +43,17 @@ public class SpicordBukkit extends JavaPlugin implements SpicordPlugin {
     }
 
     @Override
-    public void onEnable() {
+    public void onLoad() {
         Fixes.checkForceload(this);
 
         this.loader = new SpicordLoader(this);
+    }
 
+    @Override
+    public void onEnable() {
         final int loadDelay = loader.getConfig().getLoadDelay();
-        getLogger().info("Spicord will load in " + loadDelay + " seconds");
 
+        getLogger().info("Spicord will load in " + loadDelay + " seconds");
         getServer().getScheduler().scheduleSyncDelayedTask(this, () -> {
             BukkitJDADetector.checkOtherJDA(this);
             loader.load();

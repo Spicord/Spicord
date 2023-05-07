@@ -44,15 +44,21 @@ public class SpicordBungee extends Plugin implements SpicordPlugin {
     }
 
     @Override
-    public void onEnable() {
+    public void onLoad() {
         Fixes.checkForceload(this);
 
         this.loader = new SpicordLoader(this);
+    }
 
+    @Override
+    public void onEnable() {
         final int loadDelay = loader.getConfig().getLoadDelay();
 
         getLogger().info("Spicord will load in " + loadDelay + " seconds");
-        getProxy().getScheduler().schedule(this, () -> loader.load(), loadDelay, TimeUnit.SECONDS);
+        getProxy().getScheduler().schedule(this, () -> {
+            BungeeJDADetector.checkOtherJDA(this);
+            loader.load();
+        }, loadDelay, TimeUnit.SECONDS);
 
         Fixes.checkLoader(this, false);
     }
