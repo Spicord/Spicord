@@ -57,6 +57,7 @@ import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.CloseCode;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 public class DiscordBot extends SimpleBot {
 
@@ -125,10 +126,21 @@ public class DiscordBot extends SimpleBot {
 
         try {
             this.status = BotStatus.STARTING;
-            this.jda = JDABuilder.create(token, intents)
+
+            final JDABuilder builder = JDABuilder.create(token, intents)
                     .setAutoReconnect(true)
-                    .addEventListeners(new BotStatusListener())
-                    .build();
+                    .addEventListeners(new BotStatusListener());
+
+            for (CacheFlag flag : CacheFlag.values()) {
+                if (flag.getRequiredIntent() == null) {
+                    continue;
+                }
+                if (!intents.contains(flag.getRequiredIntent())) {
+                    builder.disableCache(flag);
+                }
+            }
+
+            this.jda = builder.build();
 
             if (commandSupportEnabled)
                 jda.addEventListener(new BotCommandListener());
