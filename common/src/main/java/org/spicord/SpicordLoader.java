@@ -46,6 +46,8 @@ public final class SpicordLoader {
     private final LibraryLoader libraryLoader;
     private final Logger logger;
 
+    private SpicordPlugin plugin;
+
     /**
      * The {@link SpicordLoader} constructor.
      */
@@ -55,6 +57,8 @@ public final class SpicordLoader {
 
     public SpicordLoader(JarClassLoader classLoader, SpicordPlugin plugin) {
         Preconditions.checkNotNull(plugin);
+
+        this.plugin = plugin;
 
         final Logger logger = plugin.getLogger();
         final File dataFolder = plugin.getDataFolder();
@@ -67,8 +71,6 @@ public final class SpicordLoader {
                 firstRun = false;
                 libraryLoader.downloadLibraries();
                 libraryLoader.loadLibraries();
-
-                new SpicordCommand(plugin).register(plugin);
             }
 
             this.spicord = new Spicord(logger);
@@ -79,6 +81,8 @@ public final class SpicordLoader {
     }
 
     public void load() {
+        new SpicordCommand(plugin).register(plugin);
+
         try {
             for (EventHandler<Spicord> listener : startupListeners) {
                 this.spicord.addEventListener(SpicordEvent.SPICORD_LOADED, listener);
