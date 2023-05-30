@@ -34,6 +34,9 @@ public class Embed implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private Embed() {
+    }
+
     public Embed(String description) {
         this.embed = new EmbedData();
         this.embed.description = description;
@@ -77,7 +80,7 @@ public class Embed implements Serializable {
         return embed;
     }
 
-    public class EmbedData implements Serializable {
+    public static class EmbedData implements Serializable {
 
         private static final long serialVersionUID = 1L;
 
@@ -443,9 +446,7 @@ public class Embed implements Serializable {
      */
     @Override
     public Embed clone() {
-        // planning to make this manual but im too busy for write a lot of code.
-        // probably i will do this later, idk
-        return fromJson(toString());
+        return fromJson(toJson());
     }
 
     /**
@@ -456,6 +457,21 @@ public class Embed implements Serializable {
      */
     public Message sendToChannel(GuildMessageChannel channel) {
         return EmbedSender.prepare(channel, this).complete();
+    }
+
+    public Webhook toWebhook() {
+        return Webhook.fromEmbed(this);
+    }
+
+    public static Embed fromWebhook(Webhook webhook) {
+        Embed embed = new Embed();
+        embed.content = webhook.getContent();
+        if (webhook.getEmbeds().length > 0) {
+            embed.embed = webhook.getEmbeds()[0];
+        } else {
+            embed.embed = new EmbedData();
+        }
+        return embed;
     }
 
     /**
