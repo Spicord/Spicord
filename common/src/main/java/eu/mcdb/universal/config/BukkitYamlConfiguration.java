@@ -159,6 +159,11 @@ class BukkitYamlConfiguration extends YamlConfiguration {
     }
 
     @Override
+    public boolean contains(String path) {
+        return config.contains(path);
+    }
+
+    @Override
     public Collection<String> getKeys() {
     	return config.getKeys(false);
     }

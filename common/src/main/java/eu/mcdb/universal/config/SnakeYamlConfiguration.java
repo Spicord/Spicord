@@ -114,6 +114,11 @@ class SnakeYamlConfiguration extends YamlConfiguration implements GetBasedConfig
     }
 
     @Override
+    public boolean contains(String path) {
+        return get(path) != null;
+    }
+
+    @Override
     public Collection<String> getKeys() {
     	return map.keySet();
     }

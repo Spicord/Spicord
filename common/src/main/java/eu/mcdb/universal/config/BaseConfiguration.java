@@ -58,6 +58,8 @@ public interface BaseConfiguration {
 
     List<String> getStringList(String path);
 
+    boolean contains(String path);
+
     Collection<String> getKeys();
     Map<String, Object> getValues();
 
