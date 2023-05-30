@@ -98,7 +98,7 @@ public final class SpicordLoader {
     }
 
     private void handleException(Exception e) {
-        logger.severe("Spicord could not be loaded, please report this error in \n\t -> https://github.com/OopsieWoopsie/Spicord/issues");
+        logger.severe("Spicord could not be loaded, please report this error in \n\t -> https://github.com/Spicord/Spicord/issues");
         e.printStackTrace();
         shutdown();
     }
