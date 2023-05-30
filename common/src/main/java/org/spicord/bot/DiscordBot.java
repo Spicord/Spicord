@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -78,6 +81,8 @@ public class DiscordBot extends SimpleBot {
 
     @Getter private long botId;
 
+    @Getter private ScheduledExecutorService threadPool;
+
     /**
      * Create a new DiscordBot.<br>
      * 
@@ -130,6 +135,16 @@ public class DiscordBot extends SimpleBot {
             final JDABuilder builder = JDABuilder.create(token, intents)
                     .setAutoReconnect(true)
                     .addEventListeners(new BotStatusListener());
+
+            if (Runtime.getRuntime().availableProcessors() == 1) {
+                this.threadPool = Executors.newScheduledThreadPool(2);
+
+                builder.setAudioPool(threadPool, false);
+                builder.setCallbackPool(threadPool, false);
+                builder.setEventPool(threadPool, false);
+                builder.setGatewayPool(threadPool, false);
+                builder.setRateLimitPool(threadPool, false);
+            }
 
             for (CacheFlag flag : CacheFlag.values()) {
                 if (flag.getRequiredIntent() == null) {
@@ -345,14 +360,20 @@ public class DiscordBot extends SimpleBot {
                 jda.removeEventListener(listener);
             }
 
-            ThreadPoolExecutor pool = (ThreadPoolExecutor) jda.getGatewayPool();
-            pool.setRejectedExecutionHandler((r, executor) -> {
-                // NOP
-            });
+            ExecutorService pool = jda.getGatewayPool();
+            if (pool instanceof ThreadPoolExecutor) {
+                ((ThreadPoolExecutor) pool).setRejectedExecutionHandler((r, executor) -> {
+                    // NOP
+                });
+            }
 
             jda.shutdownNow();
         }
- 
+
+        if (threadPool != null) {
+            threadPool.shutdownNow();
+        }
+
         jda = null;
         status = BotStatus.OFFLINE;
 
