@@ -31,13 +31,6 @@ import com.google.common.base.Preconditions;
 
 public final class SpicordLoader {
 
-    static {
-        // Java 17 fix for single-core systems
-        if (Runtime.getRuntime().availableProcessors() == 1) {
-            System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "1");
-        }
-    }
-
     private static boolean firstRun = true;
 
     private Spicord spicord;
