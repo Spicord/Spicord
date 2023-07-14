@@ -143,20 +143,20 @@ public class UniversalPlayer extends UniversalCommandSender {
     // this is needed to avoid ClassNotFoundException
 
     private static class sendMessageBungee {
-        sendMessageBungee(ProxiedPlayer player, String message) {
-            player.sendMessage(new TextComponent(message));
+        sendMessageBungee(Object player, String message) {
+            ((ProxiedPlayer)player).sendMessage(new TextComponent(message));
         }
     }
 
     private static class sendMessageVelocity {
-        sendMessageVelocity(com.velocitypowered.api.proxy.Player player, String message) {
-            player.sendMessage(net.kyori.adventure.text.Component.text(message));
+        sendMessageVelocity(Object player, String message) {
+            ((com.velocitypowered.api.proxy.Player)player).sendMessage(net.kyori.adventure.text.Component.text(message));
         }
     }
 
     private static class sendMessageSponge {
-        sendMessageSponge(org.spongepowered.api.entity.living.player.Player player, String message) {
-            player.sendMessage(Component.text(message));
+        sendMessageSponge(Object player, String message) {
+            ((org.spongepowered.api.entity.living.player.Player)player).sendMessage(Component.text(message));
         }
     }
 }
