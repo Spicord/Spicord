@@ -17,8 +17,8 @@
 
 package org.spicord.bot;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
+
 import org.spicord.Spicord;
 import org.spicord.bot.DiscordBot.BotStatus;
 
@@ -41,7 +41,9 @@ public class DiscordBotLoader {
         if (bot.isEnabled()) {
             if (bot.getStatus() == BotStatus.OFFLINE) {
                 logger.info("Starting bot '" + bot.getName() + "'.");
-                CompletableFuture.runAsync(() -> bot.start());
+
+                Spicord.getInstance().getThreadPool().execute(() -> bot.start());
+
                 return true;
             } else {
                 logger.warning("Can't start bot '" + bot.getName() + "', status: " + bot.getStatus());

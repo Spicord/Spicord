@@ -23,6 +23,7 @@ import org.spicord.Spicord;
 import org.spicord.SpicordLoader;
 import org.spicord.SpicordPlugin;
 import org.spicord.fix.Fixes;
+
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class SpicordBungee extends Plugin implements SpicordPlugin {
@@ -55,7 +56,7 @@ public class SpicordBungee extends Plugin implements SpicordPlugin {
         final int loadDelay = loader.getConfig().getLoadDelay();
 
         getLogger().info("Spicord will load in " + loadDelay + " seconds");
-        getProxy().getScheduler().schedule(this, () -> {
+        loader.getThreadPool().schedule(() -> {
             BungeeJDADetector.checkOtherJDA(this);
             loader.load();
         }, loadDelay, TimeUnit.SECONDS);

@@ -18,6 +18,8 @@
 package org.spicord.bukkit;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
+
 import org.bukkit.plugin.java.JavaPlugin;
 import org.spicord.Spicord;
 import org.spicord.SpicordLoader;
@@ -54,10 +56,11 @@ public class SpicordBukkit extends JavaPlugin implements SpicordPlugin {
         final int loadDelay = loader.getConfig().getLoadDelay();
 
         getLogger().info("Spicord will load in " + loadDelay + " seconds");
-        getServer().getScheduler().scheduleSyncDelayedTask(this, () -> {
+
+        loader.getThreadPool().schedule(() -> {
             BukkitJDADetector.checkOtherJDA(this);
             loader.load();
-        }, loadDelay * 20);
+        }, loadDelay, TimeUnit.SECONDS);
 
         Fixes.checkLoader(this, true);
     }

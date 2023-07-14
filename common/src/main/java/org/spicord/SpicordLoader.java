@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Logger;
 
 import org.spicord.config.SpicordConfiguration;
@@ -41,6 +43,8 @@ public final class SpicordLoader {
 
     private SpicordPlugin plugin;
 
+    private ScheduledExecutorService threadPool;
+
     /**
      * The {@link SpicordLoader} constructor.
      */
@@ -50,6 +54,12 @@ public final class SpicordLoader {
 
     public SpicordLoader(JarClassLoader classLoader, SpicordPlugin plugin) {
         Preconditions.checkNotNull(plugin);
+
+        int availableProcessors = Runtime.getRuntime().availableProcessors();
+
+        this.threadPool = Executors.newScheduledThreadPool(
+            Math.min(availableProcessors * 2, 6)
+        );
 
         this.plugin = plugin;
 
@@ -66,7 +76,7 @@ public final class SpicordLoader {
                 libraryLoader.loadLibraries();
             }
 
-            this.spicord = new Spicord(logger);
+            this.spicord = new Spicord(logger, threadPool);
             this.config  = new SpicordConfiguration(spicord, dataFolder);
         } catch (IOException e) {
             handleException(e);
@@ -88,6 +98,10 @@ public final class SpicordLoader {
 
     public Spicord getSpicord() {
         return spicord;
+    }
+
+    public ScheduledExecutorService getThreadPool() {
+        return threadPool;
     }
 
     public void shutdown() {

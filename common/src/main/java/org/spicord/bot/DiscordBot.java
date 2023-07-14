@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
@@ -81,8 +80,6 @@ public class DiscordBot extends SimpleBot {
 
     @Getter private long botId;
 
-    @Getter private ScheduledExecutorService threadPool;
-
     /**
      * Create a new DiscordBot.<br>
      * 
@@ -136,15 +133,13 @@ public class DiscordBot extends SimpleBot {
                     .setAutoReconnect(true)
                     .addEventListeners(new BotStatusListener());
 
-            if (Runtime.getRuntime().availableProcessors() == 1) {
-                this.threadPool = Executors.newScheduledThreadPool(2);
+            ScheduledExecutorService threadPool = Spicord.getInstance().getThreadPool();
 
-                builder.setAudioPool(threadPool, false);
-                builder.setCallbackPool(threadPool, false);
-                builder.setEventPool(threadPool, false);
-                builder.setGatewayPool(threadPool, false);
-                builder.setRateLimitPool(threadPool, false);
-            }
+            builder.setAudioPool(threadPool, false);
+            builder.setCallbackPool(threadPool, false);
+            builder.setEventPool(threadPool, false);
+            builder.setGatewayPool(threadPool, false);
+            builder.setRateLimitPool(threadPool, false);
 
             for (CacheFlag flag : CacheFlag.values()) {
                 if (flag.getRequiredIntent() == null) {
@@ -368,10 +363,6 @@ public class DiscordBot extends SimpleBot {
             }
 
             jda.shutdownNow();
-        }
-
-        if (threadPool != null) {
-            threadPool.shutdownNow();
         }
 
         jda = null;

@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.spicord.addon.AddonManager;
@@ -52,17 +53,22 @@ public final class Spicord {
 
     private Map<SpicordEvent<?>, Set<EventHandler<?>>> listeners;
 
+    private ScheduledExecutorService threadPool;
+
     /**
      * The Spicord constructor.
      * 
      * @param logger the logger instance
+     * @param threadPool 
      */
-    protected Spicord(Logger logger) {
+    protected Spicord(Logger logger, ScheduledExecutorService threadPool) {
         instance = this;
 
         logger.setLevel(Level.INFO);
 
         this.logger = logger;
+        this.threadPool = threadPool;
+
         this.addonManager = new AddonManager(logger);
         this.serviceManager = new SpicordServiceManager();
         this.listeners = new HashMap<>();
@@ -129,12 +135,19 @@ public final class Spicord {
             config.getBots().clear();
         }
 
+        threadPool.shutdownNow();
+
+        this.threadPool = null;
         this.addonManager = null;
         this.serviceManager = null;
         this.serverType = null;
         this.logger = null;
         this.config = null;
         instance = null;
+    }
+
+    public ScheduledExecutorService getThreadPool() {
+        return threadPool;
     }
 
     /**
