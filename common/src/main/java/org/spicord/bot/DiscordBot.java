@@ -43,6 +43,9 @@ import com.google.common.base.Preconditions;
 import lombok.Getter;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.entities.ApplicationInfo;
 import net.dv8tion.jda.api.entities.ApplicationTeam;
 import net.dv8tion.jda.api.entities.TeamMember;
@@ -77,6 +80,7 @@ public class DiscordBot extends SimpleBot {
 
     private final Spicord spicord;
     private final Logger logger;
+    @Getter private Presence presence;
 
     @Getter private long botId;
 
@@ -104,6 +108,7 @@ public class DiscordBot extends SimpleBot {
         this.commandPrefix = prefix.trim();
         this.commands = new HashMap<String, Consumer<DiscordBotCommand>>();
         this.status = BotStatus.OFFLINE;
+        this.presence = new Presence();
 
         if (commandSupportEnabled) {
             if (prefix.isEmpty()) {
@@ -396,6 +401,48 @@ public class DiscordBot extends SimpleBot {
             return jda.getStatus().name();
         }
         return "-";
+    }
+
+    public class Presence {
+        public void setPlaying(String name) {
+            jda.getPresence().setActivity(Activity.of(ActivityType.PLAYING, name));
+        }
+
+        public void setListening(String name) {
+            jda.getPresence().setActivity(Activity.of(ActivityType.LISTENING, name));
+        }
+
+        public void setStreaming(String name) {
+            jda.getPresence().setActivity(Activity.of(ActivityType.STREAMING, name));
+        }
+
+        public void setWatching(String name) {
+            jda.getPresence().setActivity(Activity.of(ActivityType.WATCHING, name));
+        }
+
+        public void setCompeting(String name) {
+            jda.getPresence().setActivity(Activity.of(ActivityType.COMPETING, name));
+        }
+
+        public void setCustom(String name) {
+            jda.getPresence().setActivity(Activity.of(ActivityType.CUSTOM_STATUS, name));
+        }
+
+        public void setDoNotDisturb() {
+            jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
+        }
+
+        public void setIdle() {
+            jda.getPresence().setStatus(OnlineStatus.IDLE);
+        }
+
+        public void setInvisible() {
+            jda.getPresence().setStatus(OnlineStatus.INVISIBLE);
+        }
+
+        public void setOnline() {
+            jda.getPresence().setStatus(OnlineStatus.ONLINE);
+        }
     }
 
     private class BotStatusListener extends ListenerAdapter {
