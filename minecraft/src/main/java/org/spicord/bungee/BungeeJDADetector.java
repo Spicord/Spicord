@@ -1,7 +1,6 @@
 package org.spicord.bungee;
 
 import java.net.URL;
-import java.net.URLClassLoader;
 
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -13,7 +12,7 @@ public class BungeeJDADetector {
                 continue;
             }
 
-            URLClassLoader classLoader = (URLClassLoader) plugin.getClass().getClassLoader();
+            ClassLoader classLoader = plugin.getClass().getClassLoader();
 
             URL cls = classLoader.getResource("net.dv8tion.jda.api.JDA".replace('.', '/') + ".class");
 

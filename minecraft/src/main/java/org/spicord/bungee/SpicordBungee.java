@@ -56,6 +56,7 @@ public class SpicordBungee extends Plugin implements SpicordPlugin {
         final int loadDelay = loader.getConfig().getLoadDelay();
 
         getLogger().info("Spicord will load in " + loadDelay + " seconds");
+
         loader.getThreadPool().schedule(() -> {
             BungeeJDADetector.checkOtherJDA(this);
             loader.load();
