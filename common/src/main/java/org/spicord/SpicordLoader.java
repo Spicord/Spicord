@@ -56,10 +56,13 @@ public final class SpicordLoader {
         Preconditions.checkNotNull(plugin);
 
         int availableProcessors = Runtime.getRuntime().availableProcessors();
+        int poolSize = 2;
 
-        this.threadPool = Executors.newScheduledThreadPool(
-            Math.min(availableProcessors * 2, 6)
-        );
+        if (availableProcessors > 1) {
+            poolSize = availableProcessors * 2;
+        }
+
+        this.threadPool = Executors.newScheduledThreadPool(poolSize);
 
         this.plugin = plugin;
 
