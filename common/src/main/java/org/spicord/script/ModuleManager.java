@@ -100,6 +100,8 @@ public interface ModuleManager {
         this.register("spicord", Spicord.getInstance()); // FIXME: Do not use Spicord.getInstance()
         this.register("worker", new Worker(getEngine()));
         this.register("native", new Native(getEngine()));
+
+        this.register("bukkit-events", new BukkitEvents());
     }
 
     /**
