@@ -22,6 +22,7 @@ import org.spicord.api.addon.JavaScriptBaseAddon;
 import org.spicord.script.module.*;
 
 import eu.mcdb.universal.Server;
+import eu.mcdb.universal.ServerType;
 import eu.mcdb.universal.config.YamlConfiguration;
 
 /**
@@ -101,6 +102,12 @@ public interface ModuleManager {
         this.register("worker", new Worker(getEngine()));
         this.register("native", new Native(getEngine()));
 
+        if (Server.getServerType() == ServerType.BUKKIT) {
+            registerBukkitModules();
+        }
+    }
+
+    default void registerBukkitModules() {
         this.register("bukkit-events", new BukkitEvents());
     }
 
