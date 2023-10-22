@@ -5,9 +5,9 @@
     "url": "https://repo1.maven.org/maven2/com/moandjiezana/toml/toml4j/0.7.2/toml4j-0.7.2.jar"
   },
   {
-    "name": "net.dv8tion:JDA:5.0.0-beta.13",
-    "sha1": "8e41b416ab12c8489e7629236d6115e50e2c9f4b",
-    "url": "https://github.com/discord-jda/JDA/releases/download/v5.0.0-beta.13/JDA-5.0.0-beta.13-withDependencies-min.jar"
+    "name": "net.dv8tion:JDA:5.0.0-beta.16",
+    "sha1": "752e4af82f5d1dcf08fd43a7a6b1378c959d006f",
+    "url": "https://github.com/discord-jda/JDA/releases/download/v5.0.0-beta.16/JDA-5.0.0-beta.16-withDependencies-min.jar"
   },
   {
     "name": "org.mozilla:rhino:1.7.12",
