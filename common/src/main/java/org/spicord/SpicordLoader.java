@@ -29,6 +29,8 @@ import org.spicord.config.SpicordConfiguration;
 import org.spicord.event.EventHandler;
 import org.spicord.event.SpicordEvent;
 import org.spicord.util.JarClassLoader;
+import org.spicord.util.sched.SpicordSchedulerV1;
+
 import com.google.common.base.Preconditions;
 
 public final class SpicordLoader {
@@ -55,14 +57,26 @@ public final class SpicordLoader {
     public SpicordLoader(JarClassLoader classLoader, SpicordPlugin plugin) {
         Preconditions.checkNotNull(plugin);
 
-        int availableProcessors = Runtime.getRuntime().availableProcessors();
-        int poolSize = 2;
+        final int availableProcessors = Runtime.getRuntime().availableProcessors();
+
+        final boolean isJava17 = System.getProperty("java.version").startsWith("17.");
+
+        final boolean useTestScheduler = isJava17 && availableProcessors < 2;
+
+        if (useTestScheduler) {
+
+            plugin.getLogger().info("Using test scheduler");
+
+            this.threadPool = new SpicordSchedulerV1();
+        } else
 
         if (availableProcessors > 1) {
-            poolSize = availableProcessors * 2;
-        }
+            int poolSize = availableProcessors * 2;
 
-        this.threadPool = Executors.newScheduledThreadPool(poolSize);
+            this.threadPool = Executors.newScheduledThreadPool(poolSize);
+        } else {
+            this.threadPool = Executors.newScheduledThreadPool(2);
+        }
 
         this.plugin = plugin;
 
