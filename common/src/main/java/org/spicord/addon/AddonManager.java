@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.spicord.Spicord;
 import org.spicord.api.addon.JavaScriptAddon;
@@ -154,6 +155,24 @@ public class AddonManager {
     }
 
     /**
+     * Get the available addons for the given bot.
+     * 
+     * @param bot the bot
+     * @return the list of addons
+     */
+    public Set<SimpleAddon> getAddons(DiscordBot bot) {
+        checkNotNull(bot);
+
+        if (bot.getAddons().isEmpty())
+            return Collections.emptySet();
+
+        return bot.getAddons().stream()
+                .map(this::getAddonById)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
+    /**
      * Load the available addons for the given bot.
      * 
      * @param bot the bot that will load its addons
@@ -206,7 +225,7 @@ public class AddonManager {
 
             if (entry.isPresent()) {
                 final Reader reader = entry.get();
-                final AddonData data = GSON.fromJson(reader, AddonData.class);
+                final JSAddonDescription data = GSON.fromJson(reader, JSAddonDescription.class);
 
                 final String id      = checkNotNull(data.getId(), "id");
                 final String name    = data.getName()    == null ? id : data.getName();
@@ -266,7 +285,7 @@ public class AddonManager {
 
             if (addonJson.exists()) {
                 final Reader reader = new FileReader(addonJson);
-                final AddonData data = GSON.fromJson(reader, AddonData.class);
+                final JSAddonDescription data = GSON.fromJson(reader, JSAddonDescription.class);
 
                 final String id      = checkNotNull(data.getId(), "id");
                 final String name    = data.getName()    == null ? id : data.getName();

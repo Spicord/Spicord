@@ -17,6 +17,8 @@
 
 package org.spicord.api.addon;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.logging.Logger;
 import org.spicord.Spicord;
 import org.spicord.bot.DiscordBot;
@@ -24,6 +26,7 @@ import org.spicord.bot.command.DiscordBotCommand;
 
 import lombok.Getter;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 
 @Getter
 public abstract class SimpleAddon {
@@ -165,5 +168,9 @@ public abstract class SimpleAddon {
 
     public Logger getLogger() {
         return spicord.getLogger();
+    }
+
+    public Collection<GatewayIntent> getRequiredIntents() {
+        return Collections.emptySet();
     }
 }

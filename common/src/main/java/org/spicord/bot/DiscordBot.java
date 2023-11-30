@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -129,7 +130,17 @@ public class DiscordBot extends SimpleBot {
         if (!enabled) return false;
 
         EnumSet<GatewayIntent> intents = EnumSet.allOf(GatewayIntent.class);
+        // All privileged intents will be disabled in the future,
+        // unless explicitly required by an addon.
         intents.remove(GatewayIntent.GUILD_PRESENCES);
+        //intents.remove(GatewayIntent.GUILD_MEMBERS);
+        //intents.remove(GatewayIntent.MESSAGE_CONTENT);
+
+        Set<SimpleAddon> theAddons = spicord.getAddonManager().getAddons(this);
+
+        for (SimpleAddon addon : theAddons) {
+            intents.addAll(addon.getRequiredIntents());
+        }
 
         try {
             this.status = BotStatus.STARTING;
@@ -160,7 +171,8 @@ public class DiscordBot extends SimpleBot {
             if (commandSupportEnabled)
                 jda.addEventListener(new BotCommandListener());
 
-            spicord.getAddonManager().loadAddons(this);
+            theAddons.forEach(this::loadAddon);
+
             return true;
         } catch (InvalidTokenException e) {
             this.status = BotStatus.OFFLINE;

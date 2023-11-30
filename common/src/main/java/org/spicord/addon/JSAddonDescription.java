@@ -20,7 +20,7 @@ package org.spicord.addon;
 import lombok.Getter;
 
 @Getter
-public class AddonData {
+public class JSAddonDescription {
 
     private String id;
     private String name;

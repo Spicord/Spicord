@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.spicord.addon;
+package org.spicord.addon.internal;
 
 import java.awt.Color;
 import org.spicord.Spicord;
@@ -25,19 +25,38 @@ import org.spicord.bot.command.DiscordBotCommand;
 import eu.mcdb.universal.Server;
 import net.dv8tion.jda.api.EmbedBuilder;
 
-public class PluginsAddon extends SimpleAddon {
+public class InfoAddon extends SimpleAddon {
 
-    public PluginsAddon() {
-        super("Plugin List", "spicord::plugins", "Sheidy", new String[] { "plugins" });
+    public InfoAddon() {
+        super("Server Information", "spicord::info", "Sheidy", new String[] { "info" });
     }
 
     @Override
     public void onCommand(DiscordBotCommand command, String[] args) {
-        final Server server = Server.getInstance();
+        Server server = Server.getInstance();
+        int onlineCount = server.getOnlineCount();
+        int playerLimit = server.getPlayerLimit();
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Online players: ");
+        sb.append(onlineCount);
+        sb.append('/');
+
+        if (playerLimit < 0) {
+            sb.append("∞"); // infinity symbol
+        } else {
+            sb.append(playerLimit);
+        }
+
+        sb.append('\n'); // new line
+
+        sb.append("Server version: ");
+        sb.append(server.getVersion());
 
         final EmbedBuilder builder = new EmbedBuilder()
-                .setTitle("Plugins (" + server.getPlugins().length + "): ")
-                .setDescription(String.join(", ", server.getPlugins()))
+                .setTitle("Server information")
+                .setDescription(sb.toString())
                 .setColor(new Color(5154580));
 
         String footer = getSpicord().getConfig().getIntegratedAddonFooter();
