@@ -19,10 +19,13 @@ package org.spicord.addon;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
@@ -39,6 +42,7 @@ import org.spicord.bot.DiscordBot;
 import org.spicord.script.ScriptEngine;
 import org.spicord.script.ScriptEnvironment;
 import org.spicord.script.ScriptException;
+
 import com.google.gson.Gson;
 
 import eu.mcdb.util.FileUtils;
@@ -55,9 +59,11 @@ public class AddonManager {
         addons = Collections.synchronizedSet(new HashSet<SimpleAddon>());
     }
 
+    private final Spicord spicord;
     private final Logger logger;
 
-    public AddonManager(Logger logger) {
+    public AddonManager(Spicord spicord, Logger logger) {
+        this.spicord = spicord;
         this.logger = logger;
     }
 
@@ -91,21 +97,30 @@ public class AddonManager {
      *         already registered
      */
     public boolean registerAddon(SimpleAddon addon) {
+        return registerAddon(addon, true);
+    }
+
+    private boolean registerAddon(SimpleAddon addon, boolean initFields) {
         if (!isRegistered(addon)) {
-            final Object[] args = new Object[] { addon.getName(), addon.getId(), addon.getAuthor() };
 
-            logger.info(String.format("Registered addon '%s' (%s) by %s", args));
+            if (initFields) {
+                addon.initFields(spicord, null, null, logger);
+            }
 
-            final Spicord spicord = Spicord.getInstance();
-            if (spicord != null) {
-                final boolean spicordLoaded = spicord.getConfig() != null;
-                if (spicordLoaded) { // too late
-                    for (DiscordBot bot : spicord.getConfig().getBots()) {
-                        if (bot.isEnabled() && bot.getAddons().contains(addon.getId())) {
-                            bot.loadAddon(addon);
-                            if (bot.isReady()) {
-                                addon.onReady(bot);
-                            }
+            logger.info(String.format(
+                "Registered addon '%s' (%s) by %s",
+                addon.getName(),
+                addon.getId(),
+                addon.getAuthor()
+            ));
+
+            final boolean spicordLoaded = spicord.getConfig() != null;
+            if (spicordLoaded) { // too late
+                for (DiscordBot bot : spicord.getConfig().getBots()) {
+                    if (bot.isEnabled() && bot.getAddons().contains(addon.getId())) {
+                        bot.loadAddon(addon);
+                        if (bot.isReady()) {
+                            addon.onReady(bot);
                         }
                     }
                 }
@@ -220,62 +235,131 @@ public class AddonManager {
     private static final Gson GSON = new Gson();
 
     private void loadZipAddon(final File file, final File runtimeDir) {
-        try (final ZipExtractor ex = new ZipExtractor(file)) {
-            final Optional<Reader> entry = ex.readEntry("addon.json");
+        try (final ZipExtractor zip = new ZipExtractor(file)) {
+            final Optional<Reader> entry = zip.readEntry("addon.json");
 
             if (entry.isPresent()) {
                 final Reader reader = entry.get();
-                final JSAddonDescription data = GSON.fromJson(reader, JSAddonDescription.class);
+                final AddonDescription data = GSON.fromJson(reader, AddonDescription.class);
 
-                final String id      = checkNotNull(data.getId(), "id");
-                final String name    = data.getName()    == null ? id : data.getName();
-                final String author  = data.getAuthor()  == null ? "unknown" : data.getAuthor();
-                final String version = data.getVersion() == null ? "unknown" : data.getVersion();
-                final String main    = checkNotNull(data.getMain(), "main");
-                final String engineName  = "rhino";
+                final String language = checkNotNull(data.getLanguage(), "language");
 
-                if (!ex.hasEntry(main)) {
-                    throw new ScriptException(main + " not found for addon " + name);
-                }
-
-                final File tempDir = new File(runtimeDir, id);
-                tempDir.mkdirs();
-
-                ex.extract(tempDir);
-
-                File dataDir = new File(tempDir, "data");
-
-                if (dataDir.exists()) {
-                    final File addonsDir = FileUtils.getParent(runtimeDir);
-                    final File addonDir = new File(addonsDir, name);
-
-                    if (!addonDir.exists()) {
-                        dataDir.renameTo(addonDir);
-                    }
-                    dataDir = addonDir;
-                }
-
-                final File addonMain = new File(tempDir, main);
-
-                final ScriptEnvironment env = new ScriptEnvironment()
-                        .addEnv("__data", dataDir.toString());
-
-                final ScriptEngine engine = ScriptEngine.getEngine(engineName);
-                final Object res = engine.loadScript(addonMain, env);
-
-                if (res instanceof JavaScriptBaseAddon) {
-                    final JavaScriptAddon addon = new JavaScriptAddon(name, id, author, version, (JavaScriptBaseAddon) res, engine);
-                    this.registerAddon(addon);
+                if ("JavaScript".equalsIgnoreCase(language)) {
+                    loadJSAddon1(zip, data, file, runtimeDir);
+                } else if ("Java".equalsIgnoreCase(language)) {
+                    loadJavaAddon1(zip, data, file, runtimeDir);
                 } else {
-                    throw new ScriptException("the '" + main + "' file needs to export the addon instance");
+                    logger.warning(String.format(
+                        "The addon '%s' specifies an unrecognized language: %s",
+                        data.getId(),
+                        language
+                    ));
                 }
+
             } else {
                 logger.warning(String.format(
-                        "The file '%s' doesn't contains the 'addon.json' file on its root directory, ignoring it",
-                        file.getName()));
+                    "The file '%s' doesn't contains the 'addon.json' file on its root directory, ignoring it",
+                    file.getName()
+                ));
             }
         } catch (IOException e) {
             logger.warning(String.format("The file '%s' cannot be loaded: %s", file.getName(), e.getMessage()));
+        }
+    }
+
+    private void loadJSAddon1(ZipExtractor zip, AddonDescription data, File file, File runtimeDir) throws IOException {
+        final String id      = checkNotNull(data.getId(), "id");
+        final String name    = data.getName()    == null ? id : data.getName();
+        final String author  = data.getAuthor()  == null ? "unknown" : data.getAuthor();
+        final String version = data.getVersion() == null ? "unknown" : data.getVersion();
+        final String main    = checkNotNull(data.getMain(), "main");
+        final String engineName  = "rhino";
+
+        if (!zip.hasEntry(main)) {
+            throw new ScriptException(main + " not found for addon " + name);
+        }
+
+        final File tempDir = new File(runtimeDir, id);
+        tempDir.mkdirs();
+
+        zip.extract(tempDir);
+
+        File dataDir = new File(tempDir, "data");
+
+        if (dataDir.exists()) {
+            final File addonsDir = FileUtils.getParent(runtimeDir);
+            final File addonDir = new File(addonsDir, name);
+
+            if (!addonDir.exists()) {
+                dataDir.renameTo(addonDir);
+            }
+            dataDir = addonDir;
+        }
+
+        final File addonMain = new File(tempDir, main);
+
+        final ScriptEnvironment env = new ScriptEnvironment()
+                .addEnv("__data", dataDir.toString());
+
+        final ScriptEngine engine = ScriptEngine.getEngine(engineName);
+        final Object res = engine.loadScript(addonMain, env);
+
+        if (res instanceof JavaScriptBaseAddon) {
+            final JavaScriptAddon addon = new JavaScriptAddon(name, id, author, version, (JavaScriptBaseAddon) res, engine);
+            this.registerAddon(addon);
+        } else {
+            throw new ScriptException("the '" + main + "' file needs to export the addon instance");
+        }
+    }
+
+    private void loadJavaAddon1(ZipExtractor zip, AddonDescription data, File file, File runtimeDir) throws IOException {
+        final String id   = checkNotNull(data.getId(), "id");
+        final String name = data.getName() == null ? id : data.getName();
+        final String main = checkNotNull(data.getMain(), "main");
+
+        final String mainClassPath = main.replace('.', '/') + ".class";
+
+        if (!zip.hasEntry(mainClassPath)) {
+            throw new ScriptException(main + " not found for addon " + name);
+        }
+
+        final File addonsDir = FileUtils.getParent(runtimeDir);
+        final File addonDir = new File(addonsDir, name);
+
+        final URLClassLoader classLoader = new URLClassLoader(
+            new URL[] { file.toURI().toURL() },
+            Spicord.class.getClassLoader()
+        );
+
+        Object.class.cast(classLoader);
+
+        final Class<?> mainClass;
+
+        try {
+            mainClass = classLoader.loadClass(main);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        final boolean isValidClass = SimpleAddon.class.isAssignableFrom(mainClass);
+
+        if (!isValidClass) {
+            throw new RuntimeException("Your main class must implement the SimpleAddon class");
+        }
+
+        try {
+            final SimpleAddon addon = (SimpleAddon) mainClass.getConstructor().newInstance();
+
+            addon.initFields(
+                spicord,
+                file,
+                addonDir,
+                Logger.getLogger(name)
+            );
+
+            this.registerAddon(addon, false);
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -285,7 +369,7 @@ public class AddonManager {
 
             if (addonJson.exists()) {
                 final Reader reader = new FileReader(addonJson);
-                final JSAddonDescription data = GSON.fromJson(reader, JSAddonDescription.class);
+                final AddonDescription data = GSON.fromJson(reader, AddonDescription.class);
 
                 final String id      = checkNotNull(data.getId(), "id");
                 final String name    = data.getName()    == null ? id : data.getName();

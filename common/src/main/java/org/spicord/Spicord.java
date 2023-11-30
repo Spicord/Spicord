@@ -69,7 +69,7 @@ public final class Spicord {
         this.logger = logger;
         this.threadPool = threadPool;
 
-        this.addonManager = new AddonManager(logger);
+        this.addonManager = new AddonManager(this, logger);
         this.serviceManager = new SpicordServiceManager();
         this.listeners = new HashMap<>();
 

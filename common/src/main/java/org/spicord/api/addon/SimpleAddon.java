@@ -17,6 +17,7 @@
 
 package org.spicord.api.addon;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Logger;
@@ -24,11 +25,9 @@ import org.spicord.Spicord;
 import org.spicord.bot.DiscordBot;
 import org.spicord.bot.command.DiscordBotCommand;
 
-import lombok.Getter;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
-@Getter
 public abstract class SimpleAddon {
 
     private final String name;
@@ -38,8 +37,19 @@ public abstract class SimpleAddon {
     private final String[] commands;
 
     //--------------
-    private final Spicord spicord;
+    private Spicord spicord;
     //--------------
+
+    private File file;
+    private File dataFolder;
+    private Logger logger;
+
+    public void initFields(Spicord spicord, File file, File dataFolder, Logger logger) {
+        this.spicord = spicord;
+        this.file = file;
+        this.dataFolder = dataFolder;
+        this.logger = logger;
+    }
 
     /**
      * Constructor.
@@ -91,11 +101,6 @@ public abstract class SimpleAddon {
         this.author = author;
         this.version = version;
         this.commands = commands;
-
-        //--------------
-        // FIXME: Do not use Spicord.getInstance()
-        this.spicord = Spicord.getInstance();
-        //--------------
     }
 
     /**
@@ -166,8 +171,41 @@ public abstract class SimpleAddon {
         return this instanceof JavaScriptAddon;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    @Deprecated
+    public String[] getCommands() {
+        return commands;
+    }
+
+    public Spicord getSpicord() {
+        return spicord;
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public File getDataFolder() {
+        return dataFolder;
+    }
+
     public Logger getLogger() {
-        return spicord.getLogger();
+        return logger;
     }
 
     public Collection<GatewayIntent> getRequiredIntents() {

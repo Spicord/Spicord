@@ -20,7 +20,7 @@ package org.spicord.addon;
 import lombok.Getter;
 
 @Getter
-public class JSAddonDescription {
+public class AddonDescription {
 
     private String id;
     private String name;
@@ -28,6 +28,7 @@ public class JSAddonDescription {
     private String version;
     //private String[] authors = new String[0];
     private String[] modules = new String[0];
-    private String main = "index.js";
+    private String main = "index.js"; //default
     //private String engine = "rhino";
+    private String language = "javascript"; //default
 }
