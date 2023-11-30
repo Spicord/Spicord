@@ -24,44 +24,50 @@ import eu.mcdb.universal.player.UniversalPlayer;
 public interface LinkingService extends Service {
 
     /**
+     * Check if the given player is pending to link their account.
      * 
-     * @param player
-     * @return
+     * @param player the player
+     * @return true if the player is pending to link
      */
     boolean isPending(UniversalPlayer player);
 
     /**
+     * Check if the given player has linked their account.
      * 
-     * @param player
-     * @return
+     * @param player the player
+     * @return true if the player is linked
      */
     boolean isLinked(UniversalPlayer player);
 
     /**
+     * Check if a player with the given id has linked their account.
      * 
-     * @param id
-     * @return
+     * @param id the id of a player
+     * @return true if the player is linked
      */
-    boolean isLinked(UUID id);
+    boolean isLinked(UUID playerId);
 
     /**
+     * Check if the given Discord user id is linked to a player.
      * 
-     * @param id
-     * @return
+     * @param id the discord id
+     * @return true if the user is linked
      */
-    boolean isLinked(Long id);
+    boolean isLinked(Long discordId);
 
     /**
+     * Link the player with a discord id and return the LinkData instance.
      * 
-     * @param data
-     * @param id
-     * @return
+     * @param playerData the player data
+     * @param discordId the discord user id
+     * @return the resulting LinkData
      */
-    LinkData createLink(PendingLinkData data, long id);
+    LinkData createLink(PendingLinkData playerData, long discordId);
 
     /**
+     * Removes the given link data.
      * 
-     * @param data
+     * @param data the data to remove
      * @return
      */
     boolean removeLink(LinkData data);
@@ -93,11 +99,12 @@ public interface LinkingService extends Service {
     PendingLinkData[] getPending();
 
     /**
+     * Check if the given player name is a valid "Minecraft: Java Edition" name.
      * 
-     * @param name
-     * @return
+     * @param name the player name
+     * @return true if the name is a valid 
      */
-    static boolean isValidMinecraftName(String name) {
+    public static boolean isValidMinecraftName(String name) {
         return name.length() >= 3
                 && name.length() <= 16
                 && name.replaceAll("[A-Za-z0-9_]", "").length() == 0;

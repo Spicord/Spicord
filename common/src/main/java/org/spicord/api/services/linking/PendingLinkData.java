@@ -18,25 +18,69 @@
 package org.spicord.api.services.linking;
 
 import java.util.UUID;
+
 import eu.mcdb.universal.player.UniversalPlayer;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Class containing information about the player.
  */
-@Getter
-@RequiredArgsConstructor
 public class PendingLinkData {
 
     private final String name;
     private final UUID uniqueId;
 
-    public LinkData create(long id) {
-        return new LinkData(id, name, uniqueId.toString());
+    public PendingLinkData(String playerName, UUID playerId) {
+        this.name = playerName;
+        this.uniqueId = playerId;
     }
 
-    public static PendingLinkData of(UniversalPlayer player) {
+    public String getPlayerName() {
+        return name;
+    }
+
+    public UUID getPlayerId() {
+        return uniqueId;
+    }
+
+    public LinkData complete(long discordId) {
+        return new LinkData(discordId, name, uniqueId.toString());
+    }
+
+    public static PendingLinkData forPlayer(UniversalPlayer player) {
         return new PendingLinkData(player.getName(), player.getUniqueId());
+    }
+
+    // OLD METHODS BELOW --
+
+    /**
+     * Use getPlayerName()
+     */
+    @Deprecated
+    public String getName() {
+        return getPlayerName();
+    }
+
+    /**
+     * Use getPlayerId()
+     */
+    @Deprecated
+    public UUID getUniqueId() {
+        return getPlayerId();
+    }
+
+    /**
+     * Use complete(id)
+     */
+    @Deprecated
+    public LinkData create(long discordId) {
+        return complete(discordId);
+    }
+
+    /**
+     * Use forPlayer(player)
+     */
+    @Deprecated
+    public static PendingLinkData of(UniversalPlayer player) {
+        return forPlayer(player);
     }
 }

@@ -18,20 +18,57 @@
 package org.spicord.api.services.linking;
 
 import java.util.UUID;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Class containing information about the player and the discord id.
  */
-@RequiredArgsConstructor
 public class LinkData {
 
-    @Getter private final Long id;
-    @Getter private final String name;
+    private final Long id;
+    private final String name;
     private final String uuid;
 
-    public UUID getUniqueId() {
+    public LinkData(Long discordId, String playerName, String playerId) {
+        this.id = discordId;
+        this.name = playerName;
+        this.uuid = playerId;
+    }
+
+    public long getDiscordId() {
+        return id;
+    }
+
+    public String getPlayerName() {
+        return name;
+    }
+
+    public UUID getPlayerId() {
         return UUID.fromString(uuid);
+    }
+
+    // OLD METHODS BELOW --
+
+    /**
+     * Use getDiscordId()
+     */
+    @Deprecated
+    public Long getId() {
+        return getDiscordId();
+    }
+
+    /**
+     * Use getPlayerName()
+     */
+    @Deprecated
+    public String getName() {
+        return getPlayerName();
+    }
+
+    /**
+     * Use getPlayerId()
+     */
+    @Deprecated
+    public UUID getUniqueId() {
+        return getPlayerId();
     }
 }
