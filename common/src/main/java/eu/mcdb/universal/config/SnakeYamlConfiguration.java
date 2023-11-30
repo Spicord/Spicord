@@ -23,6 +23,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -44,6 +45,12 @@ class SnakeYamlConfiguration extends YamlConfiguration implements GetBasedConfig
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private SnakeYamlConfiguration(Map<String, Object> map) {
+        this.file = null;
+        this.yaml = null;
+        this.map = map;
     }
 
     @Override
@@ -114,8 +121,18 @@ class SnakeYamlConfiguration extends YamlConfiguration implements GetBasedConfig
     }
 
     @Override
+    public List<Map<?, ?>> getMapList(String path) {
+        return (List<Map<?, ?>>) getList(path);
+    }
+
+    @Override
     public boolean contains(String path) {
         return get(path) != null;
+    }
+
+    @Override
+    public BaseConfiguration getConfiguration(String path) {
+        return new SnakeYamlConfiguration((Map<String, Object>) get(path));
     }
 
     @Override
@@ -130,6 +147,9 @@ class SnakeYamlConfiguration extends YamlConfiguration implements GetBasedConfig
 
     @Override
     public void save() throws IOException {
+        if (yaml == null || file == null) {
+            return;
+        }
         final String str = yaml.dumpAsMap(map);
         final FileWriter fw = new FileWriter(file);
         fw.write(str.toCharArray());

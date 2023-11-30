@@ -23,20 +23,21 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.bukkit.configuration.MemorySection;
+
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 class BukkitYamlConfiguration extends YamlConfiguration {
 
     private final File file;
-    private final MemorySection config;
+    private final ConfigurationSection config;
 
     BukkitYamlConfiguration(final File file) {
         this.file = file;
         this.config = org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(file);
     }
 
-    private BukkitYamlConfiguration(final MemorySection section) {
+    private BukkitYamlConfiguration(final ConfigurationSection section) {
         this.file = null;
         this.config = section;
     }
@@ -50,8 +51,8 @@ class BukkitYamlConfiguration extends YamlConfiguration {
     public Object get(String path) {
         Object o = config.get(path);
 
-        if (o instanceof MemorySection) {
-        	o = new BukkitYamlConfiguration((MemorySection) o);
+        if (o instanceof ConfigurationSection) {
+        	o = new BukkitYamlConfiguration((ConfigurationSection) o);
         }
 
         return o;
@@ -61,8 +62,8 @@ class BukkitYamlConfiguration extends YamlConfiguration {
     public Object get(String path, Object def) {
         Object o = config.get(path, def);
 
-        if (o instanceof MemorySection) {
-        	o = new BukkitYamlConfiguration((MemorySection) o);
+        if (o instanceof ConfigurationSection) {
+        	o = new BukkitYamlConfiguration((ConfigurationSection) o);
         }
 
         return o;
@@ -129,6 +130,11 @@ class BukkitYamlConfiguration extends YamlConfiguration {
     }
 
     @Override
+    public List<Map<?, ?>> getMapList(String path) {
+        return config.getMapList(path);
+    }
+
+    @Override
     public long getLong(String path) {
         return config.getLong(path);
     }
@@ -164,6 +170,11 @@ class BukkitYamlConfiguration extends YamlConfiguration {
     }
 
     @Override
+    public BaseConfiguration getConfiguration(String path) {
+        return new BukkitYamlConfiguration(config.getConfigurationSection(path));
+    }
+
+    @Override
     public Collection<String> getKeys() {
     	return config.getKeys(false);
     }
@@ -173,14 +184,14 @@ class BukkitYamlConfiguration extends YamlConfiguration {
         return dig(config);
     }
 
-    private Map<String, Object> dig(MemorySection c) {
+    private Map<String, Object> dig(ConfigurationSection c) {
         final Map<String, Object> values = new HashMap<String, Object>();
 
         for (final String key : c.getKeys(false)) {
             Object o = c.get(key);
 
-            if (o instanceof MemorySection) {
-                o = dig((MemorySection) o);
+            if (o instanceof ConfigurationSection) {
+                o = dig((ConfigurationSection) o);
             }
 
             values.put(key, o);

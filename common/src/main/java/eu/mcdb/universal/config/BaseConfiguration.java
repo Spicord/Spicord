@@ -48,6 +48,8 @@ public interface BaseConfiguration {
     List<?> getList(String path);
     List<?> getList(String path, List<?> def);
 
+    List<Map<?, ?>> getMapList(String path);
+
     long getLong(String path);
     long getLong(String path, long def);
 
@@ -59,6 +61,8 @@ public interface BaseConfiguration {
     List<String> getStringList(String path);
 
     boolean contains(String path);
+
+    BaseConfiguration getConfiguration(String path);
 
     Collection<String> getKeys();
     Map<String, Object> getValues();

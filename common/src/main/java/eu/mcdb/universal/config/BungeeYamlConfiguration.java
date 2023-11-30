@@ -136,6 +136,12 @@ class BungeeYamlConfiguration extends YamlConfiguration {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<Map<?, ?>> getMapList(String path) {
+        return (List<Map<?, ?>>) config.getList(path);
+    }
+
+    @Override
     public long getLong(String path) {
         return config.getLong(path);
     }
@@ -168,6 +174,11 @@ class BungeeYamlConfiguration extends YamlConfiguration {
     @Override
     public boolean contains(String path) {
         return config.contains(path);
+    }
+
+    @Override
+    public BaseConfiguration getConfiguration(String path) {
+        return new BungeeYamlConfiguration(config.getSection(path));
     }
 
     @Override
