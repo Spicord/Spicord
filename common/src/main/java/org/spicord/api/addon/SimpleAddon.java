@@ -103,6 +103,12 @@ public abstract class SimpleAddon {
         this.commands = commands;
     }
 
+    public void onRegister(Spicord spicord) {
+    }
+
+    public void onUnregister(Spicord spicord) {
+    }
+
     /**
      * This method will be called when a bot loads this addon.
      * 

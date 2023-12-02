@@ -28,6 +28,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -114,6 +115,8 @@ public class AddonManager {
                 addon.getAuthor()
             ));
 
+            addon.onRegister(spicord);
+
             final boolean spicordLoaded = spicord.getConfig() != null;
             if (spicordLoaded) { // too late
                 for (DiscordBot bot : spicord.getConfig().getBots()) {
@@ -138,7 +141,11 @@ public class AddonManager {
      * @return true if it was unregistered, or false if not
      */
     public boolean unregisterAddon(SimpleAddon addon) {
-        return addons.remove(addon);
+        if (addons.remove(addon)) {
+            addon.onUnregister(spicord);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -148,7 +155,16 @@ public class AddonManager {
      * @return true if it was unregistered, or false if not
      */
     public boolean unregisterAddon(String id) {
-        return addons.removeIf(addon -> addon.getId().equals(id));
+        Iterator<SimpleAddon> iterator = addons.iterator();
+        while (iterator.hasNext()) {
+            SimpleAddon addon = iterator.next();
+            if (addon.getId().equals(id)) {
+                iterator.remove();
+                addon.onUnregister(spicord);
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
