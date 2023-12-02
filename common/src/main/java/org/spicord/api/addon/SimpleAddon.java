@@ -44,7 +44,7 @@ public abstract class SimpleAddon {
     private File dataFolder;
     private Logger logger;
 
-    public void initFields(Spicord spicord, File file, File dataFolder, Logger logger) {
+    public final void initFields(Spicord spicord, File file, File dataFolder, Logger logger) {
         this.spicord = spicord;
         this.file = file;
         this.dataFolder = dataFolder;
@@ -177,40 +177,40 @@ public abstract class SimpleAddon {
         return this instanceof JavaScriptAddon;
     }
 
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
-    public String getId() {
+    public final String getId() {
         return id;
     }
 
-    public String getAuthor() {
+    public final String getAuthor() {
         return author;
     }
 
-    public String getVersion() {
+    public final String getVersion() {
         return version;
     }
 
     @Deprecated
-    public String[] getCommands() {
+    public final String[] getCommands() {
         return commands;
     }
 
-    public Spicord getSpicord() {
+    public final Spicord getSpicord() {
         return spicord;
     }
 
-    public File getFile() {
+    public final File getFile() {
         return file;
     }
 
-    public File getDataFolder() {
+    public final File getDataFolder() {
         return dataFolder;
     }
 
-    public Logger getLogger() {
+    public final Logger getLogger() {
         return logger;
     }
 

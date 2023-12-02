@@ -1,38 +1,31 @@
-/*
- * Copyright (C) 2019  OopsieWoopsie
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package org.spicord.addon.internal;
 
 import java.awt.Color;
+
 import org.spicord.Spicord;
 import org.spicord.api.addon.SimpleAddon;
-import org.spicord.bot.command.DiscordBotCommand;
+import org.spicord.bot.DiscordBot;
+import org.spicord.bot.command.SlashCommandBuilder;
 
 import eu.mcdb.universal.Server;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 public class PluginsAddon extends SimpleAddon {
 
     public PluginsAddon() {
-        super("Plugin List", "spicord::plugins", "Sheidy", new String[] { "plugins" });
+        super("Plugin List", "spicord::plugins", "Tini");
     }
 
     @Override
-    public void onCommand(DiscordBotCommand command, String[] args) {
+    public void onReady(DiscordBot bot) {
+        SlashCommandBuilder command = bot.commandBuilder("plugins", "Plugin List")
+            .setExecutor(this::handleCommand)
+        ;
+        bot.registerCommand(command);
+    }
+
+    public void handleCommand(SlashCommandInteractionEvent event) {
         final Server server = Server.getInstance();
 
         final EmbedBuilder builder = new EmbedBuilder()
@@ -48,6 +41,6 @@ public class PluginsAddon extends SimpleAddon {
             builder.setFooter(footer.replace("{version}", Spicord.getVersion()), null);
         }
 
-        command.reply(builder.build());
+        event.replyEmbeds(builder.build()).queue();
     }
 }

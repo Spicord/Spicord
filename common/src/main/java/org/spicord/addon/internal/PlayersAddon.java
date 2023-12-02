@@ -1,51 +1,56 @@
-/*
- * Copyright (C) 2019  OopsieWoopsie
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package org.spicord.addon.internal;
 
 import java.awt.Color;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.spicord.Spicord;
 import org.spicord.api.addon.SimpleAddon;
-import org.spicord.bot.command.DiscordBotCommand;
+import org.spicord.bot.DiscordBot;
+import org.spicord.bot.command.SlashCommandBuilder;
 
 import eu.mcdb.universal.Server;
 import eu.mcdb.universal.ServerType;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 public class PlayersAddon extends SimpleAddon {
 
     public PlayersAddon() {
-        super("Player List", "spicord::players", "Sheidy", new String[] { "players" });
+        super("Player List", "spicord::players", "Tini");
     }
 
     @Override
-    public void onCommand(DiscordBotCommand command, String[] args) {
+    public void onReady(DiscordBot bot) {
+        SlashCommandBuilder command = bot.commandBuilder("players", "Player List")
+            .addOption(OptionType.STRING, "server", "Server name", false, true)
+            .setExecutor(this::handleCommand)
+            .setCompleter(e -> {
+                Collection<String> options = Server.getInstance()
+                    .getServersAndPlayers()
+                    .keySet()
+                ;
+                e.replyChoiceStrings(options).queue();
+            })
+        ;
+        bot.registerCommand(command);
+    }
+
+    public void handleCommand(SlashCommandInteractionEvent event) {
         Server server = Server.getInstance();
+
+        EmbedBuilder builder = new EmbedBuilder();
 
         if (Server.getServerType() == ServerType.BUNGEECORD) {
             String desc = "";
 
             if (server.getOnlineCount() == 0) {
-                command.reply(command.getAuthorAsMention() + ", there are no players online!");
+                event.reply(event.getUser().getAsMention() + ", there are no players online!").queue();
                 return;
             }
 
@@ -53,13 +58,15 @@ public class PlayersAddon extends SimpleAddon {
 
             int playerCount = 0;
 
-            if (args.length > 0) {
-                String serverName = args[0].replace("`", "'");
+            OptionMapping serverOption = event.getOption("server");
+
+            if (serverOption != null) {
+                String serverName = serverOption.getAsString();
                 List<String> players = playerList.get(serverName);
 
                 if (players == null) {
-                    String usage = "Usage: `" + command.getPrefix() + "players [server]`";
-                    command.reply(command.getAuthorAsMention() + ", the server `" + serverName + "` was not found!\n" + usage);
+                    String usage = "Usage: `/players [server]`";
+                    event.reply(event.getUser().getAsMention() + ", the server `" + serverName + "` was not found!\n" + usage).queue();
                     return;
                 } else {
                     desc = buildServerLine(serverName, players);
@@ -77,29 +84,21 @@ public class PlayersAddon extends SimpleAddon {
                 }
             }
 
-            final EmbedBuilder builder = new EmbedBuilder()
-                    .setTitle("Total players: " + playerCount)
-                    .setDescription(desc)
-                    .setColor(new Color(5154580));
-
-            setFooter(builder);
-
-            command.reply(builder.build());
+            builder
+                .setTitle("Total players: " + playerCount)
+                .setDescription(desc)
+                .setColor(new Color(5154580))
+            ;
         } else {
             final String[] online = server.getOnlinePlayers();
 
-            final EmbedBuilder builder = new EmbedBuilder()
-                    .setTitle("Players (" + online.length + "): ")
-                    .setDescription(String.join(", ", escapeUnderscores(online)))
-                    .setColor(new Color(5154580));
-
-            setFooter(builder);
-
-            command.reply(builder.build());
+            builder
+                .setTitle("Players (" + online.length + "): ")
+                .setDescription(String.join(", ", escapeUnderscores(online)))
+                .setColor(new Color(5154580))
+            ;
         }
-    }
 
-    private void setFooter(EmbedBuilder builder) {
         String footer = getSpicord().getConfig().getIntegratedAddonFooter();
 
         if (footer == null || footer.isEmpty()) {
@@ -107,6 +106,8 @@ public class PlayersAddon extends SimpleAddon {
         } else {
             builder.setFooter(footer.replace("{version}", Spicord.getVersion()), null);
         }
+
+        event.replyEmbeds(builder.build()).queue();
     }
 
     private String buildServerLine(String server, List<String> players) {

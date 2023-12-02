@@ -44,6 +44,7 @@ import org.spicord.script.ScriptEngine;
 import org.spicord.script.ScriptEnvironment;
 import org.spicord.script.ScriptException;
 
+import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 
 import eu.mcdb.util.FileUtils;
@@ -101,12 +102,19 @@ public class AddonManager {
         return registerAddon(addon, true);
     }
 
-    private boolean registerAddon(SimpleAddon addon, boolean initFields) {
+    public boolean registerAddon(SimpleAddon addon, boolean initFields) {
         if (!isRegistered(addon)) {
 
             if (initFields) {
                 addon.initFields(spicord, null, null, logger);
             }
+
+            Preconditions.checkNotNull(addon.getSpicord(), "'spicord' field is null");
+            Preconditions.checkNotNull(addon.getLogger(), "'logger' field is null");
+
+            addon.onRegister(spicord);
+
+            addons.add(addon);
 
             logger.info(String.format(
                 "Registered addon '%s' (%s) by %s",
@@ -114,8 +122,6 @@ public class AddonManager {
                 addon.getId(),
                 addon.getAuthor()
             ));
-
-            addon.onRegister(spicord);
 
             final boolean spicordLoaded = spicord.getConfig() != null;
             if (spicordLoaded) { // too late
@@ -129,7 +135,7 @@ public class AddonManager {
                 }
             }
 
-            return addons.add(addon);
+            return true;
         }
         return false;
     }

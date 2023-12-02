@@ -38,6 +38,10 @@ import org.spicord.api.bot.SimpleBot;
 import org.spicord.api.bot.command.BotCommand;
 import org.spicord.bot.command.DiscordBotCommand;
 import org.spicord.bot.command.DiscordCommand;
+import org.spicord.bot.command.SlashCommandBuilder;
+import org.spicord.bot.command.SlashCommandCompleter;
+import org.spicord.bot.command.SlashCommandExecutor;
+import org.spicord.bot.command.SlashCommandOption;
 
 import com.google.common.base.Preconditions;
 
@@ -64,7 +68,6 @@ import net.dv8tion.jda.api.events.session.SessionResumeEvent;
 import net.dv8tion.jda.api.events.session.ShutdownEvent;
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.requests.CloseCode;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
@@ -231,7 +234,9 @@ public class DiscordBot extends SimpleBot {
 
     private void onReady(ReadyEvent event) {
         this.botId = jda.getSelfUser().getIdLong();
-        loadedAddons.forEach(addon -> addon.onReady(this));
+        for (SimpleAddon addon : loadedAddons) {
+            addon.onReady(this);
+        }
     }
 
     private void onMessageReceived(MessageReceivedEvent event) {
@@ -260,49 +265,52 @@ public class DiscordBot extends SimpleBot {
      * @return the builder instance
      */
     public SlashCommandBuilder commandBuilder(String name, String description) {
-        return SlashCommandBuilder.builder(jda.upsertCommand(name, description));
+        return new SlashCommandBuilder(name, description);
     }
 
     /**
-     * Creates a new SlashCommandBuilder.
-     * It has to be later registered with the registerCommand() method.
-     * The command could only be used in the specified guild after its registration.
-     * 
-     * @param name the command name
-     * @param description the command description
-     * @param guild the guild to register this command to
-     * @return the builder instance
-     */
-    public SlashCommandBuilder commandBuilder(String name, String description, Guild guild) {
-        if (guild.getJDA() != jda) {
-            throw new IllegalArgumentException("Guild JDA instance does not belong to this bot");
-        }
-        return SlashCommandBuilder.builder(guild.upsertCommand(name, description));
-    }
-
-    /**
-     * Builds and register the given slash command. 
+     * Builds and register the given slash command to the specified guild.
      * 
      * @param builder the command builder
-     * @return the newly registered JDA Command instance
+     * @param guild the guild
      */
-    public Command registerCommand(SlashCommandBuilder builder) {
-        CommandCreateAction createAction = builder.getCreateAction();
+    public void registerCommand(SlashCommandBuilder builder, Guild guild) {
+        CommandCreateAction createAction = guild.upsertCommand(builder.getName(), builder.getDescription());
+        registerCommand(builder, createAction);
+    }
+
+    /**
+     * Builds and register the given slash command.
+     * 
+     * @param builder the command builder
+     */
+    public void registerCommand(SlashCommandBuilder builder) {
+        CommandCreateAction createAction = jda.upsertCommand(builder.getName(), builder.getDescription());
+        registerCommand(builder, createAction);
+    }
+
+    private void registerCommand(SlashCommandBuilder builder, CommandCreateAction createAction) {
+        for (SlashCommandOption option : builder.getOptions()) {
+            createAction.addOption(option.getType(), option.getName(), option.getDescription(), option.isRequired(), option.isAutoComplete());
+        }
+
+        createAction.setNSFW(createAction.isNSFW());
+        createAction.setGuildOnly(createAction.isGuildOnly());
+        createAction.setDefaultPermissions(createAction.getDefaultPermissions());
 
         if (createAction.getJDA() != jda) {
             throw new IllegalArgumentException("SlashCommand JDA instance does not belong to this bot");
         }
 
-        Command command = createAction.complete();
-
-        if (builder.getExecutor() != null) {
-            commandExecutors.put(command.getIdLong(), builder.getExecutor());
-        }
-        if (builder.getCompleter() != null) {
-            commandCompleters.put(command.getIdLong(), builder.getCompleter());
-        }
-
-        return command;
+        createAction.submit().thenAccept(command -> {
+            if (builder.getExecutor() != null) {
+                commandExecutors.put(command.getIdLong(), builder.getExecutor());
+            }
+            if (builder.getCompleter() != null) {
+                commandCompleters.put(command.getIdLong(), builder.getCompleter());
+            }
+            logger.info("Registered discord command /" + command.getName());
+        });
     }
 
     /**

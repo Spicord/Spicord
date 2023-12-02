@@ -1,44 +1,57 @@
-package org.spicord.bot;
+package org.spicord.bot.command;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+import lombok.Getter;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
 
+@Getter
 public class SlashCommandBuilder {
 
-    private CommandCreateAction action;
+    private String name;
+    private String description;
+
     private SlashCommandExecutor executor;
     private SlashCommandCompleter completer;
 
-    private SlashCommandBuilder(CommandCreateAction command) {
-        this.action = command;
+    private boolean guildOnly = false;
+    private boolean nsfw = false;
+
+    private List<SlashCommandOption> options = new ArrayList<>();
+
+    private DefaultMemberPermissions defaultMemberPermissions = DefaultMemberPermissions.ENABLED;
+
+    public SlashCommandBuilder(String name, String description) {
+        this.name = name;
+        this.description = description;
     }
 
     public SlashCommandBuilder setGuildOnly(boolean guildOnly) {
-        action.setGuildOnly(guildOnly);
+        this.guildOnly = guildOnly;
         return this;
     }
 
     public SlashCommandBuilder setNSFW(boolean nsfw) {
-        action.setNSFW(nsfw);
+        this.nsfw = nsfw;
         return this;
     }
 
     public SlashCommandBuilder setDefaultPermissions(Collection<Permission> permissions) {
-        action.setDefaultPermissions(DefaultMemberPermissions.enabledFor(permissions));
+        this.defaultMemberPermissions = DefaultMemberPermissions.enabledFor(permissions);
         return this;
     }
 
     public SlashCommandBuilder setDefaultPermissions(Permission... permissions) {
-        action.setDefaultPermissions(DefaultMemberPermissions.enabledFor(permissions));
+        this.defaultMemberPermissions = DefaultMemberPermissions.enabledFor(permissions);
         return this;
     }
 
     public SlashCommandBuilder addOption(OptionType type, String name, String description, boolean required, boolean autoComplete) {
-        action.addOption(type, name, description, required, autoComplete);
+        this.options.add(new SlashCommandOption(type, name, description, required, autoComplete));
         return this;
     }
 
@@ -50,21 +63,5 @@ public class SlashCommandBuilder {
     public SlashCommandBuilder setCompleter(SlashCommandCompleter completer) {
         this.completer = completer;
         return this;
-    }
-
-    public SlashCommandExecutor getExecutor() {
-        return executor;
-    }
-
-    public SlashCommandCompleter getCompleter() {
-        return completer;
-    }
-
-    CommandCreateAction getCreateAction() {
-        return action;
-    }
-
-    static SlashCommandBuilder builder(CommandCreateAction action) {
-        return new SlashCommandBuilder(action);
     }
 }
