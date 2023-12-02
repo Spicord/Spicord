@@ -5,7 +5,7 @@ import java.awt.Color;
 import org.spicord.Spicord;
 import org.spicord.api.addon.SimpleAddon;
 import org.spicord.bot.DiscordBot;
-import org.spicord.bot.command.SlashCommandBuilder;
+import org.spicord.bot.command.SlashCommand;
 
 import eu.mcdb.universal.Server;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -19,7 +19,7 @@ public class PluginsAddon extends SimpleAddon {
 
     @Override
     public void onReady(DiscordBot bot) {
-        SlashCommandBuilder command = bot.commandBuilder("plugins", "Plugin List")
+        SlashCommand command = bot.commandBuilder("plugins", "Plugin List")
             .setExecutor(this::handleCommand)
         ;
         bot.registerCommand(command);

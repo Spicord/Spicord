@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import org.spicord.Spicord;
 import org.spicord.api.addon.SimpleAddon;
 import org.spicord.bot.DiscordBot;
-import org.spicord.bot.command.SlashCommandBuilder;
+import org.spicord.bot.command.SlashCommand;
 
 import eu.mcdb.universal.Server;
 import eu.mcdb.universal.ServerType;
@@ -27,7 +27,7 @@ public class PlayersAddon extends SimpleAddon {
 
     @Override
     public void onReady(DiscordBot bot) {
-        SlashCommandBuilder command = bot.commandBuilder("players", "Player List")
+        SlashCommand command = bot.commandBuilder("players", "Player List")
             .addOption(OptionType.STRING, "server", "Server name", false, true)
             .setExecutor(this::handleCommand)
             .setCompleter(e -> {

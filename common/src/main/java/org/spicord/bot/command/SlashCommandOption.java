@@ -2,6 +2,7 @@ package org.spicord.bot.command;
 
 import lombok.Getter;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 @Getter
 public class SlashCommandOption {
@@ -18,5 +19,9 @@ public class SlashCommandOption {
         this.description = description;
         this.required = required;
         this.autoComplete = autoComplete;
+    }
+
+    public OptionData buildOption() {
+        return new OptionData(type, name, description, required, autoComplete);
     }
 }

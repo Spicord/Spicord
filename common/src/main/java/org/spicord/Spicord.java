@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.spicord.addon.AddonManager;
 import org.spicord.addon.internal.InfoAddon;
 import org.spicord.addon.internal.PlayersAddon;
@@ -37,6 +38,7 @@ import org.spicord.bot.DiscordBotLoader;
 import org.spicord.config.SpicordConfiguration;
 import org.spicord.event.EventHandler;
 import org.spicord.event.SpicordEvent;
+
 import eu.mcdb.universal.Server;
 import eu.mcdb.universal.ServerType;
 import lombok.Getter;

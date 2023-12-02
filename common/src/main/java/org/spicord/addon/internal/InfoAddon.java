@@ -5,7 +5,7 @@ import java.awt.Color;
 import org.spicord.Spicord;
 import org.spicord.api.addon.SimpleAddon;
 import org.spicord.bot.DiscordBot;
-import org.spicord.bot.command.SlashCommandBuilder;
+import org.spicord.bot.command.SlashCommand;
 
 import eu.mcdb.universal.Server;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -19,7 +19,7 @@ public class InfoAddon extends SimpleAddon {
 
     @Override
     public void onReady(DiscordBot bot) {
-        SlashCommandBuilder command = bot.commandBuilder("info", "Server Information").setExecutor(this::handleCommand);
+        SlashCommand command = bot.commandBuilder("info", "Server Information").setExecutor(this::handleCommand);
         bot.registerCommand(command);
     }
 

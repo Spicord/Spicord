@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,13 +39,16 @@ import org.spicord.api.bot.SimpleBot;
 import org.spicord.api.bot.command.BotCommand;
 import org.spicord.bot.command.DiscordBotCommand;
 import org.spicord.bot.command.DiscordCommand;
-import org.spicord.bot.command.SlashCommandBuilder;
+import org.spicord.bot.command.SlashCommand;
 import org.spicord.bot.command.SlashCommandCompleter;
 import org.spicord.bot.command.SlashCommandExecutor;
+import org.spicord.bot.command.SlashCommandGroup;
+import org.spicord.bot.command.SlashCommandHandler;
 import org.spicord.bot.command.SlashCommandOption;
 
 import com.google.common.base.Preconditions;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -252,8 +256,7 @@ public class DiscordBot extends SimpleBot {
         jda.addEventListener(listener);
     }
 
-    private Map<Long, SlashCommandExecutor> commandExecutors = new HashMap<>();
-    private Map<Long, SlashCommandCompleter> commandCompleters = new HashMap<>();
+    private Map<Long, Map<String, SlashCommandHandler>> commandHandlers = new HashMap<>();
 
     /**
      * Creates a new SlashCommandBuilder.
@@ -264,8 +267,8 @@ public class DiscordBot extends SimpleBot {
      * @param description the command description
      * @return the builder instance
      */
-    public SlashCommandBuilder commandBuilder(String name, String description) {
-        return new SlashCommandBuilder(name, description);
+    public SlashCommand commandBuilder(String name, String description) {
+        return new SlashCommand(name, description);
     }
 
     /**
@@ -274,7 +277,7 @@ public class DiscordBot extends SimpleBot {
      * @param builder the command builder
      * @param guild the guild
      */
-    public void registerCommand(SlashCommandBuilder builder, Guild guild) {
+    public void registerCommand(SlashCommand builder, Guild guild) {
         CommandCreateAction createAction = guild.upsertCommand(builder.getName(), builder.getDescription());
         registerCommand(builder, createAction);
     }
@@ -284,31 +287,69 @@ public class DiscordBot extends SimpleBot {
      * 
      * @param builder the command builder
      */
-    public void registerCommand(SlashCommandBuilder builder) {
+    public void registerCommand(SlashCommand builder) {
         CommandCreateAction createAction = jda.upsertCommand(builder.getName(), builder.getDescription());
         registerCommand(builder, createAction);
     }
 
-    private void registerCommand(SlashCommandBuilder builder, CommandCreateAction createAction) {
-        for (SlashCommandOption option : builder.getOptions()) {
-            createAction.addOption(option.getType(), option.getName(), option.getDescription(), option.isRequired(), option.isAutoComplete());
+    private void registerCommand(SlashCommand builder, CommandCreateAction createAction) {
+        if (createAction.getJDA() != jda) {
+            throw new IllegalArgumentException("SlashCommand JDA instance does not belong to this bot");
+        }
+
+        Map<String, SlashCommandHandler> handlers = new LinkedHashMap<>();
+
+        if (builder.isSingle()) {
+            final SlashCommandHandler handler = new SlashCommandHandler(
+                builder.getExecutor(),
+                builder.getCompleter()
+            );
+            handlers.put(builder.getName(), handler);
+        } else {
+            for (SlashCommandOption option : builder.getOptions()) {
+                createAction.addOptions(option.buildOption());
+            }
+
+            for (SlashCommandGroup subcommandGroup : builder.getSubcommandGroups()) {
+                createAction.addSubcommandGroups(subcommandGroup.buildGroup());
+
+                for (SlashCommand subcommand : subcommandGroup.getSubcommands()) {
+                    final String id = String.format(
+                        "%s %s %s",
+                        builder.getName(),
+                        subcommandGroup.getName(),
+                        subcommand.getName()
+                    );
+                    final SlashCommandHandler handler = new SlashCommandHandler(
+                        subcommand.getExecutor(),
+                        subcommand.getCompleter()
+                    );
+                    handlers.put(id, handler);
+                }
+            }
+
+            for (SlashCommand subcommand : builder.getSubcommands()) {
+                createAction.addSubcommands(subcommand.buildAsSubcommand());
+
+                final String id = String.format(
+                    "%s %s",
+                    builder.getName(),
+                    subcommand.getName()
+                );
+                final SlashCommandHandler handler = new SlashCommandHandler(
+                    subcommand.getExecutor(),
+                    subcommand.getCompleter()
+                );
+                handlers.put(id, handler);
+            }
         }
 
         createAction.setNSFW(createAction.isNSFW());
         createAction.setGuildOnly(createAction.isGuildOnly());
         createAction.setDefaultPermissions(createAction.getDefaultPermissions());
 
-        if (createAction.getJDA() != jda) {
-            throw new IllegalArgumentException("SlashCommand JDA instance does not belong to this bot");
-        }
-
         createAction.submit().thenAccept(command -> {
-            if (builder.getExecutor() != null) {
-                commandExecutors.put(command.getIdLong(), builder.getExecutor());
-            }
-            if (builder.getCompleter() != null) {
-                commandCompleters.put(command.getIdLong(), builder.getCompleter());
-            }
+            commandHandlers.put(command.getIdLong(), handlers);
             logger.info("Registered discord command /" + command.getName());
         });
     }
@@ -585,8 +626,13 @@ public class DiscordBot extends SimpleBot {
         public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
             final Long commandId = event.getCommandIdLong();
 
-            if (commandExecutors.containsKey(commandId)) {
-                commandExecutors.get(commandId).handle(event);
+            if (commandHandlers.containsKey(commandId)) {
+                final String id = event.getFullCommandName();
+                final Map<String, SlashCommandHandler> handlers = commandHandlers.get(commandId);
+
+                if (handlers.containsKey(id)) {
+                    handlers.get(id).execute(event);
+                }
             }
         }
 
@@ -594,8 +640,13 @@ public class DiscordBot extends SimpleBot {
         public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent event) {
             final Long commandId = event.getCommandIdLong();
 
-            if (commandCompleters.containsKey(commandId)) {
-                commandCompleters.get(commandId).handle(event);
+            if (commandHandlers.containsKey(commandId)) {
+                final String id = event.getFullCommandName();
+                final Map<String, SlashCommandHandler> handlers = commandHandlers.get(commandId);
+
+                if (handlers.containsKey(id)) {
+                    handlers.get(id).complete(event);
+                }
             }
         }
 
