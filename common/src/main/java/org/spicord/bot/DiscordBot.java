@@ -53,6 +53,8 @@ import net.dv8tion.jda.api.entities.TeamMember;
 import net.dv8tion.jda.api.entities.TeamMember.MembershipState;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.StatusChangeEvent;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.events.session.SessionDisconnectEvent;
@@ -61,6 +63,7 @@ import net.dv8tion.jda.api.events.session.SessionResumeEvent;
 import net.dv8tion.jda.api.events.session.ShutdownEvent;
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.requests.CloseCode;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
@@ -240,6 +243,26 @@ public class DiscordBot extends SimpleBot {
      */
     public void addEventListener(ListenerAdapter listener) {
         jda.addEventListener(listener);
+    }
+
+    private Map<Long, SlashCommandExecutor> commandExecutors = new HashMap<>();
+    private Map<Long, SlashCommandCompleter> commandCompleters = new HashMap<>();
+
+    public SlashCommand commandBuilder(String name, String description) {
+        return SlashCommand.builder(jda, name, description);
+    }
+
+    public Command registerCommand(SlashCommand commandData) {
+        Command command = commandData.getCreateAction().complete();
+
+        if (commandData.getExecutor() != null) {
+            commandExecutors.put(command.getIdLong(), commandData.getExecutor());
+        }
+        if (commandData.getCompleter() != null) {
+            commandCompleters.put(command.getIdLong(), commandData.getCompleter());
+        }
+
+        return command;
     }
 
     /**
@@ -509,6 +532,24 @@ public class DiscordBot extends SimpleBot {
     }
 
     private class BotCommandListener extends ListenerAdapter {
+
+        @Override
+        public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
+            final Long commandId = event.getCommandIdLong();
+
+            if (commandExecutors.containsKey(commandId)) {
+                commandExecutors.get(commandId).handle(event);
+            }
+        }
+
+        @Override
+        public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent event) {
+            final Long commandId = event.getCommandIdLong();
+
+            if (commandCompleters.containsKey(commandId)) {
+                commandCompleters.get(commandId).handle(event);
+            }
+        }
 
         private final DiscordBot bot = DiscordBot.this;
 
