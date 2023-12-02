@@ -49,6 +49,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.entities.ApplicationInfo;
 import net.dv8tion.jda.api.entities.ApplicationTeam;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TeamMember;
 import net.dv8tion.jda.api.entities.TeamMember.MembershipState;
 import net.dv8tion.jda.api.entities.User;
@@ -66,6 +67,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.requests.CloseCode;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 public class DiscordBot extends SimpleBot {
@@ -248,18 +250,56 @@ public class DiscordBot extends SimpleBot {
     private Map<Long, SlashCommandExecutor> commandExecutors = new HashMap<>();
     private Map<Long, SlashCommandCompleter> commandCompleters = new HashMap<>();
 
-    public SlashCommand commandBuilder(String name, String description) {
-        return SlashCommand.builder(jda, name, description);
+    /**
+     * Creates a new SlashCommandBuilder.
+     * It has to be later registered with the registerCommand() method.
+     * The command could be used globally after its registration.
+     * 
+     * @param name the command name
+     * @param description the command description
+     * @return the builder instance
+     */
+    public SlashCommandBuilder commandBuilder(String name, String description) {
+        return SlashCommandBuilder.builder(jda.upsertCommand(name, description));
     }
 
-    public Command registerCommand(SlashCommand commandData) {
-        Command command = commandData.getCreateAction().complete();
-
-        if (commandData.getExecutor() != null) {
-            commandExecutors.put(command.getIdLong(), commandData.getExecutor());
+    /**
+     * Creates a new SlashCommandBuilder.
+     * It has to be later registered with the registerCommand() method.
+     * The command could only be used in the specified guild after its registration.
+     * 
+     * @param name the command name
+     * @param description the command description
+     * @param guild the guild to register this command to
+     * @return the builder instance
+     */
+    public SlashCommandBuilder commandBuilder(String name, String description, Guild guild) {
+        if (guild.getJDA() != jda) {
+            throw new IllegalArgumentException("Guild JDA instance does not belong to this bot");
         }
-        if (commandData.getCompleter() != null) {
-            commandCompleters.put(command.getIdLong(), commandData.getCompleter());
+        return SlashCommandBuilder.builder(guild.upsertCommand(name, description));
+    }
+
+    /**
+     * Builds and register the given slash command. 
+     * 
+     * @param builder the command builder
+     * @return the newly registered JDA Command instance
+     */
+    public Command registerCommand(SlashCommandBuilder builder) {
+        CommandCreateAction createAction = builder.getCreateAction();
+
+        if (createAction.getJDA() != jda) {
+            throw new IllegalArgumentException("SlashCommand JDA instance does not belong to this bot");
+        }
+
+        Command command = createAction.complete();
+
+        if (builder.getExecutor() != null) {
+            commandExecutors.put(command.getIdLong(), builder.getExecutor());
+        }
+        if (builder.getCompleter() != null) {
+            commandCompleters.put(command.getIdLong(), builder.getCompleter());
         }
 
         return command;
