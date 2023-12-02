@@ -1,4 +1,4 @@
 name: Spicord
-author: Sheidy
+author: Tini
 version: ${project.version}
 main: org.spicord.bungee.SpicordBungee

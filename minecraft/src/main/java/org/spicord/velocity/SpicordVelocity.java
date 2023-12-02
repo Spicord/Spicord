@@ -30,7 +30,7 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
 
-@Plugin(id = "spicord", name = "Spicord", version = "5", authors = { "Sheidy" })
+@Plugin(id = "spicord", name = "Spicord", version = "5", authors = { "Tini" })
 public class SpicordVelocity extends VelocityPlugin implements SpicordPlugin {
 
     private SpicordLoader loader;

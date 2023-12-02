@@ -1,5 +1,5 @@
 name: Spicord
-author: Sheidy
+author: Tini
 version: ${project.version}
 main: org.spicord.bukkit.SpicordBukkit
 api-version: 1.13
