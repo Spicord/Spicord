@@ -17,7 +17,10 @@
 
 package eu.mcdb.universal;
 
+import org.spicord.Spicord;
 import org.spicord.server.impl.ServerUtil;
+
+import eu.mcdb.universal.command.UniversalCommand;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -42,5 +45,9 @@ public abstract class Server implements ServerInterface {
     public boolean isProxy() {
         return serverType == ServerType.VELOCITY
             || serverType == ServerType.BUNGEECORD;
+    }
+
+    public void registerCommandAsSpicord(UniversalCommand command) {
+        command.register(Spicord.getInstance().getPlugin());
     }
 }

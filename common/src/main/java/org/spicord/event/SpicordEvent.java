@@ -13,7 +13,7 @@ public final class SpicordEvent<T> {
     /*====================================*/
 
     private SpicordEvent() {
-        values.add(this);
+        values.add(this); // Add its own instance to the static 'values' Set
     }
 
     public static SpicordEvent<?>[] values() {

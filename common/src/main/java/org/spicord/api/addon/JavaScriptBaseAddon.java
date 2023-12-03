@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 public class JavaScriptBaseAddon {
 
     private final Map<String, Object> actions;
+    private String[] requiredIntents;
 
     public JavaScriptBaseAddon() {
         this.actions = new HashMap<String, Object>();
@@ -31,6 +32,14 @@ public class JavaScriptBaseAddon {
 
     public void on(String action, Object function) {
         actions.put(action, function);
+    }
+
+    public void setRequiredIntents(String... requiredIntents) {
+        this.requiredIntents = requiredIntents;
+    }
+
+    public String[] getRequiredIntents() {
+        return requiredIntents;
     }
 
     public Map<String[], Object> buildCommands() {

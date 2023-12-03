@@ -17,12 +17,16 @@
 
 package org.spicord.api.addon;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.spicord.api.bot.command.BotCommand;
 import org.spicord.bot.DiscordBot;
 import org.spicord.script.ScriptEngine;
+
+import net.dv8tion.jda.api.requests.GatewayIntent;
 
 public final class JavaScriptAddon extends SimpleAddon {
 
@@ -59,6 +63,28 @@ public final class JavaScriptAddon extends SimpleAddon {
     @Override
     public void onDisable() {
         call(baseAddon.get("disable"));
+    }
+
+    @Override
+    public Collection<GatewayIntent> getRequiredIntents() {
+        if (baseAddon.getRequiredIntents() != null) {
+            Collection<GatewayIntent> requiredIntents = new HashSet<>();
+
+            for (String requiredIntent : baseAddon.getRequiredIntents()) {
+                try {
+                    requiredIntents.add(GatewayIntent.valueOf(requiredIntent));
+                } catch (IllegalArgumentException e) {
+                    getLogger().severe(String.format(
+                        "The addon '%s' tried to use a Gateway Intent '%s' that does not exist",
+                        getName(),
+                        requiredIntent
+                    ));
+                }
+            }
+
+            return requiredIntents;
+        }
+        return super.getRequiredIntents();
     }
 
     private void setupCommands(DiscordBot bot) {

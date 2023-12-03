@@ -334,7 +334,8 @@ public class AddonManager {
 
         if (res instanceof JavaScriptBaseAddon) {
             final JavaScriptAddon addon = new JavaScriptAddon(name, id, author, version, (JavaScriptBaseAddon) res, engine);
-            this.registerAddon(addon);
+            addon.initFields(spicord, file, dataDir, Logger.getLogger(name));
+            this.registerAddon(addon, false);
         } else {
             throw new ScriptException("the '" + main + "' file needs to export the addon instance");
         }
@@ -422,7 +423,8 @@ public class AddonManager {
 
                 if (res instanceof JavaScriptBaseAddon) {
                     final JavaScriptAddon addon = new JavaScriptAddon(name, id, author, version, (JavaScriptBaseAddon) res, engine);
-                    this.registerAddon(addon);
+                    addon.initFields(spicord, addonDir, dataDir, Logger.getLogger(name));
+                    this.registerAddon(addon, false);
                 } else {
                     throw new ScriptException("the '" + main + "' file needs to export the addon instance");
                 }
