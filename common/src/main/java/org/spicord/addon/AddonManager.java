@@ -40,6 +40,7 @@ import org.spicord.api.addon.JavaScriptAddon;
 import org.spicord.api.addon.JavaScriptBaseAddon;
 import org.spicord.api.addon.SimpleAddon;
 import org.spicord.bot.DiscordBot;
+import org.spicord.plugin.PluginInterface;
 import org.spicord.script.ScriptEngine;
 import org.spicord.script.ScriptEnvironment;
 import org.spicord.script.ScriptException;
@@ -100,6 +101,11 @@ public class AddonManager {
      */
     public boolean registerAddon(SimpleAddon addon) {
         return registerAddon(addon, true);
+    }
+
+    public boolean registerAddon(SimpleAddon addon, PluginInterface plugin) {
+        addon.initFields(spicord, plugin.getFile(), plugin.getDataFolder(), plugin.getLogger());
+        return registerAddon(addon, false);
     }
 
     public boolean registerAddon(SimpleAddon addon, boolean initFields) {

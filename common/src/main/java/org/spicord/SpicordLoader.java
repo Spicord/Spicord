@@ -93,7 +93,7 @@ public final class SpicordLoader {
                 libraryLoader.loadLibraries();
             }
 
-            this.spicord = new Spicord(logger, threadPool);
+            this.spicord = new Spicord(logger, threadPool, plugin);
             this.config  = new SpicordConfiguration(spicord, dataFolder);
         } catch (IOException e) {
             handleException(e);

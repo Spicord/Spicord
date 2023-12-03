@@ -47,6 +47,8 @@ public final class Spicord {
 
     private static Spicord instance;
 
+    @Getter private SpicordPlugin plugin;
+
     @Getter private Logger logger;
     @Getter private ServerType serverType;
     @Getter private SpicordConfiguration config;
@@ -62,14 +64,16 @@ public final class Spicord {
      * 
      * @param logger the logger instance
      * @param threadPool 
+     * @param plugin 
      */
-    protected Spicord(Logger logger, ScheduledExecutorService threadPool) {
+    protected Spicord(Logger logger, ScheduledExecutorService threadPool, SpicordPlugin plugin) {
         instance = this;
 
         logger.setLevel(Level.INFO);
 
         this.logger = logger;
         this.threadPool = threadPool;
+        this.plugin = plugin;
 
         this.addonManager = new AddonManager(this, logger);
         this.serviceManager = new SpicordServiceManager();
