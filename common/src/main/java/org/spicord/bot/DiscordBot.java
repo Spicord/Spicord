@@ -40,15 +40,12 @@ import org.spicord.api.bot.command.BotCommand;
 import org.spicord.bot.command.DiscordBotCommand;
 import org.spicord.bot.command.DiscordCommand;
 import org.spicord.bot.command.SlashCommand;
-import org.spicord.bot.command.SlashCommandCompleter;
-import org.spicord.bot.command.SlashCommandExecutor;
 import org.spicord.bot.command.SlashCommandGroup;
 import org.spicord.bot.command.SlashCommandHandler;
 import org.spicord.bot.command.SlashCommandOption;
 
 import com.google.common.base.Preconditions;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -88,6 +85,8 @@ public class DiscordBot extends SimpleBot {
     @Getter private final boolean commandSupportEnabled;
     @Getter private final String commandPrefix;    
 
+    private boolean initialCommandCleanup;
+
     @Getter private JDA jda;
     @Getter protected BotStatus status;
 
@@ -109,7 +108,7 @@ public class DiscordBot extends SimpleBot {
      * @param prefix                the command prefix for this bot
      * @see {@link DiscordBotLoader#startBot(DiscordBot)}
      */
-    public DiscordBot(Spicord spicord, String name, String token, boolean enabled, List<String> addons, boolean commandSupportEnabled, String prefix) {
+    public DiscordBot(Spicord spicord, String name, String token, boolean enabled, List<String> addons, boolean initialCommandCleanup, boolean commandSupportEnabled, String prefix) {
         super(name, token);
 
         this.spicord = spicord;
@@ -122,6 +121,8 @@ public class DiscordBot extends SimpleBot {
         this.commands = new HashMap<String, Consumer<DiscordBotCommand>>();
         this.status = BotStatus.OFFLINE;
         this.presence = new Presence();
+
+        this.initialCommandCleanup = initialCommandCleanup;
 
         if (commandSupportEnabled) {
             if (prefix.isEmpty()) {
@@ -582,6 +583,11 @@ public class DiscordBot extends SimpleBot {
 
         @Override
         public void onReady(ReadyEvent event) {
+
+            if (bot.initialCommandCleanup) {
+                jda.updateCommands().queue();
+            }
+
             bot.status = BotStatus.READY;
             bot.onReady(event);
         }

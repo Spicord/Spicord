@@ -92,6 +92,7 @@ public final class SpicordConfiguration {
                     botData.token,
                     botData.enabled,
                     botData.addons,
+                    botData.initialCommandCleanup,
                     botData.command_support,
                     botData.command_prefix
                 );
@@ -245,6 +246,7 @@ public final class SpicordConfiguration {
             private String name;
             private boolean enabled;
             private String token;
+            private boolean initialCommandCleanup = true;
             private boolean command_support;
             private String command_prefix;
             private List<String> addons;

@@ -22,6 +22,7 @@ integrated_addon_footer = "Powered by Spicord v{version}"
   name = "default"
   enabled = false
   token = "YOUR BOT TOKEN HERE"
+  initialCommandCleanup = true
   command_support = true
   command_prefix = "-"
   addons = [
