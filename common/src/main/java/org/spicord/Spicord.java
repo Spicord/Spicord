@@ -175,9 +175,9 @@ public final class Spicord {
      * 
      * @param message the message to print
      */
-    public void debug(String message) {
+    public void debug(String message, Object... args) {
         if (config.isDebugEnabled())
-            logger.info("[DEBUG] " + message);
+            logger.info(String.format("[DEBUG] " + message, args));
     }
 
     /**

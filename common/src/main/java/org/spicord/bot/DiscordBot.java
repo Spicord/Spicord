@@ -294,10 +294,6 @@ public class DiscordBot extends SimpleBot {
     }
 
     private void registerCommand(SlashCommand builder, CommandCreateAction createAction) {
-        if (createAction.getJDA() != jda) {
-            throw new IllegalArgumentException("SlashCommand JDA instance does not belong to this bot");
-        }
-
         Map<String, SlashCommandHandler> handlers = new LinkedHashMap<>();
 
         if (builder.isSingle()) {
@@ -351,7 +347,7 @@ public class DiscordBot extends SimpleBot {
 
         createAction.submit().thenAccept(command -> {
             commandHandlers.put(command.getIdLong(), handlers);
-            logger.info("Registered discord command /" + command.getName());
+            spicord.debug("Registered discord command /" + command.getName());
         });
     }
 
@@ -576,9 +572,7 @@ public class DiscordBot extends SimpleBot {
 
         @Override
         public void onStatusChange(StatusChangeEvent event) {
-            if (spicord.getConfig().isDebugEnabled()) {
-                spicord.getLogger().info("[DEBUG] Changed JDA Status [" + event.getOldStatus().name() + " -> " + event.getNewStatus().name() + "]");
-            }
+            spicord.debug("Changed JDA Status [%s -> %s]", event.getOldStatus().name(), event.getNewStatus().name());
         }
 
         @Override
@@ -586,6 +580,7 @@ public class DiscordBot extends SimpleBot {
 
             if (bot.initialCommandCleanup) {
                 jda.updateCommands().queue();
+                spicord.debug("Cleaning up commands for bot %s", bot.getName());
             }
 
             bot.status = BotStatus.READY;

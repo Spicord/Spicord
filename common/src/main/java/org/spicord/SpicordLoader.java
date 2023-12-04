@@ -108,7 +108,7 @@ public final class SpicordLoader {
                 this.spicord.addEventListener(SpicordEvent.SPICORD_LOADED, listener);
             }
             spicord.onLoad(config);
-        } catch (IOException e) {
+        } catch (Exception e) {
             handleException(e);
         }
     }
