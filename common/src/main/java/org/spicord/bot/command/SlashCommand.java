@@ -53,6 +53,14 @@ public class SlashCommand {
         return this;
     }
 
+    public SlashCommand addOption(OptionType type, String name, String description) {
+        return addOption(type, name, description, false, false);
+    }
+
+    public SlashCommand addOption(OptionType type, String name, String description, boolean required) {
+        return addOption(type, name, description, required, false);
+    }
+
     public SlashCommand addOption(OptionType type, String name, String description, boolean required, boolean autoComplete) {
         this.options.add(new SlashCommandOption(type, name, description, required, autoComplete));
         return this;
