@@ -27,6 +27,8 @@ import java.util.Map;
 import org.spicord.Spicord;
 
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonSyntaxException;
+
 import eu.mcdb.util.ZipExtractor;
 
 public class EmbedLoader {
@@ -54,9 +56,11 @@ public class EmbedLoader {
                     name = name.substring(0, name.length() - 5).trim();
                     final String content = new String(Files.readAllBytes(file.toPath()), charset);
                     embeds.put(name, Embed.fromJson(content));
-                } catch (IOException e) {
+                } catch (IOException | JsonSyntaxException e) {
                     // FIXME: Do not use Spicord.getInstance()
-                    Spicord.getInstance().getLogger().warning("Cannot load the embed '" + file.getName() + "': " + e.getMessage());
+                    Spicord.getInstance().getLogger().warning(
+                        "Failed to load the embed file '" + file.getName() + "': " + e.getMessage()
+                    );
                 }
             }
         }
