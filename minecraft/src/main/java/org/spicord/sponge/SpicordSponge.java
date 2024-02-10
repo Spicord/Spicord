@@ -2,6 +2,7 @@ package org.spicord.sponge;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.spicord.Spicord;
@@ -32,8 +33,16 @@ public class SpicordSponge implements SpicordPlugin {
     @Listener
     public void onLoadedGame(LoadedGameEvent event) {
         if (this.loader != null) {
-            this.loader.load();
+            loadSpicord();
         }
+    }
+
+    private void loadSpicord() {
+        final int loadDelay = loader.getConfig().getLoadDelay();
+
+        getLogger().info("Spicord will load in " + loadDelay + " seconds");
+
+        loader.getThreadPool().schedule(() -> loader.load(), loadDelay, TimeUnit.SECONDS);
     }
 
     @Listener
