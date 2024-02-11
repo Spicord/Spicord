@@ -18,10 +18,12 @@
 package org.spicord.velocity;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 import org.spicord.Spicord;
 import org.spicord.SpicordLoader;
 import org.spicord.SpicordPlugin;
+import org.spicord.fix.Fixes;
 import org.spicord.plugin.VelocityPlugin;
 import org.spicord.reflect.ReflectUtils;
 import com.google.inject.Inject;
@@ -60,7 +62,16 @@ public class SpicordVelocity extends VelocityPlugin implements SpicordPlugin {
 
     @Subscribe
     public void onProxyInitialize(ProxyInitializeEvent event) {
-        this.loader.load();
+        final int loadDelay = loader.getConfig().getLoadDelay();
+
+        getLogger().info("Spicord will load in " + loadDelay + " seconds");
+
+        loader.getThreadPool().schedule(() -> {
+            VelocityJDADetector.checkOtherJDA(this);
+            loader.load();
+        }, loadDelay, TimeUnit.SECONDS);
+
+        Fixes.checkLoader(this, false);
     }
 
     @Override
