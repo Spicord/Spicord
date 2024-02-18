@@ -134,8 +134,10 @@ public class AddonManager {
                 for (DiscordBot bot : spicord.getConfig().getBots()) {
                     if (bot.isEnabled() && bot.getAddons().contains(addon.getId())) {
                         bot.loadAddon(addon);
+                        spicord.debug("[Late-Loading] [%s] Notifying that bot '%s' has already loaded.", addon.getId(), bot.getName());
                         if (bot.isReady()) {
                             addon.onReady(bot);
+                            spicord.debug("[Late-Loading] [%s] Notifying that bot '%s' is ready.", addon.getId(), bot.getName());
                         }
                     }
                 }
