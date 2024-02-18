@@ -13,7 +13,30 @@ public class BukkitPlayer extends UniversalPlayer {
     }
 
     @Override
+    public Object getHandle() {
+        return getBukkitPlayer();
+    }
+
+    @Override
     public Player getBukkitPlayer() {
         return player;
+    }
+
+    @Override
+    public boolean hasPermission(String permission) {
+        if (permission == null || permission.isEmpty()) {
+            return true;
+        }
+        return player.hasPermission(permission);
+    }
+
+    @Override
+    public void sendMessage(String message) {
+        player.sendMessage(message);
+    }
+
+    @Override
+    public boolean isOnline() {
+        return player.isOnline();
     }
 }
