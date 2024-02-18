@@ -29,6 +29,8 @@ import org.spicord.SpicordPlugin;
 import org.spicord.cli.log.FormattedLogger;
 import org.spicord.reflect.ReflectUtils;
 
+import eu.mcdb.universal.Server;
+
 public class SpicordMain implements SpicordPlugin {
 
     public static void main(String[] args) throws IOException { new SpicordMain(args); }
@@ -67,6 +69,8 @@ public class SpicordMain implements SpicordPlugin {
     }
 
     public SpicordMain(String[] args) throws IOException {
+        Server.setInstance(new DummyServer());
+
         this.preload();
         this.reloadSpicord();
 

@@ -18,7 +18,6 @@
 package eu.mcdb.universal;
 
 import org.spicord.Spicord;
-import org.spicord.server.impl.ServerUtil;
 
 import eu.mcdb.universal.command.UniversalCommand;
 import lombok.Getter;
@@ -34,12 +33,8 @@ public abstract class Server implements ServerInterface {
     @Getter private static Server instance;
     @Getter @Setter private boolean debugEnabled; // false by default
 
-    static {
-        instance = buildServer(serverType = ServerType.auto());
-    }
-
-    private static Server buildServer(final ServerType serverType) {
-        return ServerUtil.buildServer(serverType);
+    public static void setInstance(Server instance) {
+        Server.instance = instance;
     }
 
     public boolean isProxy() {

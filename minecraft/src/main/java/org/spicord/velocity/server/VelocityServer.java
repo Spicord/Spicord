@@ -1,21 +1,4 @@
-/*
- * Copyright (C) 2020  OopsieWoopsie
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
-package org.spicord.server.impl;
+package org.spicord.velocity.server;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,15 +20,19 @@ import eu.mcdb.util.SLF4JWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 
-final class VelocityServer extends Server {
-
-    private static ProxyServer handle;
+public class VelocityServer extends Server {
 
     private final Logger logger = new SLF4JWrapper();
 
+    private ProxyServer server;
+
+    public VelocityServer(ProxyServer server) {
+        this.server = server;
+    }
+
     @Override
     public int getOnlineCount() {
-        return handle.getPlayerCount();
+        return server.getPlayerCount();
     }
 
     @Override
@@ -53,12 +40,12 @@ final class VelocityServer extends Server {
         // From docs: "This allows you to customize the number of “maximum” players in
         // the player’s server list. Note that Velocity doesn’t have a maximum number of
         // players it supports."
-        return handle.getConfiguration().getShowMaxPlayers();
+        return server.getConfiguration().getShowMaxPlayers();
     }
 
     @Override
     public String[] getOnlinePlayers() {
-        return handle.getAllPlayers().stream()
+        return server.getAllPlayers().stream()
                 .map(Player::getUsername)
                 .toArray(String[]::new);
     }
@@ -67,7 +54,7 @@ final class VelocityServer extends Server {
     public Map<String, List<String>> getServersAndPlayers() {
         final Map<String, List<String>> map = new HashMap<String, List<String>>();
 
-        for (RegisteredServer server : handle.getAllServers()) {
+        for (RegisteredServer server : server.getAllServers()) {
             List<String> players = server.getPlayersConnected().stream()
                     .map(Player::getUsername)
                     .collect(Collectors.toList());
@@ -80,13 +67,13 @@ final class VelocityServer extends Server {
 
     @Override
     public String getVersion() {
-        final ProxyVersion version = handle.getVersion();
+        final ProxyVersion version = server.getVersion();
         return version.getName() + " " + version.getVersion();
     }
 
     @Override
     public String[] getPlugins() {
-        return handle.getPluginManager().getPlugins().stream()
+        return server.getPluginManager().getPlugins().stream()
                 .map(plugin -> plugin.getDescription().getName())
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -95,7 +82,7 @@ final class VelocityServer extends Server {
 
     @Override
     public boolean dispatchCommand(String command) {
-        CompletableFuture<Boolean> future = handle.getCommandManager().executeAsync(handle.getConsoleCommandSource(), command);
+        CompletableFuture<Boolean> future = server.getCommandManager().executeAsync(server.getConsoleCommandSource(), command);
         try {
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
@@ -111,7 +98,7 @@ final class VelocityServer extends Server {
 
     @Override
     public UniversalPlayer getPlayer(UUID uuid) {
-        final Optional<Player> player = handle.getPlayer(uuid);
+        final Optional<Player> player = server.getPlayer(uuid);
 
         if (player.isPresent()) {
             return new VelocityPlayer(player.get());
@@ -120,17 +107,10 @@ final class VelocityServer extends Server {
         return null;
     }
 
-    protected static void setHandle(ProxyServer server) {
-        if (server == null) return;
-        if (handle != null) return;
-
-        handle = server;
-    }
-
     @Override
     public void broadcast(String message) {
         TextComponent text = Component.text(message);
-        for (Player player : handle.getAllPlayers()) {
+        for (Player player : server.getAllPlayers()) {
             player.sendMessage(text);
         }
     }

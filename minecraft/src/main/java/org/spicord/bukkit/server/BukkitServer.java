@@ -1,21 +1,4 @@
-/*
- * Copyright (C) 2020  OopsieWoopsie
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
-package org.spicord.server.impl;
+package org.spicord.bukkit.server;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,9 +19,13 @@ import org.spicord.player.BukkitPlayer;
 import org.spicord.util.VanishAPI;
 import eu.mcdb.universal.player.UniversalPlayer;
 
-final class BukkitServer extends eu.mcdb.universal.Server {
+public class BukkitServer extends eu.mcdb.universal.Server {
 
-    private final Server bukkit = Bukkit.getServer();
+    private final Server bukkit;
+
+    public BukkitServer(Server server) {
+        this.bukkit = server;
+    }
 
     @Override
     public int getOnlineCount() {

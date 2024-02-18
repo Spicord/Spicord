@@ -22,8 +22,10 @@ import java.util.concurrent.TimeUnit;
 import org.spicord.Spicord;
 import org.spicord.SpicordLoader;
 import org.spicord.SpicordPlugin;
+import org.spicord.bungee.server.BungeeServer;
 import org.spicord.fix.Fixes;
 
+import eu.mcdb.universal.Server;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class SpicordBungee extends Plugin implements SpicordPlugin {
@@ -47,6 +49,8 @@ public class SpicordBungee extends Plugin implements SpicordPlugin {
     @Override
     public void onLoad() {
         Fixes.checkForceload(this);
+
+        Server.setInstance(new BungeeServer(getProxy()));
 
         this.loader = new SpicordLoader(this);
     }

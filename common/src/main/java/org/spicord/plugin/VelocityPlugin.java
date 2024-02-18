@@ -21,7 +21,6 @@ import java.io.File;
 import java.util.logging.Logger;
 
 import org.spicord.reflect.ReflectUtils;
-import org.spicord.server.impl.ServerUtil;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.event.EventManager;
 import com.velocitypowered.api.plugin.Plugin;
@@ -52,7 +51,6 @@ public abstract class VelocityPlugin {
         commandManager = server.getCommandManager();
         eventManager   = server.getEventManager();
         pluginManager  = server.getPluginManager();
-        ServerUtil.setVelocityHandle(server);
 
         check();
     }

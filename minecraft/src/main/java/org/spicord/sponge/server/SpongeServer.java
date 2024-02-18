@@ -1,4 +1,4 @@
-package org.spicord.server.impl;
+package org.spicord.sponge.server;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,7 +20,7 @@ import eu.mcdb.universal.player.UniversalPlayer;
 import eu.mcdb.util.SLF4JWrapper;
 import net.kyori.adventure.text.Component;
 
-final class SpongeServer extends eu.mcdb.universal.Server {
+public class SpongeServer extends eu.mcdb.universal.Server {
 
     private final Game game;
     private final Server server;

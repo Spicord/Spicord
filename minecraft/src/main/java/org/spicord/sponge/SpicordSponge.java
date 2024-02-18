@@ -9,6 +9,7 @@ import org.spicord.Spicord;
 import org.spicord.SpicordLoader;
 import org.spicord.SpicordPlugin;
 import org.spicord.reflect.ReflectUtils;
+import org.spicord.sponge.server.SpongeServer;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.LoadedGameEvent;
@@ -16,6 +17,8 @@ import org.spongepowered.api.event.lifecycle.StoppedGameEvent;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
 
 import com.google.inject.Inject;
+
+import eu.mcdb.universal.Server;
 
 @Plugin("spicord")
 public class SpicordSponge implements SpicordPlugin {
@@ -26,6 +29,8 @@ public class SpicordSponge implements SpicordPlugin {
 
     @Inject
     public SpicordSponge(@ConfigDir(sharedRoot = false) Path dataFolder) {
+        Server.setInstance(new SpongeServer());
+
         this.dataFolder = dataFolder.toFile();
         this.loader = new SpicordLoader(new MostInefficientClassLoader(), this);
     }
