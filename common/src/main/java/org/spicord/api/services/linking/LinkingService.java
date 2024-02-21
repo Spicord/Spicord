@@ -65,24 +65,26 @@ public interface LinkingService extends Service {
     LinkData createLink(PendingLinkData playerData, long discordId);
 
     /**
-     * Removes the given link data.
+     * Remove the given link data.
      * 
      * @param data the data to remove
-     * @return
+     * @return true if the operation succeeded
      */
     boolean removeLink(LinkData data);
 
     /**
+     * Add the given pending link data.
      * 
-     * @param data
-     * @return
+     * @param data the data to add
+     * @return true if the operation succeeded
      */
     boolean addPending(PendingLinkData data);
 
     /**
+     * Remove the given pending link data.
      * 
-     * @param data
-     * @return
+     * @param data the data to remove
+     * @return true if the operation succeeded
      */
     boolean removePending(PendingLinkData data);
 
@@ -97,6 +99,22 @@ public interface LinkingService extends Service {
      * @return
      */
     PendingLinkData[] getPending();
+
+    /**
+     * Get the link data from a discord id
+     * 
+     * @param discordId the player discord id
+     * @return
+     */
+    LinkData getLinkData(Long discordId);
+
+    /**
+     * Get the link data from a player id
+     * 
+     * @param playerId the player id
+     * @return
+     */
+    LinkData getLinkData(UUID playerId);
 
     /**
      * Check if the given player name is a valid "Minecraft: Java Edition" name.

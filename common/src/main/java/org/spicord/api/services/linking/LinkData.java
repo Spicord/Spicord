@@ -19,31 +19,54 @@ package org.spicord.api.services.linking;
 
 import java.util.UUID;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Class containing information about the player and the discord id.
  */
 public class LinkData {
 
-    private final Long id;
-    private final String name;
-    private final String uuid;
+    @SerializedName("id")
+    private final Long discordId;
+
+    @SerializedName("name")
+    private final String playerName;
+
+    @SerializedName("uuid")
+    private final String playerId;
 
     public LinkData(Long discordId, String playerName, String playerId) {
-        this.id = discordId;
-        this.name = playerName;
-        this.uuid = playerId;
+        this.discordId = discordId;
+        this.playerName = playerName;
+        this.playerId = playerId;
     }
 
     public long getDiscordId() {
-        return id;
+        return discordId;
     }
 
     public String getPlayerName() {
-        return name;
+        return playerName;
     }
 
     public UUID getPlayerId() {
-        return UUID.fromString(uuid);
+        return UUID.fromString(playerId);
+    }
+
+    @Override
+    public int hashCode() {
+        return (discordId + playerName + playerId).hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        if (o instanceof LinkData) {
+            return o.hashCode() == this.hashCode();
+        }
+        return false;
     }
 
     // OLD METHODS BELOW --
