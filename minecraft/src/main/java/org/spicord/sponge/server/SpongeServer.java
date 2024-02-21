@@ -6,15 +6,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import org.spicord.player.SpongePlayer;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Server;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.Event;
+import org.spongepowered.api.event.EventListener;
+import org.spongepowered.api.event.EventListenerRegistration;
+import org.spongepowered.api.event.EventManager;
+import org.spongepowered.plugin.PluginContainer;
 
 import eu.mcdb.universal.player.UniversalPlayer;
 import eu.mcdb.util.SLF4JWrapper;
@@ -22,14 +27,16 @@ import net.kyori.adventure.text.Component;
 
 public class SpongeServer extends eu.mcdb.universal.Server {
 
-    private final Game game;
-    private final Server server;
-    private final Logger logger;
+    private final Logger logger = new SLF4JWrapper();
 
-    public SpongeServer() {
-        this.game = Sponge.game();
-        this.server = Sponge.server();
-        this.logger = new SLF4JWrapper();
+    private final Game game;
+    private final PluginContainer plugin;
+    private final Server server;
+
+    public SpongeServer(Game game, PluginContainer plugin) {
+        this.game = game;
+        this.plugin = plugin;
+        this.server = game.server();
     }
 
     @Override
@@ -98,5 +105,20 @@ public class SpongeServer extends eu.mcdb.universal.Server {
     @Override
     public void broadcast(String message) {
         server.broadcastAudience().sendMessage(Component.text(message));
+    }
+
+    public <T extends Event> Runnable registerListener(Class<T> event, Consumer<T> handler) {
+        EventListener<T> listener = e -> handler.accept(e);
+
+        EventListenerRegistration<T> listenerRegistration = EventListenerRegistration.builder(event)
+            .plugin(plugin)
+            .listener(listener)
+            .build();
+
+        EventManager eventManager = game.eventManager();
+
+        eventManager.registerListener(listenerRegistration);
+
+        return () -> eventManager.unregisterListeners(listener);
     }
 }

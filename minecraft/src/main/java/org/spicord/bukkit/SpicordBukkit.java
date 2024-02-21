@@ -51,7 +51,7 @@ public class SpicordBukkit extends JavaPlugin implements SpicordPlugin {
     public void onLoad() {
         Fixes.checkForceload(this);
 
-        Server.setInstance(new BukkitServer(getServer()));
+        Server.setInstance(new BukkitServer(getServer(), this));
 
         this.loader = new SpicordLoader(this);
     }

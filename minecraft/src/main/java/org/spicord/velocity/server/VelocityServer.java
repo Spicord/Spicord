@@ -7,13 +7,19 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
 import org.spicord.player.VelocityPlayer;
+
+import com.velocitypowered.api.event.EventHandler;
+import com.velocitypowered.api.event.EventManager;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.util.ProxyVersion;
+
 import eu.mcdb.universal.Server;
 import eu.mcdb.universal.player.UniversalPlayer;
 import eu.mcdb.util.SLF4JWrapper;
@@ -24,10 +30,12 @@ public class VelocityServer extends Server {
 
     private final Logger logger = new SLF4JWrapper();
 
-    private ProxyServer server;
+    private final ProxyServer server;
+    private final Object plugin;
 
-    public VelocityServer(ProxyServer server) {
+    public VelocityServer(ProxyServer server, Object plugin) {
         this.server = server;
+        this.plugin = plugin;
     }
 
     @Override
@@ -113,5 +121,19 @@ public class VelocityServer extends Server {
         for (Player player : server.getAllPlayers()) {
             player.sendMessage(text);
         }
+    }
+
+    public <T> Runnable registerListener(Class<T> event, Consumer<T> handler) {
+        EventManager eventManager = server.getEventManager();
+
+        EventHandler<T> listener = e -> handler.accept(e);
+
+        eventManager.register(
+            plugin,
+            event,
+            listener
+        );
+
+        return () -> eventManager.unregister(plugin, listener);
     }
 }

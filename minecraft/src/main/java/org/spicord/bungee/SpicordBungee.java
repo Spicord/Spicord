@@ -50,7 +50,7 @@ public class SpicordBungee extends Plugin implements SpicordPlugin {
     public void onLoad() {
         Fixes.checkForceload(this);
 
-        Server.setInstance(new BungeeServer(getProxy()));
+        Server.setInstance(new BungeeServer(getProxy(), this));
 
         this.loader = new SpicordLoader(this);
     }

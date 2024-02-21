@@ -10,10 +10,12 @@ import org.spicord.SpicordLoader;
 import org.spicord.SpicordPlugin;
 import org.spicord.reflect.ReflectUtils;
 import org.spicord.sponge.server.SpongeServer;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.LoadedGameEvent;
 import org.spongepowered.api.event.lifecycle.StoppedGameEvent;
+import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
 
 import com.google.inject.Inject;
@@ -28,8 +30,12 @@ public class SpicordSponge implements SpicordPlugin {
     private File dataFolder;
 
     @Inject
-    public SpicordSponge(@ConfigDir(sharedRoot = false) Path dataFolder) {
-        Server.setInstance(new SpongeServer());
+    public SpicordSponge(
+        @ConfigDir(sharedRoot = false) Path dataFolder,
+        Game game,
+        PluginContainer container
+    ) {
+        Server.setInstance(new SpongeServer(game, container));
 
         this.dataFolder = dataFolder.toFile();
         this.loader = new SpicordLoader(new MostInefficientClassLoader(), this);
