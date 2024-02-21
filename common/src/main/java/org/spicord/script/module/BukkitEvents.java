@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
-import org.bukkit.event.EventException;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -28,8 +27,13 @@ public class BukkitEvents {
         spicordPlugin = pluginManager.getPlugin("Spicord");
     }
 
-    public synchronized void registerEvent(Class<? extends Event> event, NativeFunction fun) {
-        JSEventListener listener = new JSEventListener(fun);
+    public synchronized void registerEvent(Class<? extends Event> event, NativeFunction executor) {
+        ListenerExecutor listener = (l, e) -> executor.call(
+            Context.enter(),
+            executor.getParentScope(),
+            executor,
+            new Object[] { event }
+        );
 
         pluginManager.registerEvent(
             event,
@@ -54,22 +58,5 @@ public class BukkitEvents {
         }
     }
 
-    public class JSEventListener implements Listener, EventExecutor {
-
-        private NativeFunction executor;
-
-        public JSEventListener(NativeFunction executor) {
-            this.executor = executor;
-        }
-
-        @Override
-        public void execute(Listener listener, Event event) throws EventException {
-            executor.call(
-                Context.enter(),
-                executor.getParentScope(),
-                executor,
-                new Object[] { event }
-            );
-        }
-    }
+    public interface ListenerExecutor extends Listener, EventExecutor {}
 }
