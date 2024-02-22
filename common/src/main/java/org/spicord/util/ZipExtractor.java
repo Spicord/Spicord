@@ -1,21 +1,4 @@
-/*
- * Copyright (C) 2020  OopsieWoopsie
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
-package eu.mcdb.util;
+package org.spicord.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +24,7 @@ public class ZipExtractor implements AutoCloseable {
     private boolean flatRoot;
 
     /**
-     * 
+     * Construct a new ZipExtractor instance.
      * 
      * @param file the zip file
      * @throws IOException if an I/O error has occurred
@@ -69,7 +52,7 @@ public class ZipExtractor implements AutoCloseable {
      * All the entries that matches with the pattern will be available for
      * extraction and the ones who didn't matched will be ignored.
      * 
-     * @see {@link #extract(File)}
+     * @see {@link #extractTo(File)}
      * @param regex the regex pattern
      */
     public void filter(final String regex) {
@@ -86,11 +69,11 @@ public class ZipExtractor implements AutoCloseable {
      * @param out the output folder to extract the files
      * @throws IOException if an I/O error has occurred
      */
-    public void extract(final File out) throws IOException {
-        extract(out, false);
+    public void extractTo(final File out) throws IOException {
+        extractTo(out, false);
     }
 
-    public void extract(final File out, final boolean replace) throws IOException {
+    public void extractTo(final File out, final boolean replace) throws IOException {
         for (final ZipEntry entry : entries) {
             String name = entry.getName();
 

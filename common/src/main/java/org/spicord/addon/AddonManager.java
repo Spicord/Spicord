@@ -44,12 +44,11 @@ import org.spicord.plugin.PluginInterface;
 import org.spicord.script.ScriptEngine;
 import org.spicord.script.ScriptEnvironment;
 import org.spicord.script.ScriptException;
+import org.spicord.util.FileUtils;
+import org.spicord.util.ZipExtractor;
 
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
-
-import eu.mcdb.util.FileUtils;
-import eu.mcdb.util.ZipExtractor;
 
 /**
  * This class is used for manage and register addons.
@@ -312,7 +311,7 @@ public class AddonManager {
         final File tempDir = new File(runtimeDir, id);
         tempDir.mkdirs();
 
-        zip.extract(tempDir);
+        zip.extractTo(tempDir);
 
         File dataDir = new File(tempDir, "data");
 

@@ -25,11 +25,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.spicord.Spicord;
+import org.spicord.util.ZipExtractor;
 
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonSyntaxException;
-
-import eu.mcdb.util.ZipExtractor;
 
 public class EmbedLoader {
 
@@ -98,7 +97,7 @@ public class EmbedLoader {
         final ZipExtractor ex = new ZipExtractor(file);
         ex.filter("embed\\/.*\\.json");
         ex.setFlatRoot(true);
-        ex.extract(out, false);
+        ex.extractTo(out, false);
         ex.close();
 
         final EmbedLoader loader = new EmbedLoader();
