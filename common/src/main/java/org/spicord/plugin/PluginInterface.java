@@ -6,7 +6,9 @@ import java.util.logging.Logger;
 public interface PluginInterface {
 
     File getFile();
+
     File getDataFolder();
+
     Logger getLogger();
 
 }

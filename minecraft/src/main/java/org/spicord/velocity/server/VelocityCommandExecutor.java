@@ -1,21 +1,4 @@
-/*
- * Copyright (C) 2019  OopsieWoopsie
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
-package eu.mcdb.universal.command;
+package org.spicord.velocity.server;
 
 import org.spicord.player.VelocityPlayer;
 import org.spicord.plugin.VelocityPlugin;
@@ -24,14 +7,10 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
 
+import eu.mcdb.universal.command.UniversalCommand;
+import eu.mcdb.universal.command.UniversalCommandSender;
 import net.kyori.adventure.text.Component;
 
-/**
- * Wrapper for the {@link UniversalCommand} class to
- * make it usable by Velocity.
- * 
- * @author sheidy
- */
 public final class VelocityCommandExecutor implements SimpleCommand {
 
     private final UniversalCommand command;

@@ -21,6 +21,7 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.util.ProxyVersion;
 
 import eu.mcdb.universal.Server;
+import eu.mcdb.universal.command.UniversalCommand;
 import eu.mcdb.universal.player.UniversalPlayer;
 import eu.mcdb.util.SLF4JWrapper;
 import net.kyori.adventure.text.Component;
@@ -135,5 +136,10 @@ public class VelocityServer extends Server {
         );
 
         return () -> eventManager.unregister(plugin, listener);
+    }
+
+    @Override
+    public void registerCommand(Object plugin, UniversalCommand command) {
+        VelocityCommandExecutor.register(plugin, command);
     }
 }

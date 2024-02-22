@@ -22,9 +22,11 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.spicord.player.BukkitPlayer;
 import org.spicord.util.VanishAPI;
 
+import eu.mcdb.universal.command.UniversalCommand;
 import eu.mcdb.universal.player.UniversalPlayer;
 
 public class BukkitServer extends eu.mcdb.universal.Server {
@@ -137,4 +139,9 @@ public class BukkitServer extends eu.mcdb.universal.Server {
     }
 
     private interface ListenerExecutor<T> extends Listener, EventExecutor {}
+
+    @Override
+    public void registerCommand(Object plugin, UniversalCommand command) {
+        BukkitCommandExecutor.register((JavaPlugin) plugin, command);
+    }
 }

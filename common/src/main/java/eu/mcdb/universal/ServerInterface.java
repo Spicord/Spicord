@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
+
+import eu.mcdb.universal.command.UniversalCommand;
 import eu.mcdb.universal.player.UniversalPlayer;
 
 public interface ServerInterface {
@@ -148,4 +150,7 @@ public interface ServerInterface {
     default boolean isSponge() {
         return Server.getServerType() == ServerType.SPONGE;
     }
+
+    void registerCommand(Object plugin, UniversalCommand command);
+
 }

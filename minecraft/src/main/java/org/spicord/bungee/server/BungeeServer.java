@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.spicord.player.BungeePlayer;
 import org.spicord.util.VanishAPI;
 import eu.mcdb.universal.Server;
+import eu.mcdb.universal.command.UniversalCommand;
 import eu.mcdb.universal.player.UniversalPlayer;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -143,5 +144,10 @@ public class BungeeServer extends Server {
 
     public <T extends Event> Runnable registerListener(Class<T> event, Consumer<T> handler) {
         return eventProcessor.registerEvent(event, handler);
+    }
+
+    @Override
+    public void registerCommand(Object plugin, UniversalCommand command) {
+        BungeeCommandExecutor.register((Plugin) plugin, command);
     }
 }

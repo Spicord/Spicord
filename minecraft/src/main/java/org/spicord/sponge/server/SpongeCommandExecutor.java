@@ -1,4 +1,4 @@
-package eu.mcdb.universal.command;
+package org.spicord.sponge.server;
 
 import java.util.Optional;
 
@@ -15,15 +15,11 @@ import org.spongepowered.api.command.registrar.CommandRegistrar;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.plugin.PluginContainer;
 
+import eu.mcdb.universal.command.UniversalCommand;
+import eu.mcdb.universal.command.UniversalCommandSender;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 
-/**
- * Wrapper for the {@link UniversalCommand} class to
- * make it usable by Sponge v8
- * 
- * @author Tini
- */
 public class SpongeCommandExecutor implements CommandExecutor {
 
     private final UniversalCommand command;

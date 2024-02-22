@@ -21,6 +21,7 @@ import org.spongepowered.api.event.EventListenerRegistration;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.plugin.PluginContainer;
 
+import eu.mcdb.universal.command.UniversalCommand;
 import eu.mcdb.universal.player.UniversalPlayer;
 import eu.mcdb.util.SLF4JWrapper;
 import net.kyori.adventure.text.Component;
@@ -120,5 +121,10 @@ public class SpongeServer extends eu.mcdb.universal.Server {
         eventManager.registerListener(listenerRegistration);
 
         return () -> eventManager.unregisterListeners(listener);
+    }
+
+    @Override
+    public void registerCommand(Object plugin, UniversalCommand command) {
+        SpongeCommandExecutor.register(plugin, command);
     }
 }
