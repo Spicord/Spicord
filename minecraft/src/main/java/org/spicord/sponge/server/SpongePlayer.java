@@ -1,26 +1,26 @@
-package org.spicord.player;
+package org.spicord.sponge.server;
 
-import com.velocitypowered.api.proxy.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import eu.mcdb.universal.player.UniversalPlayer;
 import net.kyori.adventure.text.Component;
 
-public class VelocityPlayer extends UniversalPlayer {
+public class SpongePlayer extends UniversalPlayer {
 
-    private final Player player;
+    private final ServerPlayer player;
 
-    public VelocityPlayer(Player player) {
-        super(player.getUsername(), player.getUniqueId());
+    public SpongePlayer(ServerPlayer player) {
+        super(player.name(), player.uniqueId());
         this.player = player;
     }
 
     @Override
     public Object getHandle() {
-        return getVelocityPlayer();
+        return getSpongePlayer();
     }
 
     @Override
-    public Player getVelocityPlayer() {
+    public ServerPlayer getSpongePlayer() {
         return player;
     }
 
@@ -39,6 +39,6 @@ public class VelocityPlayer extends UniversalPlayer {
 
     @Override
     public boolean isOnline() {
-        return player.isActive();
+        return player.isOnline();
     }
 }

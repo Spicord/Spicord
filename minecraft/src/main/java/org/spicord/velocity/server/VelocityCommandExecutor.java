@@ -1,6 +1,5 @@
 package org.spicord.velocity.server;
 
-import org.spicord.player.VelocityPlayer;
 import org.spicord.plugin.VelocityPlugin;
 
 import com.velocitypowered.api.command.CommandSource;

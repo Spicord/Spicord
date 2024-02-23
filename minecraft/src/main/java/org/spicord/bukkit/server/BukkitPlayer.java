@@ -1,26 +1,24 @@
-package org.spicord.player;
+package org.spicord.bukkit.server;
 
-import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-
+import org.bukkit.entity.Player;
 import eu.mcdb.universal.player.UniversalPlayer;
-import net.kyori.adventure.text.Component;
 
-public class SpongePlayer extends UniversalPlayer {
+public class BukkitPlayer extends UniversalPlayer {
 
-    private final ServerPlayer player;
+    private final Player player;
 
-    public SpongePlayer(ServerPlayer player) {
-        super(player.name(), player.uniqueId());
+    public BukkitPlayer(Player player) {
+        super(player.getName(), player.getUniqueId());
         this.player = player;
     }
 
     @Override
     public Object getHandle() {
-        return getSpongePlayer();
+        return getBukkitPlayer();
     }
 
     @Override
-    public ServerPlayer getSpongePlayer() {
+    public Player getBukkitPlayer() {
         return player;
     }
 
@@ -34,7 +32,7 @@ public class SpongePlayer extends UniversalPlayer {
 
     @Override
     public void sendMessage(String message) {
-        player.sendMessage(Component.text(message));
+        player.sendMessage(message);
     }
 
     @Override

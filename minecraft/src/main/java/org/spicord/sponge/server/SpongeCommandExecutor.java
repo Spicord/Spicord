@@ -2,7 +2,6 @@ package org.spicord.sponge.server;
 
 import java.util.Optional;
 
-import org.spicord.player.SpongePlayer;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.command.Command.Parameterized;

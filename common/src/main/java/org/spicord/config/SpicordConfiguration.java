@@ -1,20 +1,3 @@
-/*
- * Copyright (C) 2019  OopsieWoopsie
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package org.spicord.config;
 
 import java.io.ByteArrayOutputStream;
@@ -33,14 +16,12 @@ import java.util.logging.Logger;
 
 import org.spicord.Spicord;
 import org.spicord.bot.DiscordBot;
-import org.spicord.config.SpicordConfiguration.SpicordConfig.Bot;
 
 import com.moandjiezana.toml.Toml;
 import com.moandjiezana.toml.TomlWriter;
 
 import lombok.Getter;
 
-// this is a mess, i know, will be re-made in the future :)
 public final class SpicordConfiguration {
 
     private final Spicord spicord;
@@ -85,25 +66,25 @@ public final class SpicordConfiguration {
         final Toml toml = new Toml().read(configFile);
         this.config = toml.to(SpicordConfig.class);
 
-        for (final SpicordConfig.Bot botData : config.bots) {
+        for (final SpicordConfig.Bot botData : config.getBots()) {
             final DiscordBot bot = new DiscordBot(
                     spicord,
-                    botData.name,
-                    botData.token,
-                    botData.enabled,
-                    botData.addons,
-                    botData.initialCommandCleanup,
-                    botData.command_support,
-                    botData.command_prefix
+                    botData.getName(),
+                    botData.getToken(),
+                    botData.isEnabled(),
+                    botData.getAddons(),
+                    botData.isInitialCommandCleanupEnabled(),
+                    botData.isCommandSupportEnabled(),
+                    botData.getCommandPrefix()
                 );
 
             bots.add(bot);
         }
 
-        this.loadDelay = config.loadDelay >= 10 ? config.loadDelay : 10;
-        this.jdaMessagesEnabled = config.jda_messages.enabled;
-        this.debugEnabled = config.jda_messages.debug;
-        this.integratedAddonFooter = config.integrated_addon_footer;
+        this.loadDelay = config.getLoadDelay() >= 10 ? config.getLoadDelay() : 10;
+        this.jdaMessagesEnabled = config.getJdaLogging().isEnabled();
+        this.debugEnabled = config.getJdaLogging().isDebug();
+        this.integratedAddonFooter = config.getIntegratedAddonFooter();
 
         long disabledCount = bots.stream().filter(DiscordBot::isDisabled).count();
         logger.info("Loaded " + bots.size() + " bots, " + disabledCount + " disabled.");
@@ -208,9 +189,9 @@ public final class SpicordConfiguration {
         }
 
         public void addAddonToBot(String addonKey, String botName) {
-            for (Bot b : conf.bots) {
-                if (b.name.equals(botName)) {
-                    b.addons.add(addonKey);
+            for (SpicordConfig.Bot b : conf.getBots()) {
+                if (b.getName().equals(botName)) {
+                    b.getAddons().add(addonKey);
                     save();
                     return;
                 }
@@ -218,44 +199,13 @@ public final class SpicordConfiguration {
         }
 
         public void removeAddonFromBot(String addonKey, String botName) {
-            for (Bot b : conf.bots) {
-                if (b.name.equals(botName)) {
-                    b.addons.remove(addonKey);
+            for (SpicordConfig.Bot b : conf.getBots()) {
+                if (b.getName().equals(botName)) {
+                    b.getAddons().remove(addonKey);
                     save();
                     return;
                 }
             }
-        }
-    }
-
-    public static class SpicordConfig {
-
-        private int loadDelay;
-        //private int config_version; // not used yet
-        private String integrated_addon_footer;
-
-        private Bot[] bots;
-        private Messages jda_messages;
-
-        public SpicordConfig() {
-            this.jda_messages = new Messages();
-        }
-
-        public class Bot {
-
-            private String name;
-            private boolean enabled;
-            private String token;
-            private boolean initialCommandCleanup = true;
-            private boolean command_support;
-            private String command_prefix;
-            private List<String> addons;
-        }
-
-        public class Messages {
-
-            private boolean enabled;
-            private boolean debug;
         }
     }
 }

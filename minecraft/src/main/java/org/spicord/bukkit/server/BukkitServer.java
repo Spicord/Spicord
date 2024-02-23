@@ -23,7 +23,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.spicord.player.BukkitPlayer;
 import org.spicord.util.VanishAPI;
 
 import eu.mcdb.universal.command.UniversalCommand;

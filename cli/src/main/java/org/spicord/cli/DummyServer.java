@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 import eu.mcdb.universal.Server;
+import eu.mcdb.universal.command.UniversalCommand;
 import eu.mcdb.universal.player.UniversalPlayer;
 
 public class DummyServer extends Server {
@@ -63,5 +64,9 @@ public class DummyServer extends Server {
     @Override
     public void broadcast(String message) {
         getLogger().info("Broadcast: " + message);
+    }
+
+    @Override
+    public void registerCommand(Object plugin, UniversalCommand command) {
     }
 }

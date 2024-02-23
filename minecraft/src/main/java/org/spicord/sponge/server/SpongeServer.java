@@ -9,7 +9,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-import org.spicord.player.SpongePlayer;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.command.exception.CommandException;

@@ -1,7 +1,5 @@
 package org.spicord.bungee.server;
 
-import org.spicord.player.BungeePlayer;
-
 import eu.mcdb.universal.command.UniversalCommand;
 import eu.mcdb.universal.command.UniversalCommandSender;
 import net.md_5.bungee.api.CommandSender;

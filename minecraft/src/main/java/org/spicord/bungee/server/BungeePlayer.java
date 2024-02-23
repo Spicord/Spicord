@@ -1,4 +1,4 @@
-package org.spicord.player;
+package org.spicord.bungee.server;
 
 import eu.mcdb.universal.player.UniversalPlayer;
 import net.md_5.bungee.api.chat.TextComponent;

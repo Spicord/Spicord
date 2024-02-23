@@ -1,24 +1,26 @@
-package org.spicord.player;
+package org.spicord.velocity.server;
 
-import org.bukkit.entity.Player;
+import com.velocitypowered.api.proxy.Player;
+
 import eu.mcdb.universal.player.UniversalPlayer;
+import net.kyori.adventure.text.Component;
 
-public class BukkitPlayer extends UniversalPlayer {
+public class VelocityPlayer extends UniversalPlayer {
 
     private final Player player;
 
-    public BukkitPlayer(Player player) {
-        super(player.getName(), player.getUniqueId());
+    public VelocityPlayer(Player player) {
+        super(player.getUsername(), player.getUniqueId());
         this.player = player;
     }
 
     @Override
     public Object getHandle() {
-        return getBukkitPlayer();
+        return getVelocityPlayer();
     }
 
     @Override
-    public Player getBukkitPlayer() {
+    public Player getVelocityPlayer() {
         return player;
     }
 
@@ -32,11 +34,11 @@ public class BukkitPlayer extends UniversalPlayer {
 
     @Override
     public void sendMessage(String message) {
-        player.sendMessage(message);
+        player.sendMessage(Component.text(message));
     }
 
     @Override
     public boolean isOnline() {
-        return player.isOnline();
+        return player.isActive();
     }
 }
