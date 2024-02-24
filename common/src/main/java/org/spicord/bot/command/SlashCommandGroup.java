@@ -27,7 +27,7 @@ public class SlashCommandGroup {
     public SubcommandGroupData buildGroup() {
         SubcommandGroupData data = new SubcommandGroupData(name, description);
         for (SlashCommand subcommand : subcommands) {
-            data.addSubcommands(subcommand.buildAsSubcommand());
+            data.addSubcommands(subcommand.toJdaSubcommand());
         }
         return data;
     }

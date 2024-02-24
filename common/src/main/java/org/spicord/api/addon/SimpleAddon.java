@@ -17,10 +17,16 @@
 
 package org.spicord.api.addon;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Logger;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.spicord.Spicord;
 import org.spicord.bot.DiscordBot;
 import org.spicord.bot.command.DiscordBotCommand;
@@ -30,8 +36,8 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 
 public abstract class SimpleAddon {
 
-    private final String name;
     private final String id;
+    private final String name;
     private final String author;
     private final String version;
     private final String[] commands;
@@ -44,6 +50,28 @@ public abstract class SimpleAddon {
     private File dataFolder;
     private Logger logger;
 
+    /**
+     * Argument-less constructor, you should add the {@link Addon} annotation to your class. 
+     */
+    public SimpleAddon() {
+        final Class<? extends SimpleAddon> thisClass = getClass();
+
+        if (thisClass.isAnnotationPresent(Addon.class)) {
+            final Addon addon = thisClass.getAnnotation(Addon.class);
+
+            this.id = checkNotNull(addon.id());
+            this.name = checkNotNull(addon.name());
+            this.author = String.join(", ", checkNotNull(addon.authors()));
+            this.version = checkNotNull(addon.version());
+            this.commands = new String[0];
+        } else {
+            throw new IllegalStateException(thisClass + " is missing the @Addon annotation");
+        }
+    }
+
+    /**
+     * For internal use only.
+     */
     public final void initFields(Spicord spicord, File file, File dataFolder, Logger logger) {
         this.spicord = spicord;
         this.file = file;
@@ -103,9 +131,19 @@ public abstract class SimpleAddon {
         this.commands = commands;
     }
 
+    /**
+     * This method will be called when this addon gets registered to Spicord.
+     * 
+     * @param spicord the Spicord instance
+     */
     public void onRegister(Spicord spicord) {
     }
 
+    /**
+     * This method will be called when this addon gets unregistered from Spicord.
+     * 
+     * @param spicord the Spicord instance
+     */
     public void onUnregister(Spicord spicord) {
     }
 
@@ -115,6 +153,15 @@ public abstract class SimpleAddon {
      * @param bot the bot, may not be started yet
      */
     public void onLoad(DiscordBot bot) {
+    }
+
+    /**
+     * This method will be called when a bot unloads this addon.
+     * This means you should stop interacting with this bot.
+     * 
+     * @param bot the bot
+     */
+    public void onUnload(DiscordBot bot) {
     }
 
     /**
@@ -177,18 +224,38 @@ public abstract class SimpleAddon {
         return this instanceof JavaScriptAddon;
     }
 
+    /**
+     * Get this addon name.
+     * 
+     * @return the addon name
+     */
     public final String getName() {
         return name;
     }
 
+    /**
+     * Get this addon id.
+     * 
+     * @return the addon id
+     */
     public final String getId() {
         return id;
     }
 
+    /**
+     * Get this addon author.
+     * 
+     * @return the addon author
+     */
     public final String getAuthor() {
         return author;
     }
 
+    /**
+     * Get this addon version.
+     * 
+     * @return the addon version
+     */
     public final String getVersion() {
         return version;
     }
@@ -198,22 +265,52 @@ public abstract class SimpleAddon {
         return commands;
     }
 
+    /**
+     * Get the Spicord instance.
+     * 
+     * @return the Spicord instance
+     */
     public final Spicord getSpicord() {
         return spicord;
     }
 
+    /**
+     * Get the file (usually .jar) that this addon was loaded from.
+     * 
+     * @return the addon file
+     */
+    @Nullable
     public final File getFile() {
         return file;
     }
 
+    /**
+     * Get the folder that this addon can use to store configuration files.
+     * 
+     * @return the addon data folder
+     */
+    @Nullable
     public final File getDataFolder() {
         return dataFolder;
     }
 
+    /**
+     * Get the logger for this addon.
+     * 
+     * @return the logger instance
+     */
+    @Nullable
     public final Logger getLogger() {
         return logger;
     }
 
+    /**
+     * Get the required gateway intents by this addon.
+     * Developers should override this method to enable certain features.
+     * 
+     * @return the gateway intents
+     */
+    @Nonnull
     public Collection<GatewayIntent> getRequiredIntents() {
         return Collections.emptySet();
     }

@@ -114,6 +114,37 @@ public final class SpicordConfiguration {
         }
     }
 
+    public class ConfigurationManager {
+
+        private final SpicordConfig conf;
+
+        public ConfigurationManager(SpicordConfig conf) {
+            this.conf = conf;
+        }
+
+        public void addAddonToBot(String addonKey, String botName) {
+            for (SpicordConfig.Bot b : conf.getBots()) {
+                if (b.getName().equals(botName)) {
+                    b.getAddons().add(addonKey);
+                    save();
+                    return;
+                }
+            }
+        }
+
+        public void removeAddonFromBot(String addonKey, String botName) {
+            for (SpicordConfig.Bot b : conf.getBots()) {
+                if (b.getName().equals(botName)) {
+                    b.getAddons().remove(addonKey);
+                    save();
+                    return;
+                }
+            }
+        }
+    }
+
+    // UTILITY METHODS BELOW THIS LINE --
+
     /*
      * This adds the comment at the top of the file and
      * fixes the toml indentation bug for some values
@@ -178,34 +209,5 @@ public final class SpicordConfiguration {
             builder.append(string);
 
         return builder.toString();
-    }
-
-    public class ConfigurationManager {
-
-        private final SpicordConfig conf;
-
-        public ConfigurationManager(SpicordConfig conf) {
-            this.conf = conf;
-        }
-
-        public void addAddonToBot(String addonKey, String botName) {
-            for (SpicordConfig.Bot b : conf.getBots()) {
-                if (b.getName().equals(botName)) {
-                    b.getAddons().add(addonKey);
-                    save();
-                    return;
-                }
-            }
-        }
-
-        public void removeAddonFromBot(String addonKey, String botName) {
-            for (SpicordConfig.Bot b : conf.getBots()) {
-                if (b.getName().equals(botName)) {
-                    b.getAddons().remove(addonKey);
-                    save();
-                    return;
-                }
-            }
-        }
     }
 }

@@ -21,7 +21,7 @@ public class SlashCommandOption {
         this.autoComplete = autoComplete;
     }
 
-    public OptionData buildOption() {
+    public OptionData toJdaOption() {
         return new OptionData(type, name, description, required, autoComplete);
     }
 }

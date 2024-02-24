@@ -231,12 +231,6 @@ public class DiscordBot extends SimpleBot {
         return false;
     }
 
-    public <T extends SimpleAddon> void unloadAddon(T addonInstance) {
-        unregisterCommands(addonInstance.getCommands());
-        loadedAddons.remove(addonInstance);
-        addonInstance.onDisable();
-    }
-
     private void onReady(ReadyEvent event) {
         this.botId = jda.getSelfUser().getIdLong();
         for (SimpleAddon addon : loadedAddons) {
@@ -249,7 +243,7 @@ public class DiscordBot extends SimpleBot {
     }
 
     /**
-     * Add an event listener to this bot.
+     * Register a JDA event listener.
      * 
      * @param listener the event listener
      */
@@ -260,60 +254,60 @@ public class DiscordBot extends SimpleBot {
     private Map<Long, Map<String, SlashCommandHandler>> commandHandlers = new HashMap<>();
 
     /**
-     * Creates a new SlashCommandBuilder.
+     * Create a new SlashCommand instance.
      * It has to be later registered with the registerCommand() method.
-     * The command could be used globally after its registration.
+     * The command will only be available after its registration.
      * 
      * @param name the command name
      * @param description the command description
-     * @return the builder instance
+     * @return the command instance
      */
     public SlashCommand commandBuilder(String name, String description) {
         return new SlashCommand(name, description);
     }
 
     /**
-     * Builds and register the given slash command to the specified guild.
+     * Register the given SlashCommand to the specified Guild.
      * 
-     * @param builder the command builder
+     * @param command the command
      * @param guild the guild
      */
-    public void registerCommand(SlashCommand builder, Guild guild) {
-        CommandCreateAction createAction = guild.upsertCommand(builder.getName(), builder.getDescription());
-        registerCommand(builder, createAction);
+    public void registerCommand(SlashCommand command, Guild guild) {
+        CommandCreateAction createAction = guild.upsertCommand(command.getName(), command.getDescription());
+        registerCommand(command, createAction);
     }
 
     /**
-     * Builds and register the given slash command.
+     * Register the given SlashCommand globally.
      * 
-     * @param builder the command builder
+     * @param command the command
      */
-    public void registerCommand(SlashCommand builder) {
-        CommandCreateAction createAction = jda.upsertCommand(builder.getName(), builder.getDescription());
-        registerCommand(builder, createAction);
+    public void registerCommand(SlashCommand command) {
+        CommandCreateAction createAction = jda.upsertCommand(command.getName(), command.getDescription());
+        registerCommand(command, createAction);
     }
 
-    private void registerCommand(SlashCommand builder, CommandCreateAction createAction) {
+    private void registerCommand(SlashCommand command, CommandCreateAction createAction) {
         Map<String, SlashCommandHandler> handlers = new LinkedHashMap<>();
 
-        if (builder.isSingle()) {
+        if (command.isSingle()) {
             final SlashCommandHandler handler = new SlashCommandHandler(
-                builder.getExecutor(),
-                builder.getCompleter()
+                command.getExecutor(),
+                command.getCompleter()
             );
-            handlers.put(builder.getName(), handler);
+            handlers.put(command.getName(), handler);
         } else {
-            for (SlashCommandOption option : builder.getOptions()) {
-                createAction.addOptions(option.buildOption());
+            for (SlashCommandOption option : command.getOptions()) {
+                createAction.addOptions(option.toJdaOption());
             }
 
-            for (SlashCommandGroup subcommandGroup : builder.getSubcommandGroups()) {
+            for (SlashCommandGroup subcommandGroup : command.getSubcommandGroups()) {
                 createAction.addSubcommandGroups(subcommandGroup.buildGroup());
 
                 for (SlashCommand subcommand : subcommandGroup.getSubcommands()) {
                     final String id = String.format(
                         "%s %s %s",
-                        builder.getName(),
+                        command.getName(),
                         subcommandGroup.getName(),
                         subcommand.getName()
                     );
@@ -325,12 +319,12 @@ public class DiscordBot extends SimpleBot {
                 }
             }
 
-            for (SlashCommand subcommand : builder.getSubcommands()) {
-                createAction.addSubcommands(subcommand.buildAsSubcommand());
+            for (SlashCommand subcommand : command.getSubcommands()) {
+                createAction.addSubcommands(subcommand.toJdaSubcommand());
 
                 final String id = String.format(
                     "%s %s",
-                    builder.getName(),
+                    command.getName(),
                     subcommand.getName()
                 );
                 final SlashCommandHandler handler = new SlashCommandHandler(
@@ -345,9 +339,9 @@ public class DiscordBot extends SimpleBot {
         createAction.setGuildOnly(createAction.isGuildOnly());
         createAction.setDefaultPermissions(createAction.getDefaultPermissions());
 
-        createAction.submit().thenAccept(command -> {
-            commandHandlers.put(command.getIdLong(), handlers);
-            spicord.debug("Registered discord command /" + command.getName());
+        createAction.submit().thenAccept(jdaCommand -> {
+            commandHandlers.put(jdaCommand.getIdLong(), handlers);
+            spicord.debug("Registered discord command /" + jdaCommand.getName());
         });
     }
 
@@ -425,17 +419,30 @@ public class DiscordBot extends SimpleBot {
     }
 
     /**
-     * Load an addon to this bot.
+     * Load the given addon to this bot.
      * 
      * @param addon the addon to be loaded
      */
     public void loadAddon(SimpleAddon addon) {
-        loadedAddons.add(addon);
-        addon.onLoad(this);
+        if (loadedAddons.add(addon)) {
+            addon.onLoad(this);
+        }
     }
 
     /**
-     * Check if the bot is enabled.
+     * Unload the given addon from this bot.
+     * 
+     * @param addon the addon to unload
+     */
+    public <T extends SimpleAddon> void unloadAddon(T addon) {
+        if (loadedAddons.remove(addon)) {
+            unregisterCommands(addon.getCommands());
+            addon.onUnload(this);
+        }
+    }
+
+    /**
+     * Check if this bot is enabled.
      * 
      * @see #isDisabled()
      * @return true if the bot is enabled
@@ -445,7 +452,7 @@ public class DiscordBot extends SimpleBot {
     }
 
     /**
-     * Check if the bot is disabled.
+     * Check if this bot is disabled.
      * 
      * @see #isEnabled()
      * @return true if the bot is disabled
@@ -455,16 +462,18 @@ public class DiscordBot extends SimpleBot {
     }
 
     /**
-     * Check if the bot is running.
+     * Check if this bot instance is connected to the
+     * Discord gateway and is ready to perform operations.
      * 
-     * @return true if the bot is running
+     * @return true if the bot is ready
      */
     public boolean isReady() {
         return status == BotStatus.READY;
     }
 
     /**
-     * Check if this bot is connected to the Discord gateway.
+     * Check if this bot instance is connected to the
+     * Discord gateway.
      * 
      * @return true if the bot is connected
      */
@@ -498,6 +507,9 @@ public class DiscordBot extends SimpleBot {
         loadedAddons.clear();
     }
 
+    /**
+     * Represents the current status of the bot.
+     */
     public enum BotStatus {
         READY("Ready"),
         OFFLINE("Offline"),
@@ -511,12 +523,19 @@ public class DiscordBot extends SimpleBot {
             this.value = value;
         }
 
+        /**
+         * Get the friendly name for this status.
+         */
         @Override
         public String toString() {
             return value;
         }
     }
 
+    /**
+     * Get the JDA Status, can be any value from {@link JDA.Status}
+     * @return
+     */
     public String getJdaStatus() {
         if (jda != null) {
             return jda.getStatus().name();
@@ -524,43 +543,89 @@ public class DiscordBot extends SimpleBot {
         return "-";
     }
 
+    /**
+     * This class provides utility methods to modify the bot presence status.
+     */
     public class Presence {
-        public void setPlaying(String name) {
-            jda.getPresence().setActivity(Activity.of(ActivityType.PLAYING, name));
+
+        /**
+         * Set the bot "Playing" status.
+         * 
+         * @param value the value to show next to it
+         */
+        public void setPlaying(String value) {
+            jda.getPresence().setActivity(Activity.of(ActivityType.PLAYING, value));
         }
 
-        public void setListening(String name) {
-            jda.getPresence().setActivity(Activity.of(ActivityType.LISTENING, name));
+        /**
+         * Set the bot "Listening" status.
+         * 
+         * @param value the value to show next to it
+         */
+        public void setListening(String value) {
+            jda.getPresence().setActivity(Activity.of(ActivityType.LISTENING, value));
         }
 
-        public void setStreaming(String name) {
-            jda.getPresence().setActivity(Activity.of(ActivityType.STREAMING, name));
+        /**
+         * Set the bot "Streaming" status.
+         * 
+         * @param value the value to show next to it
+         */
+        public void setStreaming(String value) {
+            jda.getPresence().setActivity(Activity.of(ActivityType.STREAMING, value));
         }
 
-        public void setWatching(String name) {
-            jda.getPresence().setActivity(Activity.of(ActivityType.WATCHING, name));
+        /**
+         * Set the bot "Watching" status.
+         * 
+         * @param value the value to show next to it
+         */
+        public void setWatching(String value) {
+            jda.getPresence().setActivity(Activity.of(ActivityType.WATCHING, value));
         }
 
-        public void setCompeting(String name) {
-            jda.getPresence().setActivity(Activity.of(ActivityType.COMPETING, name));
+        /**
+         * Set the bot "Competing" status.
+         * 
+         * @param value the value to show next to it
+         */
+        public void setCompeting(String value) {
+            jda.getPresence().setActivity(Activity.of(ActivityType.COMPETING, value));
         }
 
-        public void setCustom(String name) {
-            jda.getPresence().setActivity(Activity.of(ActivityType.CUSTOM_STATUS, name));
+        /**
+         * Set the bot custom status.
+         * 
+         * @param value the value to set
+         */
+        public void setCustom(String value) {
+            jda.getPresence().setActivity(Activity.of(ActivityType.CUSTOM_STATUS, value));
         }
 
+        /**
+         * Set the bot online status to DND (red circle)
+         */
         public void setDoNotDisturb() {
             jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
         }
 
+        /**
+         * Set the bot online status to Idle (yellow circle)
+         */
         public void setIdle() {
             jda.getPresence().setStatus(OnlineStatus.IDLE);
         }
 
+        /**
+         * Set the bot online status to Invisible (gray circle)
+         */
         public void setInvisible() {
             jda.getPresence().setStatus(OnlineStatus.INVISIBLE);
         }
 
+        /**
+         * Set the bot online status to Online (green circle)
+         */
         public void setOnline() {
             jda.getPresence().setStatus(OnlineStatus.ONLINE);
         }

@@ -143,6 +143,11 @@ public final class SpicordLoader {
     private static final List<EventHandler<Spicord>> startupListeners = new ArrayList<>();
     private static SpicordLoader self; { self = this; }
 
+    /**
+     * Add a new startup listener.
+     * 
+     * @param listener the listener instance
+     */
     public static void addStartupListener(EventHandler<Spicord> listener) {
         if (self == null) {
             throw new IllegalStateException("Called too early");
