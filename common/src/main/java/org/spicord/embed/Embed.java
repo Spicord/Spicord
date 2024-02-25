@@ -459,6 +459,10 @@ public class Embed implements Serializable {
         return EmbedSender.prepare(channel, this).complete();
     }
 
+    public void sendToChannelAsync(GuildMessageChannel channel) {
+        EmbedSender.prepare(channel, this).queue();
+    }
+
     public Webhook toWebhook() {
         return Webhook.fromEmbed(this);
     }
