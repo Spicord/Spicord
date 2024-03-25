@@ -37,14 +37,14 @@
 ```xml
 <!-- for Spicord -->
 <repository>
-    <id>jitpack.io</id>
-    <url>https://jitpack.io</url>
+    <id>spicord-repo</id>
+    <url>https://repo.spicord.org/</url>
 </repository>
 
 <dependency>
-    <groupId>com.github.Spicord.Spicord</groupId>
+    <groupId>org.spicord</groupId>
     <artifactId>spicord-common</artifactId>
-    <version>v5-SNAPSHOT</version>
+    <version>5.3.1</version>
     <scope>provided</scope>
 </dependency>
 ```
@@ -54,7 +54,7 @@
 <dependency>
     <groupId>net.dv8tion</groupId>
     <artifactId>JDA</artifactId>
-    <version>5.0.0-beta.4</version>
+    <version>5.0.0-beta.16</version>
     <scope>provided</scope>
 </dependency>
 ```
