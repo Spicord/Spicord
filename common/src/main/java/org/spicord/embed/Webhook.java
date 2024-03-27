@@ -6,6 +6,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
+import org.spicord.embed.Embed.Author;
+import org.spicord.embed.Embed.EmbedData;
+
 import com.google.gson.annotations.SerializedName;
 
 public class Webhook {
@@ -56,15 +59,37 @@ public class Webhook {
         return toJson();
     }
 
+    public void setUserFromEmbedData() {
+        for (int i = 0; i < embeds.length; i++) {
+            EmbedData data = embeds[i];
+
+            if (data.hasAuthor()) {
+                Author author = data.getAuthor();
+                data.removeAuthor();
+
+                this.username = author.getName();
+                this.avatarUrl = author.getIconUrl();
+
+                return;
+            }
+        }
+    }
+
     public Embed toEmbed() {
         return Embed.fromWebhook(this);
     }
 
     public static Webhook fromEmbed(Embed embed) {
         if (embed.hasEmbedData()) {
-            return new Webhook(embed.getContent(), new Embed.EmbedData[] { embed.getEmbedData() });
+            final Webhook wh = new Webhook(
+                embed.getContent(),
+                new Embed.EmbedData[] { embed.getEmbedData() }
+            );
+            wh.setUserFromEmbedData();
+            return wh;
+        } else {
+            return new Webhook(embed.getContent(), null);
         }
-        return new Webhook(embed.getContent(), null);
     }
 
     public void sendTo(String webhookUrl) throws IOException {

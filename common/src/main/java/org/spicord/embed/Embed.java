@@ -211,6 +211,10 @@ public class Embed implements Serializable {
         public Field[] getFields() {
             return fields;
         }
+
+        public void removeAuthor() {
+            author = null;
+        }
     }
 
     public class Footer implements Serializable {
@@ -470,7 +474,7 @@ public class Embed implements Serializable {
     public static Embed fromWebhook(Webhook webhook) {
         Embed embed = new Embed();
         embed.content = webhook.getContent();
-        if (webhook.getEmbeds().length > 0) {
+        if (webhook.getEmbeds() != null && webhook.getEmbeds().length > 0) {
             embed.embed = webhook.getEmbeds()[0];
         } else {
             embed.embed = new EmbedData();
