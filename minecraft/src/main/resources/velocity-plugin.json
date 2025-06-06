@@ -1,0 +1,10 @@
+{
+    "id": "spicord",
+    "name": "Spicord",
+    "version": "${project.version}",
+    "authors": [
+        "Tini"
+    ],
+    "dependencies": [],
+    "main": "org.spicord.velocity.SpicordVelocity"
+}
