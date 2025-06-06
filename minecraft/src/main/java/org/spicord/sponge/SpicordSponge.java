@@ -32,12 +32,17 @@ public class SpicordSponge implements SpicordPlugin {
 
     private Runnable serverInstanceSetter;
 
+    private Logger logger;
+
     @Inject
     public SpicordSponge(
         @ConfigDir(sharedRoot = false) Path dataFolder,
         Game game,
-        PluginContainer container
+        PluginContainer container,
+        org.apache.logging.log4j.Logger log
     ) {
+        logger = new Log4JWrapper(log);
+        
         serverInstanceSetter = () -> Server.setInstance(new SpongeServer(game, container), ServerType.SPONGE);
 
         this.dataFolder = dataFolder.toFile();
@@ -76,7 +81,7 @@ public class SpicordSponge implements SpicordPlugin {
 
     @Override
     public Logger getLogger() {
-        return Logger.getLogger("spicord");
+        return this.logger;
     }
 
     @Override
