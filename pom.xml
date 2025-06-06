@@ -5,7 +5,7 @@
 
     <groupId>org.spicord</groupId>
     <artifactId>spicord</artifactId>
-    <version>5.7.0</version>
+    <version>5.7.1</version>
     <packaging>pom</packaging>
 
     <name>Spicord-Parent</name>
@@ -96,15 +96,17 @@
         <finalName>Spicord_${project.version}</finalName>
         <resources>
             <resource>
-                <directory>${basedir}/src/main/resources</directory>
+                <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>**.yml</include>
-                    <include>**.toml</include>
+                    <include>plugin.yml</include>
+                    <include>bungee.yml</include>
+                    <include>velocity-plugin.json</include>
+                    <include>config.toml</include>
                 </includes>
             </resource>
             <resource>
-                <directory>${basedir}/src/main/resources</directory>
+                <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
                     <include>sponge_plugins.json</include>
@@ -112,9 +114,9 @@
                 <targetPath>META-INF</targetPath>
             </resource>
             <resource>
-                <directory>${basedir}/src/main/resources</directory>
+                <directory>src/main/resources</directory>
                 <includes>
-                    <include>**.libinfo</include>
+                    <include>libraries.libinfo</include>
                 </includes>
             </resource>
         </resources>

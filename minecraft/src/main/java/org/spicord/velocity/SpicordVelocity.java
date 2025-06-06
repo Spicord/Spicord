@@ -30,13 +30,12 @@ import org.spicord.velocity.server.VelocityServer;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
-import com.velocitypowered.api.plugin.Plugin;
+import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.ProxyServer;
 
 import eu.mcdb.universal.Server;
 import eu.mcdb.universal.ServerType;
 
-@Plugin(id = "spicord", name = "Spicord", version = "5.7.0", authors = { "Tini" })
 public class SpicordVelocity extends VelocityPlugin implements SpicordPlugin {
 
     private SpicordLoader loader;
@@ -56,8 +55,8 @@ public class SpicordVelocity extends VelocityPlugin implements SpicordPlugin {
     }
 
     @Inject
-    public SpicordVelocity(ProxyServer server) {
-        super(server);
+    public SpicordVelocity(ProxyServer server, PluginContainer plugin) {
+        super(server, plugin);
 
         Server.setInstance(new VelocityServer(server, this), ServerType.VELOCITY);
 
