@@ -41,18 +41,19 @@ public class SpicordSponge implements SpicordPlugin {
         serverInstanceSetter = () -> Server.setInstance(new SpongeServer(game, container), ServerType.SPONGE);
 
         this.dataFolder = dataFolder.toFile();
-        this.loader = new SpicordLoader(new MostInefficientClassLoader(), this);
     }
 
     @Listener
     public void onLoadedGame(LoadedGameEvent event) {
-        if (this.loader != null) {
+        if (this.loader == null) {
             loadSpicord();
         }
     }
 
     private void loadSpicord() {
         serverInstanceSetter.run();
+
+        this.loader = new SpicordLoader(new MostInefficientClassLoader(), this);
 
         final int loadDelay = loader.getConfig().getLoadDelay();
 
