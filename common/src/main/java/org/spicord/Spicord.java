@@ -19,7 +19,7 @@ package org.spicord;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -38,6 +38,7 @@ import org.spicord.bot.DiscordBotLoader;
 import org.spicord.config.SpicordConfiguration;
 import org.spicord.event.EventHandler;
 import org.spicord.event.SpicordEvent;
+import org.spicord.util.JDALoggerFactory;
 
 import eu.mcdb.universal.Server;
 import eu.mcdb.universal.ServerType;
@@ -105,11 +106,24 @@ public final class Spicord {
 
         if (config.isJdaMessagesEnabled()) {
             try {
-                Class<?> cls = Class.forName("org.spicord.log.SpicordLogger", false, Spicord.class.getClassLoader());
-                Method init = cls.getMethod("setLogger", Logger.class);
-                init.invoke(null, logger);
+                Class<?> cls = Class.forName(
+                    "net.dv8tion.jda.internal.utils.JDALogger",
+                    true,
+                    Spicord.class.getClassLoader()
+                );
+
+                // Enable Fallback Logger
+                cls.getMethod("setFallbackLoggerEnabled", boolean.class).invoke(null, true);
+
+                // Replace LOGS Map
+                Field logsField = cls.getDeclaredField("LOGS");
+                setStaticFinal(logsField, new JDALoggerFactory(this));
+
             } catch (Exception e) {
                 logger.warning("Failed to enable JDA messages: " + e.getMessage());
+                if (config.isDebugEnabled()) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -125,6 +139,18 @@ public final class Spicord {
 
         getLogger().info("Starting the bots...");
         config.getBots().forEach(DiscordBotLoader::startBot);
+    }
+
+    @SuppressWarnings("all")
+    private void setStaticFinal(Field field, Object value) throws Exception {
+        final Field unsafeField = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
+        unsafeField.setAccessible(true);
+        sun.misc.Unsafe unsafe = (sun.misc.Unsafe) unsafeField.get(null);
+
+        Object fieldBase = unsafe.staticFieldBase(field);
+        long fieldOffset = unsafe.staticFieldOffset(field);
+
+        unsafe.putObject(fieldBase, fieldOffset, value);
     }
 
     private void registerIntegratedAddons() {
