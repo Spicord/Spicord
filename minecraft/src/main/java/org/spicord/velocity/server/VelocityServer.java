@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -33,12 +32,9 @@ public class VelocityServer extends Server {
     private final ProxyServer server;
     private final Object plugin;
 
-    private VelocityServerScheduler scheduler;
-
     public VelocityServer(ProxyServer server, Object plugin) {
         this.server = server;
         this.plugin = plugin;
-        this.scheduler = new VelocityServerScheduler(server, plugin);
     }
 
     @Override
@@ -143,10 +139,5 @@ public class VelocityServer extends Server {
     @Override
     public void registerCommand(Object plugin, UniversalCommand command) {
         VelocityCommandExecutor.register(plugin, command);
-    }
-
-    @Override
-    public ScheduledExecutorService getScheduler() {
-        return scheduler;
     }
 }

@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Logger;
 
@@ -32,8 +31,6 @@ import org.spicord.util.JarClassLoader;
 import org.spicord.util.UpdateNotifier;
 
 import com.google.common.base.Preconditions;
-
-import eu.mcdb.universal.Server;
 
 public final class SpicordLoader {
 
@@ -61,25 +58,7 @@ public final class SpicordLoader {
     public SpicordLoader(JarClassLoader classLoader, SpicordPlugin plugin) {
         Preconditions.checkNotNull(plugin);
 
-        final int availableProcessors = Runtime.getRuntime().availableProcessors();
-
-        final boolean isJava17 = isJava17OrGreater();
-
-        final boolean useTestScheduler = isJava17 || availableProcessors < 2;
-
-        if (useTestScheduler) {
-            plugin.getLogger().info("Using test scheduler");
-
-            this.threadPool = Server.getInstance().getScheduler();
-        } else
-
-        if (availableProcessors > 1) {
-            int poolSize = availableProcessors * 2;
-
-            this.threadPool = Executors.newScheduledThreadPool(poolSize);
-        } else {
-            this.threadPool = Executors.newScheduledThreadPool(2);
-        }
+        this.threadPool = SpicordScheduler.getDefaultScheduler();
 
         this.plugin = plugin;
 
@@ -101,17 +80,6 @@ public final class SpicordLoader {
         } catch (IOException e) {
             handleException(e);
         }
-    }
-
-    private boolean isJava17OrGreater() {
-        final String javaVersionString = System.getProperty("java.version");
-        try {
-            String major = javaVersionString.split("\\.", 2)[0];
-            return Integer.parseInt(major) >= 17;
-        } catch (Exception e) {
-            new IllegalArgumentException("Failed to parse java version: " + javaVersionString, e).printStackTrace();
-        }
-        return false;
     }
 
     public void load() {

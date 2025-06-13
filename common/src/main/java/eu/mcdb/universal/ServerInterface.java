@@ -154,5 +154,4 @@ public interface ServerInterface {
 
     void registerCommand(Object plugin, UniversalCommand command);
 
-    ScheduledExecutorService getScheduler();
 }

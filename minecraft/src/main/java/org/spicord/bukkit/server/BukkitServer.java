@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -35,12 +34,10 @@ public class BukkitServer extends eu.mcdb.universal.Server {
 
     private final Server server;
     private final Plugin plugin;
-    private BukkitServerScheduler scheduler;
 
     public BukkitServer(Server server, JavaPlugin plugin) {
         this.server = server;
         this.plugin = plugin;
-        this.scheduler = new BukkitServerScheduler(plugin);
     }
 
     @Override
@@ -150,10 +147,5 @@ public class BukkitServer extends eu.mcdb.universal.Server {
     @Override
     public void registerCommand(Object plugin, UniversalCommand command) {
         BukkitCommandExecutor.register((JavaPlugin) plugin, command);
-    }
-
-    @Override
-    public ScheduledExecutorService getScheduler() {
-        return scheduler;
     }
 }
