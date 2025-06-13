@@ -9,12 +9,10 @@ import org.apache.logging.log4j.Logger;
 
 public class Log4JWrapper extends java.util.logging.Logger {
 
-    private final Logger logger;
     private final Map<Level, MessageLogger> levelToLoggerMap = new HashMap<>();
 
     protected Log4JWrapper(Logger logger) {
-        super(null,null);
-        this.logger = logger;
+        super(null, null);
 
         levelToLoggerMap.put(Level.ALL, logger::info);
         levelToLoggerMap.put(Level.CONFIG, logger::debug);

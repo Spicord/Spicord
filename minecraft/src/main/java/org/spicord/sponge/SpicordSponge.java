@@ -42,7 +42,7 @@ public class SpicordSponge implements SpicordPlugin {
         org.apache.logging.log4j.Logger log
     ) {
         logger = new Log4JWrapper(log);
-        
+
         serverInstanceSetter = () -> Server.setInstance(new SpongeServer(game, container), ServerType.SPONGE);
 
         this.dataFolder = dataFolder.toFile();
@@ -58,7 +58,7 @@ public class SpicordSponge implements SpicordPlugin {
     private void loadSpicord() {
         serverInstanceSetter.run();
 
-        this.loader = new SpicordLoader(new MostInefficientClassLoader(), this);
+        this.loader = new SpicordLoader(new CustomClassLoader(), this);
 
         final int loadDelay = loader.getConfig().getLoadDelay();
 
