@@ -167,17 +167,14 @@ public final class SpicordLoader {
      * @param listener the listener instance
      */
     public static void addStartupListener(EventHandler<Spicord> listener) {
-        if (self == null) {
-            throw new IllegalStateException("Called too early");
-        }
-
         if (
+            self != null &&
             self.spicord != null &&
             self.spicord.getConfig() != null
         ) {
             listener.handle(self.spicord);
+        } else {
+            startupListeners.add(listener);
         }
-
-        startupListeners.add(listener);
     }
 }
