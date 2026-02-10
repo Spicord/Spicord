@@ -11,7 +11,6 @@
     <name>Spicord-Parent</name>
 
     <modules>
-        <module>cli</module>
         <module>common</module>
         <module>reflect</module>
         <module>minecraft</module>
@@ -28,7 +27,7 @@
         </repository>
         <repository>
             <id>velocity-repo</id>
-            <url>https://repo.velocitypowered.com/snapshots/</url>
+            <url>https://repo.papermc.io/snapshots/</url>
         </repository>
         <repository>
             <id>sponge-repo</id>
@@ -75,7 +74,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.5.1</version>
+            <version>6.3.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

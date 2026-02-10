@@ -59,7 +59,6 @@ import net.dv8tion.jda.api.entities.SelfUser;
 import net.dv8tion.jda.api.entities.TeamMember;
 import net.dv8tion.jda.api.entities.TeamMember.MembershipState;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.StatusChangeEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -360,7 +359,7 @@ public class DiscordBot extends SimpleBot {
         }
 
         createAction.setNSFW(createAction.isNSFW());
-        createAction.setGuildOnly(createAction.isGuildOnly());
+        createAction.setContexts(createAction.getContexts());
         createAction.setDefaultPermissions(createAction.getDefaultPermissions());
 
         createAction.submit().thenAccept(jdaCommand -> {
