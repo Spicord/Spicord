@@ -44,7 +44,7 @@
 <dependency>
     <groupId>org.spicord</groupId>
     <artifactId>spicord-common</artifactId>
-    <version>5.4.0</version>
+    <version>5.8.0</version>
     <scope>provided</scope>
 </dependency>
 ```
@@ -54,7 +54,7 @@
 <dependency>
     <groupId>net.dv8tion</groupId>
     <artifactId>JDA</artifactId>
-    <version>5.0.0-beta.16</version>
+    <version>6.3.0</version>
     <scope>provided</scope>
 </dependency>
 ```
