@@ -11,7 +11,7 @@ import java.util.Map;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
-@SuppressWarnings({"serial", "unchecked"})
+@SuppressWarnings("unchecked")
 class SnakeYamlConfiguration extends YamlConfiguration {
 
     private final File file;

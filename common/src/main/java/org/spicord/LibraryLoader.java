@@ -22,13 +22,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
+import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.logging.Logger;
 import org.spicord.util.JarClassLoader;
 import org.spicord.util.SpicordClassLoader;
+
+import com.google.gson.Gson;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -42,7 +44,7 @@ public class LibraryLoader {
 
     @Getter @Setter private static boolean forceLoad;
 
-    public LibraryLoader(JarClassLoader loader, String libinfo, Logger logger, File dataFolder) {
+    public LibraryLoader(JarClassLoader loader, Logger logger, File dataFolder) {
         this.loader = loader;
         this.logger = logger;
         this.libFolder = new File(dataFolder, "lib");
@@ -53,10 +55,11 @@ public class LibraryLoader {
         if (!libFolder.isDirectory())
             throw new IllegalStateException("File 'lib' must be a directory.");
 
-        try (final InputStream in = LibraryLoader.class.getResourceAsStream(libinfo);
-                final ObjectInputStream ois = new ObjectInputStream(in)) {
-
-            this.libraries = (Library[]) ois.readObject();
+        try (final InputStream in = LibraryLoader.class.getResourceAsStream("/libraries.json")) {
+            this.libraries = new Gson().fromJson(
+                new InputStreamReader(in),
+                Library[].class
+            );
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -66,7 +66,7 @@ public final class SpicordLoader {
         final File dataFolder = plugin.getDataFolder();
 
         this.logger = logger;
-        this.libraryLoader = new LibraryLoader(classLoader, "/libraries.libinfo", logger, dataFolder);
+        this.libraryLoader = new LibraryLoader(classLoader, logger, dataFolder);
 
         try {
             if (firstRun) {

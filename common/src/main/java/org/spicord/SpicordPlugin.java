@@ -8,4 +8,7 @@ public interface SpicordPlugin extends PluginInterface {
 
     Spicord getSpicord();
 
+    default Object getInstance() {
+        return this;
+    }
 }
