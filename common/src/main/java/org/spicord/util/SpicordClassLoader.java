@@ -17,6 +17,7 @@
 
 package org.spicord.util;
 
+import java.io.IOException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
@@ -25,16 +26,23 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
+import java.util.Enumeration;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class SpicordClassLoader implements JarClassLoader {
 
     private final MethodHandle addURL;
+    private final ClassLoader loader;
 
     public SpicordClassLoader() {
         this(SpicordClassLoader.class.getClassLoader());
     }
 
     public SpicordClassLoader(ClassLoader loader) {
+        this.loader = loader;
+
         try {
             addURL = getAddUrlMethod(loader);
         } catch (ReflectiveOperationException e) {
@@ -55,6 +63,29 @@ public class SpicordClassLoader implements JarClassLoader {
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
+
+        preloadClasses(file);
+    }
+
+    private void preloadClasses(Path path) {
+        try (ZipFile zip = new JarFile(path.toFile())) {
+            Enumeration<? extends ZipEntry> entries = zip.entries();
+
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = entries.nextElement();
+                String name = entry.getName();
+
+                if (name.endsWith(".class") && !name.startsWith("META-INF/")) {
+                    name = name.substring(0, name.length() - ".class".length());
+                    name = name.replace('/', '.');
+
+                    try {
+                        loader.loadClass(name);
+                    //} catch (NoClassDefFoundError|ClassNotFoundException e) {
+                    } catch (Throwable e) {}
+                }
+            }
+        } catch (IOException e) {}
     }
 
     public MethodHandle getAddUrlMethod(ClassLoader loader) throws ReflectiveOperationException {
