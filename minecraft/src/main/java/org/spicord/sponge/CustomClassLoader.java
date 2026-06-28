@@ -17,35 +17,31 @@ public class CustomClassLoader extends URLClassLoader implements JarClassLoader 
     public CustomClassLoader() {
         super(new URL[0], Gson.class.getClassLoader());
 
-        injectTo(CustomClassLoader.class.getClassLoader());
+        injectSelf();
     }
 
     @Override
     public void loadJar(Path path) {
+        final URL url;
         try {
-            super.addURL(path.toUri().toURL());
+            url = path.toUri().toURL();
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
+        super.addURL(url);
     }
 
-    private void injectTo(ClassLoader loader) {
-        Class<?> currentClass = loader.getClass();
-        Field allParentLoadersField = null;
+    private void injectSelf() {
+        ClassLoader loader = CustomClassLoader.class.getClassLoader();
 
-        do {
+        Field allParentLoadersField = getDeclaredField(
+            loader.getClass(),
+            "allParentLoaders"
+        );
 
-            if (!ClassLoader.class.isAssignableFrom(currentClass)) {
-                throw new RuntimeException("Unable to find 'allParentLoaders' field");
-            }
-
-            try {
-                allParentLoadersField = currentClass.getDeclaredField("allParentLoaders");
-            } catch (Exception e) {
-                currentClass = currentClass.getSuperclass();
-            }
-
-        } while (allParentLoadersField == null);
+        if (allParentLoadersField == null) {
+            throw new RuntimeException("Field 'allParentLoaders' not found");
+        }
 
         try {
             allParentLoadersField.setAccessible(true);
@@ -61,5 +57,14 @@ public class CustomClassLoader extends URLClassLoader implements JarClassLoader 
         } catch (Exception e) {
             throw new RuntimeException("Failed to inject field", e);
         }
+    }
+
+    private Field getDeclaredField(Class<?> cls, String name) {
+        for (; cls != null; cls = cls.getSuperclass()) {
+            try {
+                return cls.getDeclaredField(name);
+            } catch (Exception e) {}
+        }
+        return null;
     }
 }
