@@ -3,7 +3,7 @@
         "name": "java_plain",
         "version": "1.0"
     },
-    "license": "AGPL-3.0",
+    "license": "LGPL-2.1",
     "plugins": [
         {
             "id": "spicord",
