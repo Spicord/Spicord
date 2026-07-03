@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -18,6 +19,7 @@ import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.EventListenerRegistration;
 import org.spongepowered.api.event.EventManager;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.plugin.PluginContainer;
 
 import eu.mcdb.universal.command.UniversalCommand;
@@ -78,12 +80,36 @@ public class SpongeServer extends eu.mcdb.universal.Server {
 
     @Override
     public boolean dispatchCommand(String command) {
-        try {
-            return server.commandManager().process(game.systemSubject(), command).isSuccess();
-        } catch (CommandException e) {
-            e.printStackTrace();
+        AtomicBoolean result = new AtomicBoolean(false);
+
+        synchronized (result) {
+
+            server.scheduler().submit(
+                Task.builder()
+                    .plugin(plugin)
+                    .execute(() -> dispatchCommandInMainThread(command, result))
+                    .build()
+            );
+
+            try {
+                result.wait();
+            } catch (InterruptedException e) {}
+
+            return result.get();
         }
-        return false;
+    }
+
+    private void dispatchCommandInMainThread(String command, AtomicBoolean result) {
+        try {
+            boolean val = server.commandManager().process(game.systemSubject(), command).isSuccess();
+            result.set(val);
+        } catch (CommandException e) {
+            new RuntimeException("Failed to run command: /" + command, e).printStackTrace();
+        } finally {
+            synchronized (result) {
+                result.notify();
+            }
+        }
     }
 
     @Override
